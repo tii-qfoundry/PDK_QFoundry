@@ -3,8 +3,6 @@
 #
 # It uses the KQcircuits library
 
-
-
 from kqcircuits.chips.chip import Chip
 
 from kqcircuits.defaults import default_layers, default_junction_type, default_mask_parameters, \
@@ -24,7 +22,31 @@ from kqcircuits.elements.finger_capacitor_square import FingerCapacitorSquare
 from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import FlipChipConnectorRf
 from kqcircuits.util.parameters import Param, pdt
 
-from starfish.defaults import default_sampleholders, default_marker_type
+from kqcircuits.defaults import default_sampleholders, default_marker_type
+
+qfoundry_connectors8 = {
+        "n": 8,
+        "launcher_type": "RF",
+        "launcher_width": 300,
+        "launcher_gap": 150,
+        "launcher_indent": 800,
+        "launcher_frame_gap": 180,
+        "pad_pitch": 1250,
+        "chip_box": pya.DBox(pya.DPoint(0, 0), pya.DPoint(6200, 6200))}
+qfoundry_connectors12 = {
+        "n": 12,
+        "launcher_type": "RF",
+        "launcher_width": 300,
+        "launcher_gap": 150,
+        "launcher_indent": 800,
+        "launcher_frame_gap": 180,
+        "pad_pitch": 1250,
+        "chip_box": pya.DBox(pya.DPoint(0, 0), pya.DPoint(6200, 6200))}
+        
+default_marker_type = 'QRC8'
+default_sampleholders['QRC8'] = qfoundry_connectors8
+default_sampleholders['QRC12'] = qfoundry_connectors12
+
 
 NAME_BRAND = "TII"
 NAME_MASK = "M001"
@@ -41,7 +63,7 @@ launcher_assignments12 = {1: "NW", 2: "N", 3: "NE",
                           10: "WS", 11: "W", 12: "WN"}
             
 class ChipFrancisco(Chip):
-    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", Sampleholder_name, choices=sampleholder_type_choices)
+    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
     
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
     name_chip = Param(pdt.TypeString, "Name of the chip", NAME_CHIP)

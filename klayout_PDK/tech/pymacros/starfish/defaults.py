@@ -1,4 +1,7 @@
+from pya import *
 
+from starfish.file1 import REF
+print(REF)
 from kqcircuits.defaults import default_sampleholders, default_marker_type
                                 
 
