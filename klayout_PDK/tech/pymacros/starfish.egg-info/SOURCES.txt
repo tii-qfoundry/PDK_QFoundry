@@ -1,0 +1,9 @@
+setup.py
+starfish/__init__.py
+starfish/_static_version.py
+starfish/_version.py
+starfish/defaults.py
+starfish.egg-info/PKG-INFO
+starfish.egg-info/SOURCES.txt
+starfish.egg-info/dependency_links.txt
+starfish.egg-info/top_level.txt

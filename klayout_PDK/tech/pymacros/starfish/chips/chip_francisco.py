@@ -3,7 +3,7 @@
 #
 # It uses the KQcircuits library
 
-
+from starfish.chips import defaults
 
 from kqcircuits.chips.chip import Chip
 
@@ -24,7 +24,7 @@ from kqcircuits.elements.finger_capacitor_square import FingerCapacitorSquare
 from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import FlipChipConnectorRf
 from kqcircuits.util.parameters import Param, pdt
 
-from starfish.defaults import default_sampleholders, default_marker_type
+from ..defaults import default_sampleholders, default_marker_type
 
 NAME_BRAND = "TII"
 NAME_MASK = "M001"
