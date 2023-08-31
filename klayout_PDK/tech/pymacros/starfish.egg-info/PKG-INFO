@@ -1,6 +1,0 @@
-Metadata-Version: 2.1
-Name: starfish
-Version: 0.0.0
-Summary: Starfish is a KLayout/Python-based superconducting quantum circuit PDK that works with KQcircuits, developed by TII.
-Author: TII-QRC
-Requires-Python: >=3.6.9

@@ -3,10 +3,23 @@
 #
 # It uses the KQcircuits library
 
-from starfish.chips import defaults
+
+# Need to import the 'starfish' module like this (maybe a KLayout limitation when code is in a technology definition)
+# This will import the outer files but not anything within folders
+import os, importlib, pathlib, sys
+
+module_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"..")
+lisdir = os.listdir(module_path)
+files = [f for f in lisdir if '.py' in pathlib.Path(f).suffixes and '__init__' not in f]
+
+importlib.invalidate_caches()
+for f in files:
+    module =f.replace('.py','')
+    m = importlib.import_module(module) 
+    importlib.reload(m)
+
 
 from kqcircuits.chips.chip import Chip
-
 from kqcircuits.defaults import default_layers, default_junction_type, default_mask_parameters, \
                                 default_bump_parameters
                                 
@@ -24,7 +37,7 @@ from kqcircuits.elements.finger_capacitor_square import FingerCapacitorSquare
 from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import FlipChipConnectorRf
 from kqcircuits.util.parameters import Param, pdt
 
-from ..defaults import default_sampleholders, default_marker_type
+from defaults import default_sampleholders, default_marker_type
 
 NAME_BRAND = "TII"
 NAME_MASK = "M001"
@@ -34,14 +47,9 @@ NAME_CHIP = "FS_1Q"
 
 
 sampleholder_type_choices = list(default_sampleholders.keys())
-launcher_assignments8 = {1: "NW", 2: "NE", 3: "EN", 4: "ES", 5: "SE", 6: "SW", 7: "WS", 8: "WN"}
-launcher_assignments12 = {1: "NW", 2: "N", 3: "NE",
-                          4: "ES", 5: "E", 6: "ES", 
-                          7: "SE", 8: "S", 9: "SW",
-                          10: "WS", 11: "W", 12: "WN"}
             
-class ChipFrancisco(Chip):
-    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", Sampleholder_name, choices=sampleholder_type_choices)
+class Chip_francisco(Chip):
+    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
     
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
     name_chip = Param(pdt.TypeString, "Name of the chip", NAME_CHIP)
@@ -136,18 +144,18 @@ class ChipFrancisco(Chip):
     
 
     def build(self):
-      self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], launcher_assignments=launcher_assignments12, enabled=None)
+      self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], launcher_assignments=default_launcher_assignement[self.sampleholder_type], enabled=None)
       print(self)
 
 
-class PCellLib(pya.Library):
-
-  def __init__(self):
-    self.description = "QFoundry library"
-    self.layout().register_pcell("Fransisco", ChipFrancisco())
-    self.register("QFoundry library")
+#class PCellLib(pya.Library):
+#
+ # def __init__(self):
+ #   self.description = "QFoundry library"
+ #   self.layout().register_pcell("Fransisco", Chip_francisco())
+ #   self.register("QFoundry library")
     
 # instantiate and register the library
-PCellLib()
+#PCellLib()
 
 
