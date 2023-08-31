@@ -7,14 +7,18 @@
 # This will import the outer files but not anything within folders
 import os, importlib, pathlib, sys
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+if dir_path not in sys.path:
+    sys.path.append(dir_path)
+    
 module_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"..")
 lisdir = os.listdir(module_path)
 files = [f for f in lisdir if '.py' in pathlib.Path(f).suffixes and '__init__' not in f]
 
 importlib.invalidate_caches()
 for f in files:
-    module =f.replace('.py','')
-    m = importlib.import_module(module) 
+    module = f.replace('.py','')
+    m = importlib.import_module(module)
     importlib.reload(m)
 
 from kqcircuits.chips.chip import Chip
@@ -36,7 +40,7 @@ from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import Flip
 from kqcircuits.util.parameters import Param, pdt
 
 
-from defaults import default_sampleholders, default_marker_type
+from defaults import default_sampleholders, default_marker_type, default_launcher_assignement, default_launcher_enabled
 
 
 NAME_BRAND = "TII"
@@ -50,11 +54,16 @@ sampleholder_type_choices = list(default_sampleholders.keys())
 
 class Chip_francisco(Chip):
     sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
-    
+  
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
-    name_chip = Param(pdt.TypeString, "Name of the chip", NAME_CHIP)
+    name_chip = Param(pdt.TypeString, "Name of the chip", "")
     name_copy = Param(pdt.TypeString, "Name of the copy", NAME_CHIP)
     name_brand = Param(pdt.TypeString, "Name of the brand", NAME_BRAND)
+    frames_marker_dist = Param(pdt.TypeList, "Marker distance from edge for each chip frame", [400, 1000], unit="[μm]")
+    frames_diagonal_squares = Param(pdt.TypeList, "Number of diagonal marker squares for each chip frame", [0, 0])
+    
+    
+    
     def nodes1():
       """ Node list specifying *the composite waveguide """
       return [
@@ -144,7 +153,10 @@ class Chip_francisco(Chip):
     
 
     def build(self):
-      self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], launcher_assignments=default_launcher_assignement[self.sampleholder_type], enabled=None)
+      self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], 
+        launcher_assignments=default_launcher_assignement[self.sampleholder_type], 
+        enabled = default_launcher_enabled[self.sampleholder_type])
+      print(default_launcher_enabled[self.sampleholder_type])
       print(self)
 
 
