@@ -4,7 +4,7 @@ QFoundry standard PDK for superconducting qbit fabrication.
 ## Installation
 
 ### KQcircuits
-This PDK works with the KQcircuits package, develloped by IQM(TM) at Aalto University. To use 
+This PDK works with the KQcircuits package, develloped by IQM at Aalto University. To use 
 Check the documentation in https://meetiqm.com/developers/kqcircuits/. KQcircuits is distributed using KLayout's Package Manager.
 - Open KLayout, then menu item Tools | Manage Packages
 - Install the 'KQcircuits' package
