@@ -108,6 +108,7 @@
    <source>133/1@1</source>
   </group-members>
  </properties>
+
  <properties>
   <expanded>false</expanded>
   <frame-color/>
@@ -648,6 +649,7 @@
    </group-members>
   </group-members>
  </properties>
+
  <properties>
   <expanded>true</expanded>
   <frame-color/>
@@ -864,7 +866,8 @@
    </group-members>
   </group-members>
  </properties>
- <name/>
+
+ 
  <custom-dither-pattern>
   <pattern>
    <line>..*...*...*...*...*...*...*...*</line>
@@ -878,6 +881,7 @@
   <order>5</order>
   <name>LINES_VIA</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>................................</line>
@@ -895,6 +899,7 @@
   <order>5</order>
   <name>LINES_TII</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>....**.*.................****...</line>
@@ -911,6 +916,7 @@
   <order>5</order>
   <name>EsclusionArea</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>................</line>
@@ -933,6 +939,7 @@
   <order>1</order>
   <name>LINES_H_BOLD</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>****************</line>
@@ -955,6 +962,7 @@
   <order>2</order>
   <name>FILLED</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>.*...*...*...*..</line>
@@ -977,6 +985,7 @@
   <order>3</order>
   <name>DOTS</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>*.......*.......</line>
@@ -999,6 +1008,7 @@
   <order>4</order>
   <name>LINES_DIAG_R</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>.*.*.*.*.*.*.*.*</line>
@@ -1021,6 +1031,7 @@
   <order>5</order>
   <name>LINES_V_DENSE</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>...*....*..*.....*......</line>
@@ -1031,6 +1042,7 @@
   <order>5</order>
   <name>LINES_VIA</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>**..</line>
@@ -1041,6 +1053,7 @@
   <order>6</order>
   <name>IM</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>.**.</line>
@@ -1051,6 +1064,7 @@
   <order>7</order>
   <name>IMP</name>
  </custom-dither-pattern>
+
  <custom-dither-pattern>
   <pattern>
    <line>..**</line>
@@ -1061,4 +1075,5 @@
   <order>8</order>
   <name>IMPP</name>
  </custom-dither-pattern>
+
 </layer-properties>
