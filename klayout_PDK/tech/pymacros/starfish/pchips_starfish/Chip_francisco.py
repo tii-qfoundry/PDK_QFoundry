@@ -3,7 +3,6 @@
 #
 # It uses the KQcircuits library
 
-
 # Need to import the 'starfish' module like this (maybe a KLayout limitation when code is in a technology definition)
 # This will import the outer files but not anything within folders
 import os, importlib, pathlib, sys
@@ -17,7 +16,6 @@ for f in files:
     module =f.replace('.py','')
     m = importlib.import_module(module) 
     importlib.reload(m)
-
 
 from kqcircuits.chips.chip import Chip
 from kqcircuits.defaults import default_layers, default_junction_type, default_mask_parameters, \
@@ -37,7 +35,9 @@ from kqcircuits.elements.finger_capacitor_square import FingerCapacitorSquare
 from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import FlipChipConnectorRf
 from kqcircuits.util.parameters import Param, pdt
 
+
 from defaults import default_sampleholders, default_marker_type
+
 
 NAME_BRAND = "TII"
 NAME_MASK = "M001"
@@ -45,9 +45,9 @@ NAME_CHIP = "FS_1Q"
 
 #new paramters for launchers
 
-
 sampleholder_type_choices = list(default_sampleholders.keys())
             
+
 class Chip_francisco(Chip):
     sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
     
@@ -146,16 +146,5 @@ class Chip_francisco(Chip):
     def build(self):
       self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], launcher_assignments=default_launcher_assignement[self.sampleholder_type], enabled=None)
       print(self)
-
-
-#class PCellLib(pya.Library):
-#
- # def __init__(self):
- #   self.description = "QFoundry library"
- #   self.layout().register_pcell("Fransisco", Chip_francisco())
- #   self.register("QFoundry library")
-    
-# instantiate and register the library
-#PCellLib()
 
 
