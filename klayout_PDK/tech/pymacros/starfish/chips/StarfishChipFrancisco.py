@@ -5,21 +5,6 @@
 
 # Need to import the 'starfish' module like this (maybe a KLayout limitation when code is in a technology definition)
 # This will import the outer files but not anything within folders
-import os, importlib, pathlib, sys
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-if dir_path not in sys.path:
-    sys.path.append(dir_path)
-    
-module_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"..")
-lisdir = os.listdir(module_path)
-files = [f for f in lisdir if '.py' in pathlib.Path(f).suffixes and '__init__' not in f]
-
-importlib.invalidate_caches()
-for f in files:
-    module = f.replace('.py','')
-    m = importlib.import_module(module)
-    importlib.reload(m)
 
 from kqcircuits.chips.chip import Chip
 from kqcircuits.defaults import default_layers, default_junction_type, default_mask_parameters, \
@@ -39,8 +24,7 @@ from kqcircuits.elements.finger_capacitor_square import FingerCapacitorSquare
 from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import FlipChipConnectorRf
 from kqcircuits.util.parameters import Param, pdt
 
-
-from defaults import default_sampleholders, default_marker_type, default_launcher_assignement, default_launcher_enabled
+from starfish.defaults import default_sampleholders, default_marker_type, default_launcher_assignement, default_launcher_enabled
 
 
 NAME_BRAND = "TII"
@@ -52,7 +36,7 @@ NAME_CHIP = "FS_1Q"
 sampleholder_type_choices = list(default_sampleholders.keys())
             
 
-class Chip_francisco(Chip):
+class StarfishChipFrancisco(Chip):
     sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
   
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
