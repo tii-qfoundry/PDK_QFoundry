@@ -29,9 +29,9 @@ The fastest way to start a design is using the GUI of KLayout. First create a ne
 
 <p align="center"><img width="305" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/6958674b-6697-4122-a1b1-6ea58ce2388a"> </p>
 
+If you forget to set the database units, you can always go to File > Layout Properties and set them in the window that pops out, this will scale all the components in your layout, so make sure you do this before starting your work. Some parametric elements will re-generate with the correct size after you reload KLayout but any flat polygons will need to be manually scaled after the change in units.
 
 ### The Starfish Library
-If you forgot to set the database units, you can always go to File > Layout Properties and set them in the window that pops out, this will scale all the components in your layout, so make sure you do this before starting your work.
 
 In the Library window, you will see that a set of PDK specific groups appears, these include several components of the TII QFoundry that include Parametric Chips, Parametric Cells (PCells), Fixed Cells, and Black Box (BB) cells. You can drag and drop any of these components into your layout. All of thee are extensions of the KQcircuits Package and will only work when the PDK is selected as ypur technology. Note that conseuqently, updates in KQCircuits may make some of the cells of the PDK incompatible at any time, but we make sure to update these cells as soon as stable releases are available.
 
