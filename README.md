@@ -33,11 +33,13 @@ If you forget to set the database units, you can always go to File > Layout Prop
 
 ### The Starfish Library
 
-In the Library window, you will see that a set of PDK specific groups appears, these include several components of the TII QFoundry that include Parametric Chips, Parametric Cells (PCells), Fixed Cells, and Black Box (BB) cells. You can drag and drop any of these components into your layout. All of thee are extensions of the KQcircuits Package and will only work when the PDK is selected as ypur technology. Note that conseuqently, updates in KQCircuits may make some of the cells of the PDK incompatible at any time, but we make sure to update these cells as soon as stable releases are available.
+In the Library window, you will see that a set of PDK specific groups appears, these include several components of the TII QFoundry that include Parametric Cells (PCells), Fixed Cells, and Black Box (BB) cells. You can drag and drop any of these components into your layout. All of thee are extensions of the KQcircuits Package but will work even when the PDK is not selected as your technology. Note that updates in KQCircuits may make some of the cells of the PDK incompatible at any time, but we make sure to update these cells as soon as stable releases are available.
 
 - PCells are a set of parameterized common integrated devices that allow fast placement of components with variable complexity in your layout. All these components have no CML association in the current version of the PDK, except for waveguides, that use the Ligentec waveguide models.
 - Fixed Cells are a set fixed devices, specifically designed for the TII Ligentec AN800 PDK (No devices in the current release).
-- Black Box cells are placeholders for undisclosed IP from Ligentec, that would be replaced upon fabrication for the actual devices. A few of these include CML SPICE parameters to connect to their corresponding component model. The BB Cells in the TII Ligentec PDK have been adapted to be compatible with SiEPIC tools, but you need to take special care that they are correctly used in your design and that their dimensions and labels correspond to the latest version of the released Ligentec component library.
+- Black Box cells are placeholders for undisclosed IP from the QFoundry.
+
+All files are organized following the KQcircuit file structure {Elements, junctions, qubits, test_strctureschips}. Note that 
 
 ### Define your layout dimensions
 The Quantum foundry has specific dimensions for the work submissions, so start by creating a Chip Size Layer (in the CSL layer 100/2) and a Chip Handling Size (in the CHS layer 100/0) with the correct dimensions. In the current version of the PDK, the CHS is 30 x 30 mm and the CSL is 15 x 15 mm.
