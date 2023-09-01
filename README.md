@@ -16,8 +16,12 @@ To install, first you need to clone this repository to your local machine using 
 - Start KLayout
 - Go to menu 'Tools' > 'Manage Technologies'
 - In the window on the left (Technologies), right click and select 'Import Technology'
-- Navigate to your GitHub folder and select Github / PDK_Starfish / klayout_PDK / tech / Starfish.
-- Create a new layout: Select the menu 'File' > 'New Layout', use Technology = Starfish
+- Navigate in your GitHub repository to '%USERPROFILE%\Documents\Github\PDK_Starfish\klayout_PDK\tech', here select the 'Starfish.lyt' technology specification.
+- Finally, to have KQCircuits recognize all the cells from the PDK, go to the menu KQCircuits > Add User Package, and in the source directory, point to the folder '%USERPROFILE%\Github\PDK_Starfish\klayout_PDK\tech\pymacros\starfish'.
+
+<p align="center"> <img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/41c81ad7-5c1d-4aa4-8cac-cbe46b4be78c">
+
+- Now you can create a new layout: Select the menu 'File' > 'New Layout', use Technology = Starfish
 
 ## Design a basic layout
 
