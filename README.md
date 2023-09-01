@@ -39,12 +39,10 @@ In the Library window, you will see that a set of PDK specific groups appears, t
 - Fixed Cells are a set fixed devices, specifically designed for the TII Ligentec AN800 PDK (No devices in the current release).
 - Black Box cells are placeholders for undisclosed IP from the QFoundry.
 
-All files are organized following the KQcircuit file structure {Elements, junctions, qubits, test_strctureschips}. Note that 
+All files are organized following the KQcircuit file structure {Elements, junctions, qubits, test_strctureschips}.
 
 ### Define your layout dimensions
 The Quantum foundry has specific dimensions for the work submissions, so start by creating a Chip Size Layer (in the CSL layer 100/2) and a Chip Handling Size (in the CHS layer 100/0) with the correct dimensions. In the current version of the PDK, the CHS is 30 x 30 mm and the CSL is 15 x 15 mm.
-
-> When defining your chip dimensions, make sure that the lower left corner of your box is exactly at (0,0) or you may fail DRC checks from the foundry.
 
 ### Create your layout design
 Drag and drop components in your layout, and connect them using 'paths' in the 'Waveguide' layer (you can use any layer, but for organization, you will find it useful to use this).
@@ -61,6 +59,7 @@ This runs a set of scripts from the QFoundry that test basic layout consideratio
 
 ## Exporting your design
 Go to KQCircuits > Starfish > Export for fabrication
+(to do...)
 This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
 
 ## Creating your own components
