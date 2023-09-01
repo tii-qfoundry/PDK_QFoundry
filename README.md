@@ -19,15 +19,15 @@ To install, first you need to clone this repository to your local machine using 
 - Navigate in your GitHub repository to '%USERPROFILE%\Documents\Github\PDK_Starfish\klayout_PDK\tech', here select the 'Starfish.lyt' technology specification.
 - Finally, to have KQCircuits recognize all the cells from the PDK, go to the menu KQCircuits > Add User Package, and in the source directory, point to the folder '%USERPROFILE%\Github\PDK_Starfish\klayout_PDK\tech\pymacros\starfish'.
 
-<p align="center"> <img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/41c81ad7-5c1d-4aa4-8cac-cbe46b4be78c">
+<p align="center"> <img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/41c81ad7-5c1d-4aa4-8cac-cbe46b4be78c">  </p>
 
 - Now you can create a new layout: Select the menu 'File' > 'New Layout', use Technology = Starfish
 
 ## Design a basic layout
 
-The fastest way to start a design is using the GUI of KLayout. First create a new layout by going to File > New Layout, in the window that appears select the correct technology (Ligentec_AN800) and make sure to set the database units as 0.001 um (the default for the Quantum Foundry is indeed 0.001 um, but a yo can use any other specification according to you foundry). 
+The fastest way to start a design is using the GUI of KLayout. First create a new layout by going to File > New Layout, in the window that appears select the correct technology (Starfish) and make sure to set the database units as 0.001 um (the default for the TII Quantum Foundry is indeed 0.001 um, but a you can use any other specification according to you foundry's process).
 
-<p align="center"><img src="https://user-images.githubusercontent.com/14344419/184589605-1dcc6e92-b5cb-4e9a-855f-2b2a4cd85267.png" width="400"/> </p>
+<p align="center"><img width="305" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/6958674b-6697-4122-a1b1-6ea58ce2388a"> </p>
 
 
 ### The Starfish Library
