@@ -12,16 +12,24 @@ Check the documentation in https://meetiqm.com/developers/kqcircuits/. KQcircuit
 You should see a new menu item, "KQcircuits", and a new quick command button named 'Edit Node'. Check back periodically in the Package Manager for updates.
 
 ### Installing the PDK
-To install, first you need to clone this repository to your local machine using git. In Windows, you can install GitHub Desktop https://desktop.github.com and click on the green button in this page: 'Code' > 'Open in Github Desktop'. 
+To install, first you need to clone this repository to your local machine using git. In Windows, you can install GitHub Desktop https://desktop.github.com and then come back to this website and click on the green button in this page: 'Code' > 'Open in Github Desktop'. You should now have a copy of the repository in your machine. Now:
 - Start KLayout
 - Go to menu 'Tools' > 'Manage Technologies'
-- In the window on the left (Technologies), right click and select 'Import Technology'
-- Navigate in your GitHub repository to '%USERPROFILE%\Documents\Github\PDK_Starfish\klayout_PDK\tech', here select the 'Starfish.lyt' technology specification.
-- Finally, to have KQCircuits recognize all the cells from the PDK, go to the menu KQCircuits > Add User Package, and in the source directory, point to the folder '%USERPROFILE%\Github\PDK_Starfish\klayout_PDK\tech\pymacros\starfish'.
+- In the panel on the left (Technologies), right click and select 'Import Technology'
+
+<p align="center"><img width="326" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/32b387f9-40fb-43f5-80e9-e71746cca50d"> </p>
+  
+- Navigate in your GitHub repository to '%USERPROFILE%\Documents\Github\PDK_Starfish\klayout_PDK\tech', here select the 'Starfish.lyt' technology specification. You should immediatly see a new technology with multiple panels with its different specifications. Click OK to accept the new changes.
+<p align="center"><img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/5f98f33f-0918-4ebd-a565-8edf2b78646f"> </p>
+
+- When prompted to run the macros in the new technology, make sure to accept. This will configure KQCircuits to include the custom cells of the PDK.
+<p align="center"><img width="350" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/bb6e27a2-c7fb-4a12-9f2b-d21c72d37239"> </p>
+
+If you cannot see the custom cells of the Starfish PDK (if you didnt accept running the macros for example), you may need to configure KQCircuits to recognize all the cells from the PDK. Go to the menu KQCircuits > Add User Package, and in the source directory, point to the folder '%USERPROFILE%\Github\PDK_Starfish\klayout_PDK\tech\pymacros\starfish'.
 
 <p align="center"> <img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_Starfish/assets/14344419/41c81ad7-5c1d-4aa4-8cac-cbe46b4be78c">  </p>
 
-- Now you can create a new layout: Select the menu 'File' > 'New Layout', use Technology = Starfish
+Now you are redy to design!
 
 ## Design a basic layout
 
