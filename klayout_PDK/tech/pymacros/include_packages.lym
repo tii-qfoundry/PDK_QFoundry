@@ -6,7 +6,7 @@
  <prolog/>
  <epilog/>
  <doc/>
- <autorun>false</autorun>
+ <autorun>true</autorun>
  <autorun-early>false</autorun-early>
  <priority>0</priority>
  <shortcut/>
@@ -41,12 +41,17 @@ def _setup_pkg(src_dir, pkg_name):
     """set up selected user directory as a new KQC package."""
 
     salt = Path(os.path.dirname(os.path.realpath(__file__))).parents[4]
+    
+    
+    user = os.environ['USERPROFILE'];
+    salt = Path(os.path.join(user,'KLayout','salt'))
+    
     if salt.parts[-1] != "salt":
         raise RuntimeError("Supported only when using KQC Salt package.")
 
     target_path = Path(src_dir)
     link_path = os.path.join(salt.parents[0], "python", pkg_name)
-
+    print_message = ~os.path.isdir(link_path) 
     target_path.mkdir(exist_ok=True)
     for lib in get_library_paths():
         Path(os.path.join(target_path, lib)).mkdir(exist_ok=True)
@@ -57,18 +62,18 @@ def _setup_pkg(src_dir, pkg_name):
         subprocess.check_call(['cmd', '/c', 'mklink', '/J', link_path, target_path])
     else:
         os.symlink(target_path, link_path, target_is_directory=True)
+        
+    if (os.name == "nt") &amp; print_message:
+        pya.MessageBox.info(f"Added '{pkg_name}' package.",
+                            "Restart KLayout to make it visible!", pya.MessageBox.Ok)
 
 src_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'starfish')
 pkg_name = Path(src_dir).parts[-1]
 
 try:
     _setup_pkg(src_dir, pkg_name)
-    if os.name == "nt":
-        pya.MessageBox.info(f"Added '{pkg_name.text}' package.",
-                            "Restart KLayout to make it visible!", pya.MessageBox.Ok)
-    self.accept()
 except Exception as ex:
-    pya.QMessageBox.critical(self, "Error", str(ex))
+    pya.QMessageBox.critical("Error", str(ex))
 
 </text>
 </klayout-macro>
