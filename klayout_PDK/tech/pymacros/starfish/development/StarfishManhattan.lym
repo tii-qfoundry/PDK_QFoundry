@@ -50,8 +50,10 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
     
     self.param("draw_cap", self.TypeBoolean, "Include capacitor", default=True)
     self.param("draw_patch", self.TypeBoolean, "Include patches", default=True)
-    self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
     self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0)
+    self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
+    self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=True)
+    self.param("cap_h", self.TypeDouble, "Capacitor height", default=200.0,hidden=True)
     
     
     self.param("offset_compensation",self.TypeDouble, "Compensation for top junction.", default=0.0, unit="μm",hidden=True)
@@ -59,8 +61,7 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
     
     self.conn_width = 5
     self.conn_height = 20
-    self.cap_w = 100
-    self.cap_h = 150
+
     
     
   def arc(r, start=0, stop=pi/2, n=64):
@@ -124,7 +125,7 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
       
   def _draw_cap(self):
       cap_shape = []
-      
+      cap_h = self.cap_h
       rounding_params = {
             "rinner": 5,  # inner corner rounding radius
             "router": 10,  # outer corner rounding radius
@@ -132,13 +133,13 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
       }
       
       metal_cap_pts_left = [
-            pya.DPoint(-self.cap_w / 2, self.cap_gap/2),
-            pya.DPoint(-self.cap_w / 2, self.cap_gap/2+self.cap_h)
+            pya.DPoint(-self.cap_w / 2, self.cap_gap/2.0),
+            pya.DPoint(-self.cap_w / 2, self.cap_gap/2.0+cap_h)
       ]
       
       metal_cap_shape = polygon_with_vsym(metal_cap_pts_left)
       self._round_corners_and_append(metal_cap_shape, cap_shape, rounding_params)
-      self._round_corners_and_append(metal_cap_shape*pya.DTrans(0,-self.cap_h), cap_shape, rounding_params) 
+      self._round_corners_and_append(metal_cap_shape*pya.DTrans(2,False,0,0), cap_shape, rounding_params) 
       return cap_shape
        
   def _draw_patch_open(self, gap=2, center=pya.DPoint(0, 0)):

@@ -126,7 +126,7 @@
   <name>KQcircuits</name>
   <source>*/*@*</source>
   <group-members>
-   <expanded>true</expanded>
+   <expanded>false</expanded>
    <frame-color/>
    <fill-color/>
    <frame-brightness>0</frame-brightness>
@@ -1764,7 +1764,7 @@
    <source>999/0@1</source>
   </group-members>
   <group-members>
-   <expanded>true</expanded>
+   <expanded>false</expanded>
    <frame-color/>
    <fill-color/>
    <frame-brightness>0</frame-brightness>
@@ -1850,7 +1850,7 @@
     <xfill>false</xfill>
     <animation>0</animation>
     <name>CHS</name>
-    <source>100/0@1</source>
+    <source>'CHS [99/0]' 99/0@1</source>
    </group-members>
    <group-members>
     <expanded>false</expanded>
