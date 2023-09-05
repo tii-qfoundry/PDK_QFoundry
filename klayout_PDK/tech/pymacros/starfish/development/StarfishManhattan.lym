@@ -46,21 +46,24 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
     self.param("finger_overlap",self.TypeDouble, "Length of fingers inside the pads.", default=1.0, unit="μm",hidden=True)
     self.param("finger_size",self.TypeDouble, "Length of fingers (without overshoot).", default=10.0, unit="μm")
     self.param("round_pad", self.TypeBoolean, "Pad has round edges", default=True, hidden=True)
-    self.param("pad_radius", self.TypeDouble, "Pad edge radius", default=1.0, hidden=False)
+    self.param("pad_radius", self.TypeDouble, "Pad edge radius", default=1.0, hidden=True)
+    
+    self.param("conn_width", self.TypeDouble, "Connector pad width", default=5.0, hidden=True)
+    self.param("conn_height", self.TypeDouble, "Connector pad height", default=20.0, hidden=True)
     
     self.param("draw_cap", self.TypeBoolean, "Include capacitor", default=True)
     self.param("draw_patch", self.TypeBoolean, "Include patches", default=True)
-    self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0)
+    self.param("patch_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(3, 0))
+    self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0, hidden = True)
+    self.param("patch_clearance", self.TypeDouble, "Patch clearance", default=5.0)
     self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
     self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=True)
     self.param("cap_h", self.TypeDouble, "Capacitor height", default=200.0,hidden=True)
     
-    
     self.param("offset_compensation",self.TypeDouble, "Compensation for top junction.", default=0.0, unit="μm",hidden=True)
     self.param("mirror_offset",self.TypeDouble, "Length of fingers (without overshoot).", default=False, unit="μm",hidden=True)
     
-    self.conn_width = 5
-    self.conn_height = 20
+    
 
     
     
@@ -172,35 +175,34 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
         return [(pya.DTrans(0, False, center.x,center.y) * patch_top).to_itype(self.layout.dbu),
                 (pya.DTrans(0, False, center.x,center.y) * patch_bot).to_itype(self.layout.dbu)]
   
-  def _draw_patch(self, patch_size):
+  def _draw_patch(self, patch_clearance=10.0, center=pya.DPoint(0, 0)):
         size = self.finger_size
-        conn_width = self.conn_width
+        gap = self.cap_gap
+        
+        patch_width = patch_clearance*2+self.conn_width
         conn_height = self.conn_height
         _angle = radians(self.angle)
         _inner_angle = radians(self.inner_angle)
         
-        def patch_points(heigth, size, angle,rot=0, round = True):
+        def patch_points(heigth, size, angle,rot=0, round = False):
             end_x = size*cos(angle)
-            end_y = self.cap_gap/2
+            end_y = size*sin(angle)
         
-            polygon = pya.DTrans(0,False, end_x, end_y)*pya.DTrans(rot,False, 0, 0) * pya.DPolygon([
-                pya.DPoint(-conn_width/2-gap, 0),
-                pya.DPoint(-conn_width/2-gap, heigth+gap),
-                pya.DPoint(conn_width/2+gap, heigth+gap),
-                pya.DPoint(conn_width/2+gap, 0),
+            span_y = heigth+patch_clearance+(end_y)*sign(end_y)
+            
+            polygon = pya.DTrans(0,False, end_x, 0)*pya.DTrans(rot,False, 0, 0) * pya.DPolygon([
+                pya.DPoint(-patch_width/2, gap/2),
+                pya.DPoint(patch_width/2, gap/2),
+                pya.DPoint(patch_width/2, span_y),
+                pya.DPoint(-patch_width/2, span_y),
             ])
-            if True:
-              polygon = polygon.round_corners(1, 1, 64)
             return polygon
             
-        patch_top = pya.DTrans(0,False,0, -1) * (patch_points(heigth=conn_height,size=size,  angle=_angle))
-        patch_bot = pya.DTrans(0,False,0, 1 ) * (patch_points(heigth=conn_height,size=size,  angle=_angle-(_inner_angle),rot=2))
-        
-        patch_top = patch_top.round_corners(1, 1, 64)
-        patch_bot = patch_bot.round_corners(1, 1, 64)
-        
-        return [(pya.DTrans(0, False, center.x,center.y) * patch_top).to_itype(self.layout.dbu),
-                (pya.DTrans(0, False, center.x,center.y) * patch_bot).to_itype(self.layout.dbu)]   
+        patch_top = pya.DTrans(0,False,0, 0) * (patch_points(heigth=conn_height,size=size,  angle=_angle))
+        patch_bot = pya.DTrans(0,False,0, 0) * (patch_points(heigth=conn_height,size=size,  angle=_angle-(_inner_angle),rot=2))
+
+        return [(pya.DTrans(0, False, center.x,0) * patch_top).to_itype(self.layout.dbu),
+                (pya.DTrans(0, False, center.x,0) * patch_bot).to_itype(self.layout.dbu)]   
       
                
   def _draw_connectors(self, center=pya.DPoint(0, 0)):
@@ -267,10 +269,12 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
     # Capacitor
     if self.draw_cap:
         cap_shape = self._draw_cap()
+        patch_open_shape = []
         patch_shape = []
         # Patches
         if self.draw_patch:
-            patch_shape = self._draw_patch_open(gap = self.patch_gap, center = pya.DPoint(0, 0))
+            patch_open_shape = self._draw_patch_open(gap = self.patch_gap, center = pya.DPoint(0, 0))
+            patch_shape = self._draw_patch(self.patch_clearance, center = pya.DPoint(0, 0))
             
         layer_add = self.layout.layer(pya.LayerInfo(131, 1))
         
@@ -278,10 +282,11 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
         metal_neg = pya.Box(-(self.cap_w+80)/dbu/2, -(self.cap_h+40+self.cap_gap/2)/dbu,
                               (self.cap_w+80)/dbu/2, (self.cap_h+40+self.cap_gap/2)/dbu)
                               
-        region = pya.Region(metal_neg).merged()- pya.Region(cap_shape).merged() + pya.Region(patch_shape).merged()
+        region = pya.Region(metal_neg).merged()- pya.Region(cap_shape).merged() + pya.Region(patch_open_shape).merged()
         self.cell.shapes(layerm).insert(region)  
         
-        #self._substract_shapes([metal_neg]+patch_shape,cap_shape, layerm)
+        layer = self.layout.layer(self.patch_layer)
+        self._add_shapes(patch_shape, layer)
         #
       
   def _round_corners_and_append(self, polygon, polygon_list, rounding_params):
