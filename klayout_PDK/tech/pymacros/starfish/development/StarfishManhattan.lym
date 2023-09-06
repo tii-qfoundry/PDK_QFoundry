@@ -16,7 +16,7 @@
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
  <text>import pya
-from numpy import cos, sin, radians, linspace
+from numpy import cos, sin, radians, linspace, sign
 from math import pi
 # PCell template
 # This macro template provides the framework for a PCell library
