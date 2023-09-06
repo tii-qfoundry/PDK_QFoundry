@@ -1,5 +1,5 @@
 # PDK_Starfish
-TII QFoundry standard PDK for superconductive qubit fabrication.
+TII QFoundry standard PDK for superconductive qubit fabrication. It uses the KQcircuitrs.
 
 ## Installation
 
