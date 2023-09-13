@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-properties>
-
  <properties>
   <expanded>true</expanded>
   <frame-color/>
@@ -53,6 +52,24 @@
    <animation>0</animation>
    <name>Junctions (Positive EBeam) [2/0]</name>
    <source>2/0@1</source>
+  </group-members>
+  <group-members>
+   <expanded>false</expanded>
+   <frame-color>#c0c0c0</frame-color>
+   <fill-color>#c0c0c0</fill-color>
+   <frame-brightness>0</frame-brightness>
+   <fill-brightness>0</fill-brightness>
+   <dither-pattern>I12</dither-pattern>
+   <line-style/>
+   <valid>true</valid>
+   <visible>true</visible>
+   <transparent>false</transparent>
+   <width>1</width>
+   <marked>false</marked>
+   <xfill>false</xfill>
+   <animation>0</animation>
+   <name>Metallization (Aluminum Positive) [30/0]</name>
+   <source>30/0@1</source>
   </group-members>
   <group-members>
    <expanded>false</expanded>
@@ -109,7 +126,6 @@
    <source>133/1@1</source>
   </group-members>
  </properties>
-
  <properties>
   <expanded>false</expanded>
   <frame-color/>
@@ -1108,7 +1124,7 @@
    <dither-pattern/>
    <line-style/>
    <valid>true</valid>
-   <visible>true</visible>
+   <visible>false</visible>
    <transparent>false</transparent>
    <width/>
    <marked>false</marked>
@@ -1766,16 +1782,6 @@
    <source>'1b1_chip_dicing' 30/1@1</source>
   </group-members>
  </properties>
-
-
-
-
-
-
-
-
-
-
  <properties>
   <expanded>true</expanded>
   <frame-color/>
@@ -1920,12 +1926,12 @@
    <source>*/*@*</source>
    <group-members>
     <expanded>false</expanded>
-    <frame-color>#ede500</frame-color>
-    <fill-color>#ede500</fill-color>
+    <frame-color>#ffae00</frame-color>
+    <fill-color>#ffae00</fill-color>
     <frame-brightness>0</frame-brightness>
     <fill-brightness>0</fill-brightness>
     <dither-pattern>I1</dither-pattern>
-    <line-style/>
+    <line-style>I0</line-style>
     <valid>true</valid>
     <visible>true</visible>
     <transparent>false</transparent>
@@ -1933,8 +1939,44 @@
     <marked>false</marked>
     <xfill>false</xfill>
     <animation>0</animation>
-    <name>CHS</name>
-    <source>'CHS [99/0]' 99/0@1</source>
+    <name>CHS (Chip Handling Size) [100/0]</name>
+    <source>CHS 100/0@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#008080</frame-color>
+    <fill-color>#91ff00</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I1</dither-pattern>
+    <line-style>I3</line-style>
+    <valid>true</valid>
+    <visible>false</visible>
+    <transparent>false</transparent>
+    <width>1</width>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name>Design Writefield [98/0]</name>
+    <source>98/0@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ede500</frame-color>
+    <fill-color>#ede500</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I1</dither-pattern>
+    <line-style>I3</line-style>
+    <valid>true</valid>
+    <visible>false</visible>
+    <transparent>false</transparent>
+    <width>1</width>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name>CHS Writefield [99/0]</name>
+    <source>99/0@1</source>
    </group-members>
    <group-members>
     <expanded>false</expanded>
@@ -1969,7 +2011,7 @@
     <marked>false</marked>
     <xfill>false</xfill>
     <animation>0</animation>
-    <name>DCS (Single Die)</name>
+    <name>DCS (Single Die) [100/1]</name>
     <source>100/1@1</source>
    </group-members>
    <group-members>
@@ -1978,7 +2020,7 @@
     <fill-color>#00ff00</fill-color>
     <frame-brightness>0</frame-brightness>
     <fill-brightness>0</fill-brightness>
-    <dither-pattern>I1</dither-pattern>
+    <dither-pattern>C2</dither-pattern>
     <line-style/>
     <valid>true</valid>
     <visible>true</visible>
@@ -1987,7 +2029,7 @@
     <marked>false</marked>
     <xfill>false</xfill>
     <animation>0</animation>
-    <name>EXCPT</name>
+    <name>EXCPT [0/3]</name>
     <source>0/3@1</source>
    </group-members>
   </group-members>
@@ -2037,7 +2079,7 @@
    <line>......****...............*.**...</line>
   </pattern>
   <order>3</order>
-  <name>EsclusionArea</name>
+  <name>ExclusionArea</name>
  </custom-dither-pattern>
  <custom-dither-pattern>
   <pattern>
