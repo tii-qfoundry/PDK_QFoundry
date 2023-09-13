@@ -57,8 +57,8 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
     self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0, hidden = True)
     self.param("patch_clearance", self.TypeDouble, "Patch clearance", default=5.0)
     self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
-    self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=True)
-    self.param("cap_h", self.TypeDouble, "Capacitor height", default=200.0,hidden=True)
+    self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=False)
+    self.param("cap_h", self.TypeDouble, "Capacitor height", default=200.0,hidden=False)
     
     self.param("offset_compensation",self.TypeDouble, "Compensation for top junction.", default=0.0, unit="μm",hidden=True)
     self.param("mirror_offset",self.TypeDouble, "Length of fingers (without overshoot).", default=False, unit="μm",hidden=True)

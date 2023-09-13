@@ -5,6 +5,7 @@
 
 
 from pya import *
+import numpy as np
 
 def array_junctions():
     # Create an array of josephson jucntions
@@ -21,25 +22,39 @@ def array_junctions():
     met_layer = top_cell.layout().layer(pya.LayerInfo(1, 0))
     fp_layer = top_cell.layout().layer(pya.LayerInfo(68, 0))
     
-    #Draw a floor plan
-    top_cell.shapes(fp_layer).insert(Box(0,-50/dbu, 605/dbu, 555/dbu))
+    #Draw a floor plan`f*
+    top_cell.shapes(fp_layer).insert(Box(-11000/dbu,-11000/dbu, 11000/dbu, 11000/dbu))
     
     
     # Sweep over two parameter
-    sweep_width_t = [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20]
-    sweep_width_b = [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20]
+    sweep_width_t = np.linspace(0.15,0.35,11)
+    sweep_width_b = np.linspace(0.15,0.35,11)
     
     # Loop through the parameter sweep
+    
+    dx = 400
+    x0 = -2000
+    dy = dx
+    y0 = x0
     for j in range(len(sweep_width_b)):
         for i in range(len(sweep_width_t)):
-          trans = pya.Trans(pya.Trans.R0, (400+(400*i))/dbu, (400*j)/dbu)
+          
           width_t = sweep_width_t[i]
           width_b = sweep_width_b[j]
           
+          
+          cap_h = 100
+          trans = pya.Trans(pya.Trans.R0, (x0+dx*i)/dbu, (y0+dy*j)/dbu)
           cell_starfish_manhattan = ly.create_cell("Starfish%s" % "Manhattan", "DevelopmentLib", 
-            {"junction_width_t":width_t, "junction_width_b":width_b, "draw_cap":True})
+            {"junction_width_t":width_t, "junction_width_b":width_b, "draw_cap":True, "cap_h":cap_h})
           cell_instance = pya.CellInstArray(cell_starfish_manhattan.cell_index(),trans)
+          
+          label = "%.2f,%.2f"%(width_t,width_b)
+          trans = pya.Trans(pya.Trans.R0, (x0+dx*i-100+10)/dbu, (y0+dy*j+cap_h-10)/dbu)
+          cell_label = ly.create_cell("TEXT", "Basic", {"text":label, "mag":20,"layer": pya.LayerInfo(1, 0) })
+          cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),trans)
             
           shapes = top_cell.insert(cell_instance)
+          shapes = top_cell.insert(cell_instance_lbl)
 
 array_junctions();
