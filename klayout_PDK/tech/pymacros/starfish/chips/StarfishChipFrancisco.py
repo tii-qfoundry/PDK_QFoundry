@@ -3,9 +3,6 @@
 #
 # It uses the KQcircuits library
 
-# Need to import the 'starfish' module like this (maybe a KLayout limitation when code is in a technology definition)
-# This will import the outer files but not anything within folders
-
 from kqcircuits.chips.chip import Chip
 from kqcircuits.defaults import default_layers, default_junction_type, default_mask_parameters, \
                                 default_bump_parameters
@@ -43,60 +40,36 @@ class StarfishChipFrancisco(Chip):
     name_chip = Param(pdt.TypeString, "Name of the chip", "")
     name_copy = Param(pdt.TypeString, "Name of the copy", NAME_CHIP)
     name_brand = Param(pdt.TypeString, "Name of the brand", NAME_BRAND)
-    frames_marker_dist = Param(pdt.TypeList, "Marker distance from edge for each chip frame", [400, 1000], unit="[μm]")
+    frames_marker_dist = Param(pdt.TypeList, "Marker distance from edge for each chip frame", [800, 400], unit="[μm]")
     frames_diagonal_squares = Param(pdt.TypeList, "Number of diagonal marker squares for each chip frame", [0, 0])
     
     
-    
-    def nodes1():
+    def nodes1(self):
       """ Node list specifying *the composite waveguide """
       return [
-          Node((0, 1900)),
-          Node((0, 1400), AirbridgeRectangular, a=5, b=4),
-          Node((0, 1000)),
-          Node((500, 1000), WaveguideCoplanarSplitter),
-          Node((900, 1000)),
-          Node((900, 750)),
-          
-          Node((0.0, 750.0)),
-          Node((0.0, -750.0), {'length_before': 3000.0}),
-          Node((-900.0, -750.0)),
-          Node((-900.0, -1000.0)),
-          Node((-500.0, -1000.0), 'WaveguideCoplanarSplitter', {'angle': 0.0}),
-          Node((0.0, -1000.0)),
-          Node((0.0, -1400.0), 'FingerCapacitorSquare'),
-          Node((0.0, -1900.0)),
-          
-          
-          
-          Node((1060, 100), ab_across=True),
-          Node((1100, 100), a=10, b=5),
-          Node((1300, 100)),
-          Node((1400, 0), n_bridges=3),
-          Node((1700, 0), face_id="1t1", connector_type="Single"),
-          Node((1900, 0), AirbridgeConnection),
-          Node((2100, 0)),
-          Node(pya.DPoint(2150, 0), WaveguideCoplanarSplitter, **t_cross_parameters(a=10, b=5), align=("port_left", "port_right")),
-          Node(pya.DPoint(2350, 50)),
-          Node(pya.DPoint(2400, 50), WaveguideCoplanarSplitter, **t_cross_parameters(a=10, b=5), align=("port_right", "port_left"), inst_name="second_tee"),
-          Node(pya.DPoint(2500, 50)),
-          Node(pya.DPoint(2600, 50), WaveguideCoplanarSplitter, **t_cross_parameters(a=10, b=5), align=("port_bottom", "port_right")),
-          Node(pya.DPoint(2700, -200)),
-          Node(pya.DPoint(2700, -500), face_id="2b1", output_rotation=90),
-          Node(pya.DPoint(2500, -400))
+          Node((0.0, 0.0)),
+          Node((0.0, 500.0),FingerCapacitorSquare),
+          Node((0.0, 1100.0)),
+          Node((-500.0, 1100.0), WaveguideCoplanarSplitter, {'angle': 0.0}),
+          Node((-1000.0, 1100.0)),
+          Node((1000.0, 2650.0),length_before=6300.0),
+          Node((500.0, 2650.0)),
+          Node((0.0, 2650.0)),
+          Node((0.0, 2950.0)),
+          Node((0.0, 3450.0))
       ]
 
-    def _make_wg(capfd, nodes):
+    def _make_wg(self, nodes):
       layout = pya.Layout()
-      wg = WaveguideComposite.create(layout, nodes=nodes1)
-      _, err = capfd.readouterr()
-      assert err == "", err
-      return wg.length()
+      wg_cell = WaveguideComposite.create(layout, nodes=nodes)
+      top_cell = layout.top_cell()
+      top_cell.insert(pya.DCellInstArray(wg_cell.cell_index(), pya.DTrans()))
+      return wg_cell.length()
       
     
     def produce_structures(self):
         """Produces chip frame and possibly other structures before the ground grid.
-        This method override that from the KQcircuit / Chip library.
+        This method overrides that from the KQcircuit / Chip library.
         """
         self.name_brand = NAME_BRAND
         
@@ -140,7 +113,9 @@ class StarfishChipFrancisco(Chip):
       self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], 
         launcher_assignments=default_launcher_assignement[self.sampleholder_type], 
         enabled = default_launcher_enabled[self.sampleholder_type])
-      print(default_launcher_enabled[self.sampleholder_type])
+      
+      #nodes=[Node((-1.0, 750.0)), Node((-901.0, -750.0)), Node((-901.0, -1000.0)), Node((-1.0, -1000.0)), Node((-1.0, -1900.0), length_before=2000.0)]
+      self.insert_cell(WaveguideComposite,nodes=self.nodes1(),trans = pya.DTrans(0,0,2525, 800))
       print(self)
 
 
