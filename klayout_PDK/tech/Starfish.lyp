@@ -17,24 +17,7 @@
   <animation>0</animation>
   <name>X1 Quantum Circuits</name>
   <source>*/*@*</source>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#ff0000</frame-color>
-   <fill-color>#ff0000</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width>1</width>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'Metallization (Positive EBeam HC)' 6/0@*</source>
-  </group-members>
+
   <group-members>
    <expanded>false</expanded>
    <frame-color>#ffffff</frame-color>
@@ -53,6 +36,7 @@
    <name>Metallization (Alluminum Negative) [1/0]</name>
    <source>1/0@1</source>
   </group-members>
+
   <group-members>
    <expanded>false</expanded>
    <frame-color>#000000</frame-color>
@@ -71,6 +55,27 @@
    <name>Junctions (Positive EBeam) [2/0]</name>
    <source>2/0@1</source>
   </group-members>
+
+  <group-members>
+   <expanded>false</expanded>
+   <frame-color>#C09000</frame-color>
+   <fill-color>#C09000</fill-color>
+   <frame-brightness>0</frame-brightness>
+   <fill-brightness>0</fill-brightness>
+   <dither-pattern>I12</dither-pattern>
+   <line-style/>
+   <valid>true</valid>
+   <visible>true</visible>
+   <transparent>true</transparent>
+   <width>1</width>
+   <marked>false</marked>
+   <xfill>false</xfill>
+   <animation>0</animation>
+   <name>Metallization (EBeam HC Positive) [6/0]</name>
+   <source>6/0@1</source>
+  </group-members>
+
+
   <group-members>
    <expanded>false</expanded>
    <frame-color>#c0c0c0</frame-color>
