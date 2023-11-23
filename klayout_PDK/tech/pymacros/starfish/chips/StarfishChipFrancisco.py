@@ -25,8 +25,9 @@ from starfish.defaults import default_sampleholders, default_marker_type, defaul
 
 
 NAME_BRAND = "TII"
-NAME_MASK = "M001"
-NAME_CHIP = "FS_1Q"
+NAME_MASK = "FS_2Q"
+NAME_CHIP = "231123"
+RESONATOR_LENGTH = 7358
 
 #new paramters for launchers
 
@@ -35,30 +36,67 @@ sampleholder_type_choices = list(default_sampleholders.keys())
 
 class StarfishChipFrancisco(Chip):
     sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
-  
+    
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
     name_chip = Param(pdt.TypeString, "Name of the chip", "")
     name_copy = Param(pdt.TypeString, "Name of the copy", NAME_CHIP)
     name_brand = Param(pdt.TypeString, "Name of the brand", NAME_BRAND)
     frames_marker_dist = Param(pdt.TypeList, "Marker distance from edge for each chip frame", [800, 400], unit="[μm]")
     frames_diagonal_squares = Param(pdt.TypeList, "Number of diagonal marker squares for each chip frame", [0, 0])
+    cpw_length = Param(pdt.TypeDouble, "Length of the resonator", RESONATOR_LENGTH)
     
+    a = Param(pdt.TypeDouble, "Width of the center conductor", 15)
+    b = Param(pdt.TypeDouble, "Width of gap", 7.5)
+    r = Param(pdt.TypeDouble, "Turn radius", 150, hidden=True)
     
-    def nodes1(self):
-      """ Node list specifying *the composite waveguide """
+    def nodes_res(self):
+      """ Node list specifying the composite waveguide """
+      
+      splitter_params = t_cross_parameters(self.a,self.b,self.a,self.b)
+      cpw_fix_length = 5272.6185408 #Length of waveguides except the extended section in node 9
+      
+      #cpw_length = 7358
+      
       return [
           Node((0.0, 0.0)),
-          Node((0.0, 500.0),FingerCapacitorSquare),
-          Node((0.0, 1100.0)),
-          Node((-500.0, 1100.0), WaveguideCoplanarSplitter, {'angle': 0.0}),
-          Node((-1000.0, 1100.0)),
-          Node((1000.0, 2650.0),length_before=6300.0),
-          Node((500.0, 2650.0)),
-          Node((0.0, 2650.0)),
-          Node((0.0, 2950.0)),
+          Node((0.0, 300.0),FingerCapacitorSquare,
+             finger_number= 3, 
+             finger_width= 3,
+             finger_gap= 3,
+             finger_length= 30),
+          Node((0.0, 900.0)),
+          Node((-500.0, 900.0),WaveguideCoplanarSplitter,
+              angles = [0,180,270],
+              lengths=splitter_params['lengths'],
+              a_list=splitter_params['a_list'],
+              b_list=splitter_params['b_list']),
+          Node((-1000.0, 900.0)),
+          Node((-1000.0, 1200.0)),
+          Node((0.0, 1200.0)),
+          Node((0.0, 2250.0),length_before=self.cpw_length-cpw_fix_length),
+          Node((1000.0, 2250.0)),
+          Node((1000.0, 2550.0)),
+          Node((500.0, 2550.0),WaveguideCoplanarSplitter,
+              angles = [0,180,90],
+              lengths=splitter_params['lengths'],
+              a_list=splitter_params['a_list'],
+              b_list=splitter_params['b_list']),
+          Node((0.0, 2550.0)),
+          Node((0.0, 3150.0),FingerCapacitorSquare,
+             finger_number= 3, 
+             finger_width= 3,
+             finger_gap= 3,
+             finger_length= 30),
           Node((0.0, 3450.0))
       ]
 
+    def nodes_coupler_01(self):
+      return [
+        Node((0.0, 0.0)),
+        Node((0.0, 280.0)),
+        Node((500-self.a, 280.0))
+      ]
+    
     def _make_wg(self, nodes):
       layout = pya.Layout()
       wg_cell = WaveguideComposite.create(layout, nodes=nodes)
@@ -114,8 +152,15 @@ class StarfishChipFrancisco(Chip):
         launcher_assignments=default_launcher_assignement[self.sampleholder_type], 
         enabled = default_launcher_enabled[self.sampleholder_type])
       
-      #nodes=[Node((-1.0, 750.0)), Node((-901.0, -750.0)), Node((-901.0, -1000.0)), Node((-1.0, -1000.0)), Node((-1.0, -1900.0), length_before=2000.0)]
-      self.insert_cell(WaveguideComposite,nodes=self.nodes1(),trans = pya.DTrans(0,0,2525, 800))
+      self.insert_cell(WaveguideComposite,nodes=self.nodes_res(),trans = pya.DTrans(0,0,2525, 800))
+      self.insert_cell(WaveguideComposite,r=50, term2=20, nodes=self.nodes_coupler_01(),
+        trans = pya.DTrans(0,0,2525, 800)*pya.DTrans(0,0,500, 2550+self.a))
+      self.insert_cell(WaveguideComposite,r=50, term2=20, nodes=self.nodes_coupler_01(),
+        trans = pya.DTrans(0,0,2525, 800)*pya.DTrans(2,False,-500, 900-self.a))
+        
+      
+        
+        
       print(self)
 
 
