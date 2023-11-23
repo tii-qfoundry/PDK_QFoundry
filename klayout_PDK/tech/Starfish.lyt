@@ -4,8 +4,8 @@
  <description/>
  <group/>
  <dbu>0.001</dbu>
- <base-path>C:/Users/USER01/OneDrive/Documents/GitHub/PDK_Starfish/klayout_PDK/tech</base-path>
- <original-base-path>C:\Users\USER01\OneDrive\Documents\GitHub\PDK_Starfish\klayout_PDK\tech</original-base-path>
+ <base-path>C:/Users/USER01/KLayout/tech/starfish</base-path>
+ <original-base-path>C:\Users\USER01\KLayout\tech\starfish</original-base-path>
  <layer-properties_file>Starfish.lyp</layer-properties_file>
  <add-other-layers>true</add-other-layers>
  <reader-options>
