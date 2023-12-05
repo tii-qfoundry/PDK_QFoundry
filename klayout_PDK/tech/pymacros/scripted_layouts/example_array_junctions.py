@@ -20,9 +20,10 @@ def array_junctions():
   
     #Define the layers that willl be used in the layout
     met_layer = top_cell.layout().layer(pya.LayerInfo(1, 0))
+    cap_layer = pya.LayerInfo(2, 0)  #
     fp_layer = top_cell.layout().layer(pya.LayerInfo(68, 0))
     
-    #Draw a floor plan`f*
+    #Draw a floor plan 
     top_cell.shapes(fp_layer).insert(Box(-11000/dbu,-11000/dbu, 11000/dbu, 11000/dbu))
     
     
@@ -42,11 +43,16 @@ def array_junctions():
           width_t = sweep_width_t[i]
           width_b = sweep_width_b[j]
           
-          
           cap_h = 100
           trans = pya.Trans(pya.Trans.R0, (x0+dx*i)/dbu, (y0+dy*j)/dbu)
           cell_starfish_manhattan = ly.create_cell("Starfish%s" % "Manhattan", "DevelopmentLib", 
-            {"junction_width_t":width_t, "junction_width_b":width_b, "draw_cap":True, "cap_h":cap_h})
+            { "angle":90.0,
+              "junction_width_t":width_t, 
+              "junction_width_b":width_b, 
+              "draw_cap":True, 
+              "draw_patch":False,
+              "cap_h":cap_h, 
+              "cap_layer":cap_layer})
           cell_instance = pya.CellInstArray(cell_starfish_manhattan.cell_index(),trans)
           
           label = "%.2f,%.2f"%(width_t,width_b)
