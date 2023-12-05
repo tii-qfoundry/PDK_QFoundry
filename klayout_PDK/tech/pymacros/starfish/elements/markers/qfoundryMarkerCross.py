@@ -7,6 +7,12 @@ from kqcircuits.util.parameters import Param, pdt
 from kqcircuits.elements.element import Element
 from kqcircuits.defaults import default_marker_type
 
+
+Marker.marker_type_choices = [
+    'Marker Standard',
+    'Qfoundry Marker Cross'
+]
+
 class QfoundryMarkerCross(Marker):
     """The PCell declaration for the Standard Marker.
     """
@@ -16,22 +22,18 @@ class QfoundryMarkerCross(Marker):
     b = Param(pdt.TypeDouble, "Width of gap", 6, unit="μm", hidden=True)
     n = Param(pdt.TypeInt, "Number of points on turns", 64, hidden=True)
     r = Param(pdt.TypeDouble, "Turn radius", 100, unit="μm", hidden=True)
-    margin = Param(pdt.TypeDouble, "Margin of the protection layer", 5, unit="μm", hidden=True)
+    margin = Param(pdt.TypeDouble, "Margin of the protection layer", 20, unit="μm", hidden=True)
     face_ids = Param(pdt.TypeList, "Chip face IDs list", ["1t1", "2b1", "1b1", "2t1"], hidden=True)
     protect_opposite_face = Param(pdt.TypeBoolean, "Add opposite face protection too", False,hidden=True)
     
     positive = Param(pdt.TypeBoolean, "Marker for positive lithography", default=False,hidden=False)
-    diagonal_squares = Param(pdt.TypeInt, "Number of diagonal squares in the marker", 0)
     
     def build(self):
         self.produce_geometry()
     
-    
-    
-       
     def produce_geometry(self):
         """Produce common marker geometry."""
-
+        
         layer_gap = self.get_layer("base_metal_gap_wo_grid")
         layer_pads = self.get_layer("airbridge_pads")
         layer_flyover = self.get_layer("airbridge_flyover")
@@ -46,80 +48,75 @@ class QfoundryMarkerCross(Marker):
         
         # protection for the box
         protection_box = pya.DBox(
-            pya.DPoint(220, 220),
-            pya.DPoint(-220, -220)
+            pya.DPoint(50, 50),
+            pya.DPoint(-50, -50)
         )
         self.cell.shapes(layer_protection).insert(protection_box)
 
         # make corners
         corner = pya.DPolygon([
-            pya.DPoint(100, 100),
-            pya.DPoint(10, 100),
-            pya.DPoint(10, 80),
-            pya.DPoint(80, 80),
-            pya.DPoint(80, 10),
-            pya.DPoint(100, 10),
+            pya.DPoint(50, 50),
+            pya.DPoint(25, 50),
+            pya.DPoint(25, 40),
+            pya.DPoint(40, 40),
+            pya.DPoint(40, 25),
+            pya.DPoint(50, 25),
         ])
-        inner_corners = [pya.DTrans(rot) * corner for rot in [0, 1, 2, 3]]
-        outer_corners = [pya.DCplxTrans(2, rot * 90., False, pya.DVector()) * corner for rot in [0, 1, 2, 3]]
-        corners = pya.Region([s.to_itype(self.layout.dbu) for s in inner_corners + outer_corners])
+        
+        inner_corners = [pya.DCplxTrans(0.5, rot * 90., False, pya.DVector()) * corner for rot in [0, 1, 2, 3]]
+        inner_box = pya.DBox(
+            pya.DPoint(-15, -15),
+            pya.DPoint(15, 15),
+        )
+        
+        corner = pya.DPolygon([
+            pya.DPoint(95, 95),
+            pya.DPoint(25, 95),
+            pya.DPoint(25, 85),
+            pya.DPoint(85, 85),
+            pya.DPoint(85, 25),
+            pya.DPoint(95, 25),
+        ])
+        
+        outer_corners = [pya.DCplxTrans(0.5, rot * 90., False, pya.DVector()) * corner for rot in [0, 1, 2, 3]]
+        region_corners = pya.Region([s.to_itype(self.layout.dbu) for s in inner_corners + outer_corners])
+        
+        sqr = pya.DPolygon([
+            pya.DPoint(-2, 0),
+            pya.DPoint(0, 2),
+            pya.DPoint(2, 0),
+            pya.DPoint(0, -2),
+        ])
+        outer_corners = [pya.DCplxTrans(0.5, rot * 90., False, pya.DVector()) * corner for rot in [0, 1, 2, 3]]
+        
+        corner = pya.DPolygon([
+            pya.DPoint(0, 0),
+            pya.DPoint(0, 10),
+            pya.DPoint(4, 10),
+            pya.DPoint(4, 6),
+            pya.DPoint(2, 6),
+            pya.DPoint(2, 2),
+            pya.DPoint(6, 2),
+            pya.DPoint(6, 4),
+            pya.DPoint(10, 4),
+            pya.DPoint(10, 0),
+            pya.DPoint(0, 0),
+        ])
+        cross = [pya.DCplxTrans(1, rot * 90., False, pya.DVector()) * corner for rot in [0, 1, 2, 3]]
+        
+        
+        region_corners = pya.Region([s.to_itype(self.layout.dbu) for s in inner_corners + outer_corners])
+        region_cross = pya.Region([s.to_itype(self.layout.dbu) for s in cross])
+        
+        inner_region = pya.Region(inner_box.to_itype(self.layout.dbu))
+        inner_region -= region_cross
+        inner_region +=  pya.Region(sqr.to_itype(self.layout.dbu))
         
         self.inv_corners = pya.Region([protection_box.to_itype(self.layout.dbu)])
-        self.inv_corners -= corners
-        self.cell.shapes(layer_pads).insert(self.inv_corners - pya.Region(sqr_uni.to_itype(self.layout.dbu)))
+        self.inv_corners -= inner_region
+        self.inv_corners -= region_corners
+        
+        self.cell.shapes(layer_gap).insert(self.inv_corners)
        
        
         
-       
-       
-        
-        if not self.positive:
-          area = pya.DBox(
-            pya.DPoint(240, 240),
-            pya.DPoint(-240, -240)
-          )
-          sqr_uni = pya.DBox(
-              pya.DPoint(10, 10),
-              pya.DPoint(-10, -10),
-          )
-          ncorners = pya.Region(area).merged()-corners.merged()
-          insert_to_main_layers(ncorners)
-        else:
-          insert_to_main_layers(corners)
-          # center box
-          sqr_uni = pya.DBox(
-              pya.DPoint(10, 10),
-              pya.DPoint(-10, -10),
-          )
-          insert_to_main_layers(sqr_uni)
-
-        
-
-        # window for airbridge flyover layer
-        aflw = pya.DPolygon([
-            pya.DPoint(800, 800),
-            pya.DPoint(800, 10),
-            pya.DPoint(80, 10),
-            pya.DPoint(80, 2),
-            pya.DPoint(2, 2),
-            pya.DPoint(2, 80),
-            pya.DPoint(10, 80),
-            pya.DPoint(10, 800)
-        ])
-        if self.window:
-            for alpha in [0, 1, 2, 3]:
-                self.cell.shapes(layer_flyover).insert(pya.DTrans(alpha) * aflw)
-
-        # marker diagonal
-        sqr = pya.DBox(
-            pya.DPoint(10, 10),
-            pya.DPoint(2, 2),
-        )
-        self.diagonals = pya.Region()
-        for i in range(5, 5 + self.diagonal_squares):
-            ds = pya.DCplxTrans(3, 0, False, pya.DVector(50 * i - 3 * 6, 50 * i - 3 * 6)) * sqr
-            insert_to_main_layers(ds)
-            self.cell.shapes(layer_pads).insert(ds)
-            self.diagonals += ds.to_itype(self.layout.dbu)
-            self.cell.shapes(layer_protection).insert(
-                pya.DCplxTrans(20, 0, False, pya.DVector(50 * i - 20 * 6, 50 * i - 20 * 6)) * sqr)
