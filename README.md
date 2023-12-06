@@ -59,11 +59,8 @@ Drag and drop components in your layout, and connect them using 'paths' in the '
 A series of rules now need to be checked before your layout is ready for submission. Rules may be application-defined, like connectivity between components or making sure that two devices are not overlapping, or process defined, checking that two different elements are not too close to each other or making sure that an etching step has something to etch under it. 
 
 ### DRC verification
-DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:
+(To DO) DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:
 <p align="center"> <img src="https://user-images.githubusercontent.com/14344419/186352926-bfb39350-08f3-41ec-b7ab-997ce7dd4636.png" width="600"  /></p>
-
-### Layout submission verification
-This runs a set of scripts from the QFoundry that test basic layout considerations, like checking that the Chip Size cells are correctly included and that the size and layers used are consistent with their definitions. To run this check go to KQCircuits > Starfish x.x.x > Run Ligentec Pre-submission check.
 
 ## Exporting your design
 Go to KQCircuits > Starfish > Export for fabrication
