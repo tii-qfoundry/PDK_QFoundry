@@ -24,7 +24,7 @@ Minimum Feature Size (CPW core) | $6 \mu m$ |
 Maximum Feature Size (CPW core) | $20 \mu m$ |
 Metal Thickness | $200 nm$ | Measured
 Superconductive Layer Tc | $1.2 K$ | From Literature
-Superconductive Loss Tangent ($tan(\delta )$ ) | $3.3e-5$ | Measured
+Superconductive Loss Tangent ($tan(\delta )$ ) | $3.3\times10^{-5}$ | Measured
 
 #### Layer 2/0 - Junctions 
 Junctions are manufactured using a 2 step evaporation process at 40 degrees inclination with a single step of oxidation between them. Generatinbg a 3 nm thick oxide layer that forms the tunneling jucntion. The metal layers are finally capped with an oxide grown in a controlled environment to stabilize the jucntion parameters. Jucnytions 
