@@ -47,7 +47,7 @@ $$
 From which the jucntion energy can be approximated from the jucntion area $A$ as (for the qfoundry fabrication process)
 
 $$
-\frac{E_J}{h} = A \cdot 9.185\cdot 10^5 \ GHz 
+\frac{E_J}{h} = A \cdot 9.185\times 10^5 \ GHz 
 $$
 
 #### Layer 3/0 - Positive Lithography - Laser   
