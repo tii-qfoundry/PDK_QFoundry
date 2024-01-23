@@ -1,5 +1,5 @@
-# PDK_Starfish
-TII QFoundry standard PDK for superconductive qubit fabrication. It uses the KQcircuitrs.
+# QFoundry PDK
+TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK is based on KQcircuits.
 
 ## Installation
 
