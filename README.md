@@ -44,14 +44,14 @@ $$
 \frac{E_J}{h} = \frac12 \frac{\Delta}{4e^2} \frac{1}{R_N}
 $$
 
-From which the jucntion energy can be approximated from the jucntion area $A$ as (for the qfoundry fabrication process)
+From which the junction energy can be approximated from the jucntion area $A$ as (for the qfoundry fabrication process)
 
 $$
 \frac{E_J}{h} = A \cdot 9.185\times 10^5 \ GHz 
 $$
 
 #### Layer 3/0 - Positive Lithography - Laser   
-Metalization layer using high resolution lithogrpahy for the fabrication of metal patches or other metal featrues.
+Metalization layer using high resolution lithography for the fabrication of metal patches or other metal featrues.
 
 Parameter | Value | Comment
 --- | --- | --- | 
