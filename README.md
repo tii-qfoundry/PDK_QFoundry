@@ -34,7 +34,7 @@ Parameter | Value | Comment
 Minimum Feature Size (Junctions) | 200 $nm$ |
 Maximum Feature Size (Junctions) | 300 $nm$ |
 Metal Thickness | 200 $nm$ |
-Junction Resistivity |  $\Omega/ cm^2$ |
+Junction Resistivity |  $\Omega\cdot cm^2$ |
 Superconductive Tc | $1.14 K$ | From Literature
 Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
 
