@@ -17,16 +17,24 @@ def array_junctions():
     dbu = ly.dbu
   
     #Define the layers that willl be used in the layout
-    met_layer = top_cell.layout().layer(pya.LayerInfo(1, 0))
-    fp_layer = top_cell.layout().layer(pya.LayerInfo(68, 0))
+    met_layer = pya.LayerInfo(1, 0)
+    cap_layer = pya.LayerInfo(1, 0)  #
+    fp_layer  = pya.LayerInfo(68, 0) #Floor plan layer
     
-    #Draw a floor plan`f*
-    top_cell.shapes(fp_layer).insert(Box(-11000/dbu,-11000/dbu, 11000/dbu, 11000/dbu))
+    #Draw a floor plan 
+    fp_layer_idx = top_cell.layout().layer(fp_layer)
+    top_cell.shapes(fp_layer_idx).insert(Box(-11000/dbu,-11000/dbu, 11000/dbu, 11000/dbu))
     
     # Sweep over two parameter
     n = 11 
-    sweep_width = np.linspace(0.15,0.35,n)
-    sweep_angle = np.linspace(0.0,-50.0,n)
+    sweep_width_t = np.linspace(0.15,0.35,n)
+    sweep_width_b = sweep_width_t
+    #sweep_angle = np.linspace(0.0,-50.0,n)
+    
+    #Fixed parameters
+    cap_h = 100
+    angle = 90.0
+    
     
     # Loop through the parameter sweep
     
@@ -34,10 +42,12 @@ def array_junctions():
     x0 = -(dx*(n-1))/2
     dy = dx
     y0 = x0
-    for j, width in enumerate(sweep_width):
-        for i, angle in enumerate(sweep_angle):
-          cap_h = 90
+
+    for j, width_t in enumerate(sweep_width_t):
+        for i, width_b in enumerate(sweep_width_b):
+          
           trans = pya.Trans(pya.Trans.R0, (x0+dx*i)/dbu, (y0+dy*j)/dbu)
+
           label = "a:%2.1f, w:%.2f"%(angle,width)
           cell_starfish_manhattan = ly.create_cell("Qfoundry%s" % "Manhattan", "DevelopmentLib", 
             { "junction_width_t":width, 
@@ -47,9 +57,20 @@ def array_junctions():
               "patch_scratch":True,
               "path_layer":pya.LayerInfo(2,0),
               "cap_h":cap_h,
+
               "label":label,
-              "conn_height":25.0})
-          cell_instance = pya.CellInstArray(cell_starfish_manhattan.cell_index(),trans)       
-          shapes = top_cell.insert(cell_instance)
+              "cap_layer":cap_layer})
+          cell_instance = pya.CellInstArray(cell_starfish_manhattan.cell_index(),trans)
+          
+          label = "%.2f,%.2f"%(width_t,width_b)
+          trans = pya.Trans(pya.Trans.R0, (x0+dx*i-100+10)/dbu, (y0+dy*j+cap_h-10)/dbu)
+
+          if cap_layer != pya.LayerInfo(1, 0):
+            trans = trans* pya.Trans(pya.Trans.R0,0,25/dbu)
+          cell_label = ly.create_cell("TEXT", "Basic", {"text":label, "mag":20,"layer":cap_layer })
+          cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),trans)
+             
+          shapes_tmn = top_cell.insert(cell_instance)
+          shapes_lbl = top_cell.insert(cell_instance_lbl)
 
 array_junctions();

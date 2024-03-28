@@ -1,7 +1,92 @@
-# PDK_Starfish
-TII QFoundry standard PDK for superconductive qubit fabrication. It uses the KQcircuitrs.
+# QFoundry 2D - PDK
+TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK is based on KQcircuits.
 
-## Installation
+## Design Guide
+The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson jucntion micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
+
+
+### Fabrication Specifications
+
+General Process Specifications:
+Parameter | Value | Comment
+--- | --- | --- | 
+Substrate Thickness | 650 $\mu m$ | 
+Substrate Relative Permittivity | 11.65 | 
+Substrate Relative Resistivity | 10 $M\Omega \cdot cm$ |
+
+#### Layer 1/0 - Coplanar Waveguides (CPW) and Capacitors
+All superconductivce circuitry
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size | $3 \mu m$ |
+Minimum Feature Size (CPW core) | $6 \mu m$ |
+Maximum Feature Size (CPW core) | $20 \mu m$ |
+Metal Thickness | $200 nm$ | Measured
+Superconductive Layer Tc | $1.2 K$ | From Literature
+Superconductive Loss Tangent ($tan(\delta )$ ) | $3.3\times10^{-5}$ | Measured
+
+#### Layer 2/0 - Junctions 
+Junctions are manufactured using a 2 step evaporation process at 40 degrees inclination with a single step of oxidation between them. Generatinbg a 3 nm thick oxide layer that forms the tunneling jucntion. The metal layers are finally capped with an oxide grown in a controlled environment to stabilize the jucntion parameters. Jucnytions 
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size (Junctions) | 200 $nm$ |
+Maximum Feature Size (Junctions) | 300 $nm$ |
+Metal Thickness | 200 $nm$ |
+Junction Resistivity |  $\Omega\cdot cm^2$ |
+Superconductive Tc | $1.14 K$ | From Literature
+Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
+
+In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
+
+$$
+\frac{E_J}{h} = \frac12 \frac{\Delta}{4e^2} \frac{1}{R_N}
+$$
+
+From which the junction energy can be approximated from the jucntion area $A$ as (for the qfoundry fabrication process)
+
+$$
+\frac{E_J}{h} = A \cdot 9.185\times 10^5 \ GHz 
+$$
+
+#### Layer 3/0 - Positive Lithography - Laser   
+Metalization layer using high resolution lithography for the fabrication of metal patches or other metal featrues.
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size | $100 nm$ |
+Minimum Feature Spacing | $500 nm$ |
+Alignement Accuracy | $3 \mu m$ | Standard alignement marks need to be placed in Layer 1/0
+Metal Thickness | $200 nm$ | Measured
+
+
+#### Layer 4/0 - Positive Lithography - EBeam   
+Metalization layer using medium resolution lithogrpahy for the fabrication of metal patches or other metal featrues.
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size | $200 nm$ |
+Minimum Feature Spacing | $500 nm$ |
+Alignement Accuracy | $500 nm$ | Standard alignement marks need to be placed in Layer 1/0
+Metal Thickness | $200 nm$ | Measured
+
+
+
+### Standard Components
+
+
+
+
+
+### Standard PCB design
+The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of the following standard launcher configurations. 
+
+PCB Type | Die Size | Max Number of Ports | Launcher Type
+--- | --- | --- | --- 
+P001 | 5 x 5 mm | 12 (3 in a side) | 300 x 200 um
+
+## KLayout PDK Installation
 
 ### KQcircuits
 This PDK works with the KQcircuits package, develloped by IQM at Aalto University. To use 
@@ -59,11 +144,8 @@ Drag and drop components in your layout, and connect them using 'paths' in the '
 A series of rules now need to be checked before your layout is ready for submission. Rules may be application-defined, like connectivity between components or making sure that two devices are not overlapping, or process defined, checking that two different elements are not too close to each other or making sure that an etching step has something to etch under it. 
 
 ### DRC verification
-DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:
+(To DO) DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:
 <p align="center"> <img src="https://user-images.githubusercontent.com/14344419/186352926-bfb39350-08f3-41ec-b7ab-997ce7dd4636.png" width="600"  /></p>
-
-### Layout submission verification
-This runs a set of scripts from the QFoundry that test basic layout considerations, like checking that the Chip Size cells are correctly included and that the size and layers used are consistent with their definitions. To run this check go to KQCircuits > Starfish x.x.x > Run Ligentec Pre-submission check.
 
 ## Exporting your design
 Go to KQCircuits > Starfish > Export for fabrication
