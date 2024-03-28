@@ -10,7 +10,7 @@ def array_junctions():
     
     # Create a top cell and define base application pointers
     mw = pya.Application().instance().main_window()
-    ly = mw.create_layout('Starfish', 1).layout()
+    ly = mw.create_layout('Qfoundry', 1).layout()
     top_cell = ly.create_cell('top')
     lv = mw.current_view()
     lv.select_cell(top_cell.cell_index(), 0)
@@ -47,15 +47,17 @@ def array_junctions():
         for i, width_b in enumerate(sweep_width_b):
           
           trans = pya.Trans(pya.Trans.R0, (x0+dx*i)/dbu, (y0+dy*j)/dbu)
-          label = "a:%2.1f, w:%.2f"%(width_t,width_b)
-          cell_starfish_manhattan = ly.create_cell("Starfish%s" % "Manhattan", "DevelopmentLib", 
 
-            { "angle":angle,
-              "junction_width_t":width_t, 
-              "junction_width_b":width_b, 
-              "draw_cap":True, 
-              "draw_patch":False,
-              "cap_h":cap_h, 
+          label = "a:%2.1f, w:%.2f"%(angle,width)
+          cell_starfish_manhattan = ly.create_cell("Qfoundry%s" % "Manhattan", "DevelopmentLib", 
+            { "junction_width_t":width, 
+              "junction_width_b":width, 
+              "angle": angle,
+              "draw_cap":True,
+              "patch_scratch":True,
+              "path_layer":pya.LayerInfo(2,0),
+              "cap_h":cap_h,
+
               "label":label,
               "cap_layer":cap_layer})
           cell_instance = pya.CellInstArray(cell_starfish_manhattan.cell_index(),trans)

@@ -17,7 +17,7 @@ class QfoundryMarkerCross(Marker):
     """The PCell declaration for the Standard Marker.
     """
     
-    # Overriding some parameters os thta they dont get displayed in the PCell
+    # Overriding some parameters so that they dont get displayed in the PCell
     a = Param(pdt.TypeDouble, "Width of center conductor", 10, unit="μm", hidden=True)
     b = Param(pdt.TypeDouble, "Width of gap", 6, unit="μm", hidden=True)
     n = Param(pdt.TypeInt, "Number of points on turns", 64, hidden=True)
@@ -27,6 +27,7 @@ class QfoundryMarkerCross(Marker):
     protect_opposite_face = Param(pdt.TypeBoolean, "Add opposite face protection too", False,hidden=True)
     
     positive = Param(pdt.TypeBoolean, "Marker for positive lithography", default=False,hidden=False)
+    n_items = Param(pdt.TypeInt, "Number of markers (side)", default=2,hidden=False)
     
     def build(self):
         self.produce_geometry()
@@ -115,8 +116,14 @@ class QfoundryMarkerCross(Marker):
         self.inv_corners = pya.Region([protection_box.to_itype(self.layout.dbu)])
         self.inv_corners -= inner_region
         self.inv_corners -= region_corners
-        
-        self.cell.shapes(layer_gap).insert(self.inv_corners)
+        marker_step = 100
+        t = pya.Trans(pya.DVector(0,0).to_itype(self.layout.dbu))
+        for i in range(self.n_items):
+          for j in range(self.n_items):
+            self.cell.shapes(layer_gap).insert(self.inv_corners.transform(t))
+            t = pya.Trans(pya.DVector(-marker_step, 0).to_itype(self.layout.dbu))
+          t = pya.Trans(pya.DVector((self.n_items-1)*marker_step, marker_step).to_itype(self.layout.dbu))
+            
        
        
         

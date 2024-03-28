@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <technology>
- <name>Starfish</name>
+ <name>qfoundry</name>
  <description/>
  <group/>
  <dbu>0.001</dbu>
- <base-path>C:/Users/USER01/KLayout/tech/starfish</base-path>
- <original-base-path>C:\Users\USER01\KLayout\tech\starfish</original-base-path>
- <layer-properties_file>Starfish.lyp</layer-properties_file>
+ <base-path>C:/Users/USER01/KLayout/tech/qfoundry</base-path>
+ <original-base-path>C:\Users\USER01\KLayout\tech\qfoundry</original-base-path>
+ <layer-properties_file>qfoundry.lyp</layer-properties_file>
  <add-other-layers>true</add-other-layers>
  <reader-options>
   <gds2>

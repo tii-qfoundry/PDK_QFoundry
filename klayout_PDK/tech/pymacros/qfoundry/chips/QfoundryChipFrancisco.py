@@ -21,7 +21,7 @@ from kqcircuits.elements.finger_capacitor_square import FingerCapacitorSquare
 from kqcircuits.elements.flip_chip_connectors.flip_chip_connector_rf import FlipChipConnectorRf
 from kqcircuits.util.parameters import Param, pdt
 
-from starfish.defaults import default_sampleholders, default_marker_type, default_launcher_assignement, default_launcher_enabled
+from qfoundry.defaults import default_sampleholders, default_marker_type, default_launcher_assignement, default_launcher_enabled
 
 
 NAME_BRAND = "TII"
@@ -34,7 +34,7 @@ RESONATOR_LENGTH = 7358
 sampleholder_type_choices = list(default_sampleholders.keys())
             
 
-class StarfishChipFrancisco(Chip):
+class QfoundryChipFrancisco(Chip):
     sampleholder_type = Param(pdt.TypeList, "Type of the launchers", default_marker_type, choices=sampleholder_type_choices)
     
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
