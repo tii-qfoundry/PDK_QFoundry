@@ -10,7 +10,7 @@ def get_version_and_cmdclass(package_name):
     spec.loader.exec_module(module)
     return module.__version__, module.cmdclass
 
-packages=packages=['starfish']
+packages=packages=['qfoundry']
 #version, cmdclass = get_version_and_cmdclass('starfish')
 version = '0'
 
@@ -18,7 +18,7 @@ version = '0'
 setup(
     name='starfish',
     package_dir = {"starfish": "starfish"},
-    description="Starfish is a KLayout/Python-based superconducting quantum circuit PDK that works with KQcircuits, developed by TII.",
+    description="Qfoundry PDK is a KLayout/Python-based superconducting quantum circuit PDK that works with KQcircuits, developed by TII.",
     author="TII-QRC",
     packages=packages,
     python_requires=">=3.6.9",

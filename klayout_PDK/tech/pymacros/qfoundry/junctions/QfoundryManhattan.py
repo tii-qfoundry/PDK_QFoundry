@@ -15,11 +15,11 @@ from kqcircuits.util.symmetric_polygons import polygon_with_vsym
 from numpy import cos, sin, radians
 
 @logged
-class StarfishManhattan(Junction):
+class QfoundryManhattan(Junction):
     """The PCell declaration for a Manhattan style single junction.
     """
 
-    finger_overshoot = Param(pdt.TypeDouble, "Length of fingers after the junction.", 1.0, unit="μm")
+    finger_overshoot = Param(pdt.TypeDouble, "Length of fingers after the junction.", 1.0, unit="μm", hidden = False)
     include_base_metal_gap = Param(pdt.TypeBoolean, "Include base metal gap layer.", True)
     shadow_margin = Param(pdt.TypeDouble, "Shadow layer margin near the the pads.", 0.5, unit="μm")
     separate_junctions = Param(pdt.TypeBoolean, "Junctions to separate layer.", False)

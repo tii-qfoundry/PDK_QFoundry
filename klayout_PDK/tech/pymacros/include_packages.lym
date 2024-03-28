@@ -67,7 +67,7 @@ def _setup_pkg(src_dir, pkg_name):
         pya.MessageBox.info(f"Added '{pkg_name}' package.",
                             "Restart KLayout to make it visible!", pya.MessageBox.Ok)
 
-src_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'starfish')
+src_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'qfoundry')
 pkg_name = Path(src_dir).parts[-1]
 
 try:

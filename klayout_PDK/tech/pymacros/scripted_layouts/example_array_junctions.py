@@ -10,7 +10,7 @@ def array_junctions():
     
     # Create a top cell and define base application pointers
     mw = pya.Application().instance().main_window()
-    ly = mw.create_layout('Starfish', 1).layout()
+    ly = mw.create_layout('Qfoundry', 1).layout()
     top_cell = ly.create_cell('top')
     lv = mw.current_view()
     lv.select_cell(top_cell.cell_index(), 0)
@@ -39,7 +39,7 @@ def array_junctions():
           cap_h = 90
           trans = pya.Trans(pya.Trans.R0, (x0+dx*i)/dbu, (y0+dy*j)/dbu)
           label = "a:%2.1f, w:%.2f"%(angle,width)
-          cell_starfish_manhattan = ly.create_cell("Starfish%s" % "Manhattan", "DevelopmentLib", 
+          cell_starfish_manhattan = ly.create_cell("Qfoundry%s" % "Manhattan", "DevelopmentLib", 
             { "junction_width_t":width, 
               "junction_width_b":width, 
               "angle": angle,

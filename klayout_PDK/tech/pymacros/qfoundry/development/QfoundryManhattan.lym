@@ -25,12 +25,12 @@ from math import pi
 
 from kqcircuits.util.symmetric_polygons import polygon_with_vsym
 
-class StarfishManhattan(pya.PCellDeclarationHelper):
+class QfoundryManhattan(pya.PCellDeclarationHelper):
 
   def __init__(self):
 
     # Important: initialize the super class
-    super(StarfishManhattan, self).__init__()
+    super(QfoundryManhattan, self).__init__()
 
     # declare the parameters
     self.param("l_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(2, 0))
@@ -38,14 +38,14 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
     self.param("inner_angle", self.TypeDouble, "Angle between junction pads", default = 90.0)
     self.param("junction_width_t", self.TypeDouble, "Top jucntion width", default = 0.3, unit="μm",hidden=False)
     self.param("junction_width_b", self.TypeDouble, "Bottom jucntion width", default = 0.3, unit="μm",hidden=False)
-    self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=True)
+    self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=False)
     self.param("finger_overlap",self.TypeDouble, "Length of fingers inside the pads.", default=1.0, unit="μm",hidden=True)
     self.param("finger_size",self.TypeDouble, "Length of fingers (without overshoot).", default=10.0, unit="μm")
     self.param("round_pad", self.TypeBoolean, "Pad has round edges", default=True, hidden=True)
     self.param("pad_radius", self.TypeDouble, "Pad edge radius", default=1.0, hidden=True)
     
     self.param("conn_width", self.TypeDouble, "Connector pad width", default=5.0, hidden=True)
-    self.param("conn_height", self.TypeDouble, "Connector pad height", default=20.0, hidden=True)
+    self.param("conn_height", self.TypeDouble, "Connector pad height", default=20.0, hidden=False)
     
     self.param("draw_cap", self.TypeBoolean, "Include capacitor", default=True)
     self.param("draw_patch", self.TypeBoolean, "Include patches", default=True)
@@ -286,7 +286,7 @@ class StarfishManhattan(pya.PCellDeclarationHelper):
         
   def display_text_impl(self):
     # Provide a descriptive text for the cell
-    return "StarfishManhattan: A parameteric manhattan josephson jucntion"
+    return "QfoundryManhattan: A parameteric manhattan josephson jucntion"
   
   def coerce_parameters_impl(self):
     pass
@@ -360,7 +360,7 @@ class PCellLib(pya.Library):
     self.description = "QFoundry Development library"
     
     # register the PCell declarations
-    self.layout().register_pcell("StarfishManhattan", StarfishManhattan())
+    self.layout().register_pcell("QfoundryManhattan", QfoundryManhattan())
     # TODO: register more PCell declarations
     
     # register our library with the name "PCellLib"
