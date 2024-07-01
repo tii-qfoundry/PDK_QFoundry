@@ -27,7 +27,7 @@ Superconductive Layer Tc | $1.2 K$ | From Literature
 Superconductive Loss Tangent ($tan(\delta )$ ) | $3.3\times10^{-5}$ | Measured
 
 #### Layer 2/0 - Junctions 
-Junctions are manufactured using a 2 step evaporation process at 40 degrees inclination with a single step of oxidation between them. Generatinbg a 3 nm thick oxide layer that forms the tunneling jucntion. The metal layers are finally capped with an oxide grown in a controlled environment to stabilize the jucntion parameters. Jucnytions 
+Junctions are manufactured using a 2 step evaporation process at 40 degrees inclination with a single step of oxidation between them. Generatinbg a 3 nm thick oxide layer that forms the tunneling junction. The metal layers are finally capped with an oxide grown in a controlled environment to stabilize the junction parameters. 
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -44,7 +44,7 @@ $$
 \frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
-Where R* is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the jucntion capacitance calcuated from $C_{J} = \gamma * A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_r}{d}$ ). Frpom this the qubit frequency can be calculkated as
+Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the jucntion capacitance calcuated from $C_{J} = \gamma * A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_r}{d}$ ). Frpom this the qubit frequency can be calculkated as
 
 $$
   \frac{E_{q,01}}{h}= \sqrt{4E_J E_C}-E_C
@@ -59,7 +59,7 @@ $\gamma$ | 4.513e7 $F/{cm}^2$ |
 The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
 
 $$
-\frac{E_{q,01}}{h} = A \cdot 2.031\times 10^{18} + 3.988\times 10^9 \ GHz 
+\frac{E_{q,01}}{h} = A_{JJ} \cdot 2.031\times 10^{18} + 3.988\times 10^9 \ GHz 
 $$
 
 #### Layer 3/0 - Positive Lithography - Laser   
