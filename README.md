@@ -41,10 +41,10 @@ Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
 
 $$
-\frac{E_J}{h} = \frac12 \frac{\Delta}{4e^2} \frac{1}{R_N}
+\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
-From which the junction energy can be approximated from the jucntion area $A$ as (for the qfoundry fabrication process)
+Where $R^*$ is the fabrication resistance correction factor. From this equation the junction energy can be approximated directly from the jucntion area $A$ at 25 mK as (for the qfoundry fabrication process)
 
 $$
 \frac{E_J}{h} = A \cdot 9.185\times 10^5 \ GHz 
@@ -82,9 +82,11 @@ Metal Thickness | $200 nm$ | Measured
 ### Standard PCB design
 The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of the following standard launcher configurations. 
 
-PCB Type | Die Size | Max Number of Ports | Launcher Type
---- | --- | --- | --- 
-P001 | 5 x 5 mm | 12 (3 in a side) | 300 x 200 um
+PCB Type | Die Size | Max Number of Ports | Launcher Type | Comments
+--- | --- | --- | --- | --- 
+P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  
+P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  
+P003* | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  PCB not yet available
 
 ## KLayout PDK Installation
 
