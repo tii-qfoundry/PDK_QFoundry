@@ -59,9 +59,10 @@ $\gamma$ | 4.513e7 $F/{cm}^2$ |
 The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
 
 $$
-\frac{E_{q,01}}{h} = A_{JJ} \cdot 2.031\times 10^{18} + 3.988\times 10^9 \ GHz 
+\frac{E_{q,01}}{h} = A_{JJ} \cdot 2.031\times 10^{9} + 3.988 \ [GHz]
 $$
 
+With $A_{JJ}$ in $cm^2$. 
 #### Layer 3/0 - Positive Lithography - Laser   
 Metalization layer using high resolution lithography for the fabrication of metal patches or other metal featrues.
 
