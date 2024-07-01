@@ -44,10 +44,22 @@ $$
 \frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
-Where $R^*$ is the fabrication resistance correction factor. From this equation the junction energy can be approximated directly from the jucntion area $A$ at 25 mK as (for the qfoundry fabrication process)
+Where R* is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the jucntion capacitance calcuated from $C_{J} = \gamma * A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_r}{d}$ ). Frpom this the qubit frequency can be calculkated as
 
 $$
-\frac{E_J}{h} = A \cdot 9.185\times 10^5 \ GHz 
+  \frac{E_{q,01}}{h}= \sqrt{4E_J E_C}-E_C
+$$
+
+The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
+Parameter | Value | Comment
+--- | --- | --- | 
+$\rho^*$ | -2.767e-6 $Ohm \cdot {cm}^2$ |
+$\gamma$ | 4.513e7 $F/{cm}^2$ |
+
+The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
+
+$$
+\frac{E_{q,01}}{h} = A \cdot 2.031\times 10^{18} + 3.988\times 10^9 \ GHz 
 $$
 
 #### Layer 3/0 - Positive Lithography - Laser   
