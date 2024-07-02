@@ -178,9 +178,8 @@ A series of rules now need to be checked before your layout is ready for submiss
 
 ## Exporting your design
 [Export for Fabrication is not yet supported in the PDK]
-Go to KQCircuits > QFoundry > Export for fabrication
-(to do...)
-This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
+> Go to KQCircuits > QFoundry > Export for fabrication
+> This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
 
 ## Creating your own components
 To allow the cnsistnecy of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library.
