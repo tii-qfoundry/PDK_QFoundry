@@ -13,11 +13,7 @@ $$
 \frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
-Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). From these, the qubit frequency can be approximated by
-
-$$
-  \frac{E_{q,01}}{h}= \sqrt{4E_J E_C}-E_C
-$$
+Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
 
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
 Parameter | Value | Comment
@@ -26,13 +22,25 @@ $\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correct
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $\rho$ | 4.513e7 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
 
+#### Transmons
+The qubit frequency of transmon qubits can be approximated by
+
+$$
+  \frac{E_{q,01}}{h}= \sqrt{8E_J E_C}-E_C
+$$
+
+
+
 The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
 
 $$
 \frac{E_{q,01}}{h} = A_{JJ} \cdot 2.031\times 10^{9} + 3.988 \ [GHz]
 $$
 
-With $A_{JJ}$ in $cm^2$. 
+With $A_{JJ}$ the area of the Josphson Jucntion in $cm^2$. 
+
+## Layout Specification
+
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -42,9 +50,6 @@ Metal Thickness | 200 $nm$ |
 Junction Resistivity |  $\Omega\cdot cm^2$ |
 Superconductive Tc | $1.14 K$ | From Literature
 Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
-
-
-## Layout Specification
 
 ### Fabrication Specifications
 
