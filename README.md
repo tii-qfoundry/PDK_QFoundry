@@ -4,6 +4,8 @@ TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK
 ## Design Guide
 The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson jucntion micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
 
+<p align="center"><img width="200" alt="image" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/6645d804-900d-4106-accd-3f97fbc301ad"> </p>
+
 ### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
 
@@ -11,7 +13,7 @@ $$
 \frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
-Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance calcuated from $C_{J} = \gamma \cdot A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). From these, the qubit frequency can be calculated as
+Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). From these, the qubit frequency can be approximated by
 
 $$
   \frac{E_{q,01}}{h}= \sqrt{4E_J E_C}-E_C
