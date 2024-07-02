@@ -175,9 +175,9 @@ A series of rules now need to be checked before your layout is ready for submiss
 ### DRC verification
 [Design Verification is not yet supported in the PDK]
 > ~ DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:~
-<p align="center"> <img src="https://user-images.githubusercontent.com/14344419/186352926-bfb39350-08f3-41ec-b7ab-997ce7dd4636.png" width="600"  /></p>
 
 ## Exporting your design
+[Export for Fabrication is not yet supported in the PDK]
 Go to KQCircuits > QFoundry > Export for fabrication
 (to do...)
 This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
