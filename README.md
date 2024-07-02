@@ -8,7 +8,7 @@ The qfoundry microfabrication is a single layer superconductive aluminum manufac
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
 
 $$
-\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
+\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
 Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the jucntion capacitance calcuated from $C_{J} = \gamma * A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_r}{d}$ ). From these, the qubit frequency can be calculated as
@@ -20,7 +20,7 @@ $$
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
 Parameter | Value | Comment
 --- | --- | --- | 
-$\rho^*$ | -2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction 
+$\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction 
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $\rho$ | 4.513e7 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
 
