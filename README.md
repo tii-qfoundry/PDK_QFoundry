@@ -1,5 +1,5 @@
 # QFoundry 2D - PDK
-TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK lasyout tools are built on top of KQcircuits circuit package.
+TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK layout tools are built on top of KQcircuits circuit package.
 
 ## Design Guide
 The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson jucntion micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
