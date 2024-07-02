@@ -11,7 +11,7 @@ $$
 \frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
-Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the jucntion capacitance calcuated from $C_{J} = \gamma * A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_r}{d}$ ). From these, the qubit frequency can be calculated as
+Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the jucntion capacitance calcuated from $C_{J} = \gamma * A$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_r}{d}$ ). From these, the qubit frequency can be calculated as
 
 $$
   \frac{E_{q,01}}{h}= \sqrt{4E_J E_C}-E_C
