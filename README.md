@@ -1,43 +1,10 @@
 # QFoundry 2D - PDK
-TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK is based on KQcircuits.
+TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK lasyout tools are built on top of KQcircuits circuit package.
 
 ## Design Guide
 The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson jucntion micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
 
-
-### Fabrication Specifications
-
-General Process Specifications:
-Parameter | Value | Comment
---- | --- | --- | 
-Substrate Thickness | 650 $\mu m$ | 
-Substrate Relative Permittivity | 11.65 | 
-Substrate Relative Resistivity | 10 $M\Omega \cdot cm$ |
-
-#### Layer 1/0 - Coplanar Waveguides (CPW) and Capacitors
-All superconductivce circuitry
-
-Parameter | Value | Comment
---- | --- | --- | 
-Minimum Feature Size | $3 \mu m$ |
-Minimum Feature Size (CPW core) | $6 \mu m$ |
-Maximum Feature Size (CPW core) | $20 \mu m$ |
-Metal Thickness | $200 nm$ | Measured
-Superconductive Layer Tc | $1.2 K$ | From Literature
-Superconductive Loss Tangent ($tan(\delta )$ ) | $3.3\times10^{-5}$ | Measured
-
-#### Layer 2/0 - Junctions 
-Junctions are manufactured using a 2 step evaporation process at 40 degrees inclination with a single step of oxidation between them. Generatinbg a 3 nm thick oxide layer that forms the tunneling junction. The metal layers are finally capped with an oxide grown in a controlled environment to stabilize the junction parameters. 
-
-Parameter | Value | Comment
---- | --- | --- | 
-Minimum Feature Size (Junctions) | 200 $nm$ |
-Maximum Feature Size (Junctions) | 300 $nm$ |
-Metal Thickness | 200 $nm$ |
-Junction Resistivity |  $\Omega\cdot cm^2$ |
-Superconductive Tc | $1.14 K$ | From Literature
-Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
-
+### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
 
 $$
@@ -53,8 +20,9 @@ $$
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
 Parameter | Value | Comment
 --- | --- | --- | 
-$\rho^*$ | -2.767e-6 $Ohm \cdot {cm}^2$ |
-$\gamma$ | 4.513e7 $F/{cm}^2$ |
+$\rho^*$ | -2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction 
+$\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
+$\rho$ | 4.513e7 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
 
 The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
 
@@ -63,19 +31,71 @@ $$
 $$
 
 With $A_{JJ}$ in $cm^2$. 
-#### Layer 3/0 - Positive Lithography - Laser   
-Metalization layer using high resolution lithography for the fabrication of metal patches or other metal featrues.
 
 Parameter | Value | Comment
 --- | --- | --- | 
-Minimum Feature Size | $100 nm$ |
-Minimum Feature Spacing | $500 nm$ |
+Minimum Feature Size (Junctions) | 200 $nm$ |
+Maximum Feature Size (Junctions) | 300 $nm$ |
+Metal Thickness | 200 $nm$ |
+Junction Resistivity |  $\Omega\cdot cm^2$ |
+Superconductive Tc | $1.14 K$ | From Literature
+Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
+
+
+## Layout Specification
+
+### Fabrication Specifications
+
+General Process Specifications:
+Parameter | Value | Comment
+--- | --- | --- | 
+Substrate Thickness | 650 $\mu m$ | 
+Substrate Relative Permittivity | 11.65 | 
+Substrate Relative Resistivity | 10 $M\Omega \cdot cm$ |
+
+#### Layer 1/0 - Coplanar Waveguides (CPW) and Capacitors (Negative)
+All superconductivce circuitry. 
+> ``📝``
+> Layout components are specified as negative cells i.e. you draw the cells where no metalization is expected in the final design.
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size | $3 \mu m$ |
+Minimum Feature Spacing | $6 \mu m$ |
+Minimum Feature Size (CPW core) | $6 \mu m$ |
+Maximum Feature Size (CPW core) | $20 \mu m$ |
+Metal Thickness | $200 nm$ | Measured
+Superconductive Layer Tc | $1.2 K$ | From Literature
+Superconductive Loss Tangent ($tan(\delta )$ ) | $3.3\times10^{-5}$ | Measured
+
+#### Layer 2/0 - Junctions 
+Junctions are manufactured using a 2 step evaporation process at 40 degrees inclination with a single step of oxidation between them. Generating a 3 nm thick oxide layer that forms the tunneling junction. The metal layers are finally capped with an oxide grown in a controlled environment to stabilize the junction parameters.
+> ``📝``
+> Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. 
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size (Junctions) | 200 $nm$ |
+Maximum Feature Size (Junctions) | 300 $nm$ |
+Metal Thickness | 200 $nm$ |
+
+#### Layer 3/0 - Positive Lithography - Laser   
+Second metalization layer using low resolution lithography for the fabrication of metal patches or other metal features.
+> ``📝``
+> Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. You can definbe layout strctures in Layer 3/0 or 4/0 but not both.
+
+Parameter | Value | Comment
+--- | --- | --- | 
+Minimum Feature Size | $3 um$ |
+Minimum Feature Spacing | $6 um$ |
 Alignement Accuracy | $3 \mu m$ | Standard alignement marks need to be placed in Layer 1/0
 Metal Thickness | $200 nm$ | Measured
 
 
 #### Layer 4/0 - Positive Lithography - EBeam   
-Metalization layer using medium resolution lithogrpahy for the fabrication of metal patches or other metal featrues.
+Second metalization layer using medium resolution lithogrpahy for the fabrication of metal patches or other metal featrues.
+> ``📝``
+> Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. You can definbe layout strctures in Layer 3/0 or 4/0 but not both.
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -84,13 +104,7 @@ Minimum Feature Spacing | $500 nm$ |
 Alignement Accuracy | $500 nm$ | Standard alignement marks need to be placed in Layer 1/0
 Metal Thickness | $200 nm$ | Measured
 
-
-
 ### Standard Components
-
-
-
-
 
 ### Standard PCB design
 The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of the following standard launcher configurations. 
