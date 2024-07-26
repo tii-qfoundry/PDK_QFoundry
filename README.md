@@ -18,18 +18,19 @@ Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, re
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
 Parameter | Value | Comment
 --- | --- | --- | 
+$\rho$ |  1.399601E-05 $\Omega\cdot cm^2$ | Junction resisitivty of Manhattan junctions for Room Temperature measurements, see section below
+$R_0$ | -26.7 $\Omega$ | Modelled resistance at infinite area
 $\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
-$\rho$ | 1.405e-5 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
-$R_0$ | -110 $\Omega$ | Modelled resistance at infinite area
+Superconductive Tc | $1.14 K$ | From Literature
+Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
+
 #### Transmons
 The qubit frequency of transmon qubits can be approximated by
 
 $$
   \frac{E_{q,01}}{h}= \sqrt{8E_J E_C}-E_C
 $$
-
-
 
 The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
 
@@ -47,9 +48,14 @@ Parameter | Value | Comment
 Minimum Feature Size (Junctions) | 200 $nm$ |
 Maximum Feature Size (Junctions) | 300 $nm$ |
 Metal Thickness | 200 $nm$ |
-Junction Resistivity |  $\Omega\cdot cm^2$ |
-Superconductive Tc | $1.14 K$ | From Literature
-Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
+
+
+#### Junction Resistance
+![image](https://github.com/user-attachments/assets/6ac16944-4e01-4553-be56-d598301ad649)
+Measurements over 70 functional test junctions carried on the 26/07/2024
+
+
+####
 
 ### Fabrication Specifications
 
@@ -59,6 +65,12 @@ Parameter | Value | Comment
 Substrate Thickness | 650 $\mu m$ | 
 Substrate Relative Permittivity | 11.65 | 
 Substrate Relative Resistivity | 10 $M\Omega \cdot cm$ |
+
+
+
+
+
+
 
 #### Layer 1/0 - Coplanar Waveguides (CPW) and Capacitors (Negative)
 All superconductivce circuitry. 
