@@ -16,14 +16,15 @@ $$
 Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
 
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
+
 Parameter | Value | Comment
 --- | --- | --- | 
-$\rho$ |  1.399601E-05 $\Omega\cdot cm^2$ | Junction resisitivty of Manhattan junctions for Room Temperature measurements, see section below
-$R_0$ | -26.7 $\Omega$ | Modelled resistance at infinite area
+$\rho$ |  1.3996E-05 $\Omega\cdot cm^2$ | Junction resisitivity of Manhattan junctions for Room Temperature measurements, see section below
+$R_0$ | -26.7 $\Omega$ | Test probe resistance correction
 $\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
-Superconductive Tc | $1.14 K$ | From Literature
-Superconductive $\Delta$ | $2.78E-23 C$ | From Literature
+$T_c$ | $1.14 K$ | Superconductive critical temperature, from Literature
+$\Delta_{sc}$ | $2.78E-23 C$ | Superconductive bandgap, from Literature
 
 #### Transmons
 The qubit frequency of transmon qubits can be approximated by
