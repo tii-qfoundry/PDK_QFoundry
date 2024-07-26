@@ -20,7 +20,7 @@ Parameter | Value | Comment
 --- | --- | --- | 
 $\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
-$\rho$ | 1.405e-8 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
+$\rho$ | 1.405e-5 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
 $R_0$ | -110 $\Omega$ | Modelled resistance at infinite area
 #### Transmons
 The qubit frequency of transmon qubits can be approximated by
