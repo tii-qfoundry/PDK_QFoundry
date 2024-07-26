@@ -39,7 +39,7 @@ $$
 \frac{E_{q,01}}{h} = A_{JJ} \cdot 2.031\times 10^{9} + 3.988 \ [GHz]
 $$
 
-With $A_{JJ}$ the area of the Josphson Jucntion in $cm^2$. 
+With $A_{JJ}$ the specification area of the Josphson Junction in $cm^2$. 
 
 ## Layout Specification
 
@@ -55,7 +55,11 @@ Metal Thickness | 200 $nm$ |
 
 <p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/6ac16944-4e01-4553-be56-d598301ad649"> </p>
 
-Measurements over 70 functional test junctions carried on the 26/07/2024
+Measurements over 70 functional test junctions carried on the 26/07/2024. The fabricated jucntion resistance can be calculated as
+
+$$
+  R_n = \rho\cdot A_{JJ} + R_0
+$$
 
 
 ####
