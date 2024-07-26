@@ -18,10 +18,10 @@ Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, re
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
 Parameter | Value | Comment
 --- | --- | --- | 
-$\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction 
+$\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
-$\rho$ | 4.513e7 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
-
+$\rho$ | 1.405e-8 $\Omega \cdot {cm}^2$ | Junction Resisitivty 
+$R_0$ | -110 $\Omega$ | Modelled resistance at infinite area
 #### Transmons
 The qubit frequency of transmon qubits can be approximated by
 
