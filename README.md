@@ -2,44 +2,46 @@
 TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK layout tools are built on top of KQcircuits circuit package.
 
 ## Design Guide
-The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson jucntion micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
+The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson junction micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
 
 <p align="center"><img width="200" alt="image" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/6645d804-900d-4106-accd-3f97fbc301ad"> </p>
-
-### Qubit design
-In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
-
-$$
-\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^*} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
-$$
-
-Where  $R^* = \rho^*/A_{JJ}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the jucntion (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
 
 The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
 
 Parameter | Value | Comment
 --- | --- | --- | 
-$\rho$ |  1.3996E-05 $\Omega\cdot cm^2$ | Junction resisitivity of Manhattan junctions for Room Temperature measurements, see section below
+$\rho$ |  1.3996e-05 $\Omega\cdot cm^2$ | Junction resisitivity of Manhattan junctions for Room Temperature measurements, see section below
 $R_0$ | -26.7 $\Omega$ | Test probe resistance correction
-$\rho^*$ | 2.767e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
+$\rho^\ast$ | 3.073e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
+$R_0^\ast$ | 87.9 $\Omega$ | Junction total resistance correction
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $T_c$ | $1.14 K$ | Superconductive critical temperature, from Literature
 $\Delta_{sc}$ | $2.78E-23 C$ | Superconductive bandgap, from Literature
 
+### Qubit design
+In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
+
+$$
+\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^{\ast}} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
+$$
+
+Where $R^{\ast}= \rho^{\ast}/A_{JJ}+R_0^{\ast}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the junction (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
+
+
 #### Transmons
-The qubit frequency of transmon qubits can be approximated by
+The excitation frequency of transmon qubits can be approximated by
 
 $$
   \frac{E_{q,01}}{h}= \sqrt{8E_J E_C}-E_C
 $$
 
-The qubit frequency, for a transmon with shunt capacitance of $68.22 fF$ can be roughly estimated from
+The qubit frequency, for a transmon with shunt capacitance of $74 fF$ (typical transmon used by the qfoundry) can be roughly estimated from
 
 $$
-\frac{E_{q,01}}{h} = A_{JJ} \cdot 2.031\times 10^{9} + 3.988 \ [GHz]
+  \omega_{01}/2\pi = 7.2012 - 0.1473 \times R_n [GHz]
 $$
 
-With $A_{JJ}$ the specification area of the Josphson Junction in $cm^2$. 
+With $R_n$ the measured junction resistance in $k\Omega$. 
 
 ## Layout Specification
 
@@ -55,7 +57,7 @@ Metal Thickness | 200 $nm$ |
 
 <p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/6ac16944-4e01-4553-be56-d598301ad649"> </p>
 
-Measurements over 70 functional test junctions carried on the 26/07/2024. The fabricated jucntion resistance can be calculated as
+Values for $R_0$ and $\rho$ are derived frm measurements over 70 functional test junctions carried on the 26/07/2024. The fabricated junction resistance can be calculated as
 
 $$
   R_n = \rho\cdot A_{JJ} + R_0
