@@ -43,28 +43,19 @@ $$
 
 With $R_n$ the measured junction resistance in $k\Omega$. 
 
-## Layout Specification
-
-
-Parameter | Value | Comment
---- | --- | --- | 
-Minimum Feature Size (Junctions) | 200 $nm$ |
-Maximum Feature Size (Junctions) | 300 $nm$ |
-Metal Thickness | 200 $nm$ |
-
-
 #### Junction Resistance
 
 <p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/6ac16944-4e01-4553-be56-d598301ad649"> </p>
 
-Values for $R_0$ and $\rho$ are derived frm measurements over 70 functional test junctions carried on the 26/07/2024. The fabricated junction resistance can be calculated as
+Values for $R_0$ and $\rho$ are derived frm measurements over 70 functional test junctions carried on the 26/07/2024. The fabricated junction resistance can be approximated as
 
 $$
   R_n = \rho\cdot A_{JJ} + R_0
 $$
 
+Junctions R.T. resistance can tuned by annealing the fabricated device. Such process is normally carried to tune the R.T. resistance to match the design specification. 
 
-####
+## Layout Specification
 
 ### Fabrication Specifications
 
@@ -74,11 +65,6 @@ Parameter | Value | Comment
 Substrate Thickness | 650 $\mu m$ | 
 Substrate Relative Permittivity | 11.65 | 
 Substrate Relative Resistivity | 10 $M\Omega \cdot cm$ |
-
-
-
-
-
 
 
 #### Layer 1/0 - Coplanar Waveguides (CPW) and Capacitors (Negative)
