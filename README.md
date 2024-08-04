@@ -17,6 +17,7 @@ $R_0^\ast$ | 87.9 $\Omega$ | Junction total resistance correction
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $T_c$ | $1.14 K$ | Superconductive critical temperature, from Literature
 $\Delta_{sc}$ | $2.78E-23 C$ | Superconductive bandgap, from Literature
+$\epsilon_{r,Si}$ | $11.6883$ | Cold relative permittivity of Silicon, based on resonator measurements
 
 ### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
