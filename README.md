@@ -10,10 +10,8 @@ The current fabrication process of the TII qfoundry, uses the following process 
 
 Parameter | Value | Comment
 --- | --- | --- | 
-$\rho$ |  1.3996e-05 $\Omega\cdot cm^2$ | Junction resisitivity of Manhattan junctions for Room Temperature measurements, see section below
-$R_0$ | -26.7 $\Omega$ | Test probe resistance correction
-$\rho^\ast$ | 3.073e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
-$R_0^\ast$ | 87.9 $\Omega$ | Junction total resistance correction
+$R_n^\ast$ | 87.9 $\Omega$ | Junction total resistance correction (to fit qubit frequencies)
+$\rho_n^\ast$ | 3.073e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $T_c$ | $1.14 K$ | Superconductive critical temperature, from Literature
 $\Delta_{sc}$ | $2.78E-23 C$ | Superconductive bandgap, from Literature
@@ -45,16 +43,28 @@ $$
 With $R_n$ the measured junction resistance in $k\Omega$. 
 
 #### Junction Resistance
-
-<p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/6ac16944-4e01-4553-be56-d598301ad649"> </p>
-
-Values for $R_0$ and $\rho$ are derived frm measurements over 70 functional test junctions carried on the 26/07/2024. The fabricated junction resistance can be approximated as
+We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, hore used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Noth following the form:
 
 $$
   R_n = \rho\cdot A_{JJ} + R_0
 $$
 
-Junctions R.T. resistance can tuned by annealing the fabricated device. Such process is normally carried to tune the R.T. resistance to match the design specification. 
+Patched junctions
+<p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/6ac16944-4e01-4553-be56-d598301ad649"> </p>
+
+Full EBL junctions
+<p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/b6d2be6c-73de-46ed-98b0-fdd69b9ea4c3"> </p>
+
+Values for $R_0$ and $\rho$ are derived from measurements over >70 functional test junctions carried on the 26/07/2024 for Pathced jucntions and 12/08/2024 for full EBL junctions. T
+
+Parameter | Value | Comment
+--- | --- | --- | 
+$\rho_{patch}$ |  1.380e-05 $\Omega\cdot cm^2$ | Junction resisitivity of Manhattan junctions for Room Temperature measurements, see section below
+$\rho_{ebl}$ |  5.214e-05 $\Omega\cdot cm^2$ | Junction resisitivity of Manhattan junctions for Room Temperature measurements, see section below
+$R_{0,patch}$ | -26.7 $\Omega$ | Total resistance correction
+$R_{0,ebl}$ | -2.958 $k\Omega$ | Total resistance correction
+
+Furthermore, the junctions R.T. resistance can tuned by annealing the fabricated device. Such process is normally carried to tune the R.T. resistance to match the design specification. 
 
 ## Layout Specification
 
