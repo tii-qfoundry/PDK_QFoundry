@@ -36,7 +36,7 @@ NAME_CHIP = "D__"
 sampleholder_type_choices = list(default_sampleholders.keys())
             
 
-class FrameMPDK5mm(Chip):
+class FrameQF5(Chip):
     sampleholder_type = Param(pdt.TypeList, "Type of the launchers", 'mQRC12', choices=sampleholder_type_choices)
     
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)

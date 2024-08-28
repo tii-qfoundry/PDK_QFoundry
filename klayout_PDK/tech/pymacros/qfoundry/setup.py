@@ -16,8 +16,8 @@ version = '0'
 
 
 setup(
-    name='starfish',
-    package_dir = {"starfish": "starfish"},
+    name='qfoundry',
+    package_dir = {"qfoundry": "qfoundry"},
     description="Qfoundry PDK is a KLayout/Python-based superconducting quantum circuit PDK that works with KQcircuits, developed by TII.",
     author="TII-QRC",
     packages=packages,
