@@ -1,23 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>true</autorun>
- <autorun-early>false</autorun-early>
- <priority>0</priority>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>
-# Enter your Python code here
-
 # This code is part of KQFoundry
 # Copyright (C) 2024 TII
 #
@@ -97,7 +77,7 @@ class FrameQF10(Chip):
                 name_chip=self.name_chip,
                 box=frame_box,
                 face_ids=[self.face_ids[face]],
-                use_face_prefix=len(self.frames_enabled) &gt; 1,
+                use_face_prefix=len(self.frames_enabled) > 1,
                 dice_width=float(self.frames_dice_width[i]),
                 text_margin=default_mask_parameters[self.face_ids[face]]["text_margin"],
                 marker_dist=float(self.frames_marker_dist[i]),
@@ -128,6 +108,3 @@ class FrameQF10(Chip):
        
       print(self)
 
-
-</text>
-</klayout-macro>
