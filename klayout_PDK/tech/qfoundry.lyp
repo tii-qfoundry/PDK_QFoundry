@@ -145,7 +145,7 @@
   </group-members>
  </properties>
  <properties>
-  <expanded>false</expanded>
+  <expanded>true</expanded>
   <frame-color/>
   <fill-color/>
   <frame-brightness>0</frame-brightness>
@@ -162,7 +162,7 @@
   <name>KQcircuits</name>
   <source>*/*@*</source>
   <group-members>
-   <expanded>false</expanded>
+   <expanded>true</expanded>
    <frame-color/>
    <fill-color/>
    <frame-brightness>0</frame-brightness>
@@ -241,7 +241,7 @@
     <dither-pattern>I7</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -277,7 +277,7 @@
     <dither-pattern>I5</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -295,7 +295,7 @@
     <dither-pattern>I0</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -504,7 +504,7 @@
    </group-members>
   </group-members>
   <group-members>
-   <expanded>false</expanded>
+   <expanded>true</expanded>
    <frame-color/>
    <fill-color/>
    <frame-brightness>0</frame-brightness>
@@ -583,7 +583,7 @@
     <dither-pattern>I7</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -619,7 +619,7 @@
     <dither-pattern>I5</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -637,7 +637,7 @@
     <dither-pattern>I0</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -871,7 +871,7 @@
     <dither-pattern>I11</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -925,7 +925,7 @@
     <dither-pattern>I7</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -979,7 +979,7 @@
     <dither-pattern>I1</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>2</width>
     <marked>false</marked>
@@ -997,7 +997,7 @@
     <dither-pattern>I1</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>2</width>
     <marked>false</marked>
@@ -1015,7 +1015,7 @@
     <dither-pattern>I5</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1033,7 +1033,7 @@
     <dither-pattern>I5</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1051,7 +1051,7 @@
     <dither-pattern>I9</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1069,7 +1069,7 @@
     <dither-pattern>I0</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>true</transparent>
     <width>2</width>
     <marked>false</marked>
@@ -1087,7 +1087,7 @@
     <dither-pattern>I6</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1105,7 +1105,7 @@
     <dither-pattern>I23</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1123,7 +1123,7 @@
     <dither-pattern>I5</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>2</width>
     <marked>false</marked>
@@ -1142,7 +1142,7 @@
    <dither-pattern/>
    <line-style/>
    <valid>true</valid>
-   <visible>false</visible>
+   <visible>true</visible>
    <transparent>false</transparent>
    <width/>
    <marked>false</marked>
@@ -1195,7 +1195,7 @@
     <dither-pattern>I12</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1249,7 +1249,7 @@
     <dither-pattern>I12</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1375,7 +1375,7 @@
     <dither-pattern>I12</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1447,7 +1447,7 @@
     <dither-pattern>I12</dither-pattern>
     <line-style/>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -1459,11 +1459,11 @@
   </group-members>
   <group-members>
    <expanded>false</expanded>
-   <frame-color>#ff80a8</frame-color>
-   <fill-color>#ff80a8</fill-color>
+   <frame-color/>
+   <fill-color/>
    <frame-brightness>0</frame-brightness>
    <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
+   <dither-pattern/>
    <line-style/>
    <valid>true</valid>
    <visible>true</visible>
@@ -1473,277 +1473,331 @@
    <xfill>false</xfill>
    <animation>0</animation>
    <name/>
-   <source>'1b1_base_metal_gap' 1/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#c080ff</frame-color>
-   <fill-color>#c080ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_base_metal_gap_wo_grid' 2/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#9580ff</frame-color>
-   <fill-color>#9580ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_base_metal_addition' 3/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#8086ff</frame-color>
-   <fill-color>#8086ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_ground_grid' 4/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#80a8ff</frame-color>
-   <fill-color>#80a8ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_ground_grid_avoidance' 5/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#ff0000</frame-color>
-   <fill-color>#ff0000</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_base_metal_gap_for_EBL' 6/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#ff0080</frame-color>
-   <fill-color>#ff0080</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_waveguide_path' 7/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#ff00ff</frame-color>
-   <fill-color>#ff00ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_SIS_junction' 8/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#8000ff</frame-color>
-   <fill-color>#8000ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_SIS_shadow' 9/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#0080ff</frame-color>
-   <fill-color>#0080ff</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_SIS_junction_2' 11/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#80fffb</frame-color>
-   <fill-color>#80fffb</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_airbridge_pads' 18/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#80ff8d</frame-color>
-   <fill-color>#80ff8d</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_airbridge_flyover' 19/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#afff80</frame-color>
-   <fill-color>#afff80</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_underbump_metallization' 20/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#f3ff80</frame-color>
-   <fill-color>#f3ff80</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_indium_bump' 21/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#ffc280</frame-color>
-   <fill-color>#ffc280</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_through_silicon_via' 22/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#ffa080</frame-color>
-   <fill-color>#ffa080</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_through_silicon_via_avoidance' 23/1@1</source>
+   <source>*/*@*</source>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ff80a8</frame-color>
+    <fill-color>#ff80a8</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_base_metal_gap' 1/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#c080ff</frame-color>
+    <fill-color>#c080ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_base_metal_gap_wo_grid' 2/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#9580ff</frame-color>
+    <fill-color>#9580ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_base_metal_addition' 3/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#8086ff</frame-color>
+    <fill-color>#8086ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_ground_grid' 4/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#80a8ff</frame-color>
+    <fill-color>#80a8ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_ground_grid_avoidance' 5/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ff0000</frame-color>
+    <fill-color>#ff0000</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_base_metal_gap_for_EBL' 6/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ff0080</frame-color>
+    <fill-color>#ff0080</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_waveguide_path' 7/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ff00ff</frame-color>
+    <fill-color>#ff00ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_SIS_junction' 8/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#8000ff</frame-color>
+    <fill-color>#8000ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_SIS_shadow' 9/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#0080ff</frame-color>
+    <fill-color>#0080ff</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_SIS_junction_2' 11/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#80fffb</frame-color>
+    <fill-color>#80fffb</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_airbridge_pads' 18/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#80ff8d</frame-color>
+    <fill-color>#80ff8d</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_airbridge_flyover' 19/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#afff80</frame-color>
+    <fill-color>#afff80</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_underbump_metallization' 20/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#f3ff80</frame-color>
+    <fill-color>#f3ff80</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_indium_bump' 21/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ffc280</frame-color>
+    <fill-color>#ffc280</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_through_silicon_via' 22/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#ffa080</frame-color>
+    <fill-color>#ffa080</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_through_silicon_via_avoidance' 23/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#91ff00</frame-color>
+    <fill-color>#91ff00</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I9</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_ports' 26/1@1</source>
+   </group-members>
+   <group-members>
+    <expanded>false</expanded>
+    <frame-color>#008080</frame-color>
+    <fill-color>#008080</fill-color>
+    <frame-brightness>0</frame-brightness>
+    <fill-brightness>0</fill-brightness>
+    <dither-pattern>I5</dither-pattern>
+    <line-style/>
+    <valid>true</valid>
+    <visible>true</visible>
+    <transparent>false</transparent>
+    <width/>
+    <marked>false</marked>
+    <xfill>false</xfill>
+    <animation>0</animation>
+    <name/>
+    <source>'1b1_chip_dicing' 30/1@1</source>
+   </group-members>
   </group-members>
   <group-members>
    <expanded>false</expanded>
@@ -1762,42 +1816,6 @@
    <animation>0</animation>
    <name/>
    <source>'2b1_through_silicon_via_avoidance' 23/2@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#91ff00</frame-color>
-   <fill-color>#91ff00</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I9</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_ports' 26/1@1</source>
-  </group-members>
-  <group-members>
-   <expanded>false</expanded>
-   <frame-color>#008080</frame-color>
-   <fill-color>#008080</fill-color>
-   <frame-brightness>0</frame-brightness>
-   <fill-brightness>0</fill-brightness>
-   <dither-pattern>I5</dither-pattern>
-   <line-style/>
-   <valid>true</valid>
-   <visible>true</visible>
-   <transparent>false</transparent>
-   <width/>
-   <marked>false</marked>
-   <xfill>false</xfill>
-   <animation>0</animation>
-   <name/>
-   <source>'1b1_chip_dicing' 30/1@1</source>
   </group-members>
  </properties>
  <properties>
@@ -1872,7 +1890,7 @@
    <source>999/0@1</source>
   </group-members>
   <group-members>
-   <expanded>false</expanded>
+   <expanded>true</expanded>
    <frame-color/>
    <fill-color/>
    <frame-brightness>0</frame-brightness>
@@ -2005,7 +2023,7 @@
     <dither-pattern>I1</dither-pattern>
     <line-style>I3</line-style>
     <valid>true</valid>
-    <visible>false</visible>
+    <visible>true</visible>
     <transparent>false</transparent>
     <width>1</width>
     <marked>false</marked>
@@ -2052,23 +2070,41 @@
    </group-members>
    <group-members>
     <expanded>false</expanded>
-    <frame-color>#00ff00</frame-color>
+    <frame-color>#ff0080</frame-color>
     <fill-color>#00ff00</fill-color>
     <frame-brightness>0</frame-brightness>
     <fill-brightness>0</fill-brightness>
-    <dither-pattern>C2</dither-pattern>
+    <dither-pattern>I3</dither-pattern>
     <line-style/>
     <valid>true</valid>
     <visible>true</visible>
     <transparent>true</transparent>
-    <width>2</width>
+    <width>0</width>
     <marked>false</marked>
-    <xfill>false</xfill>
+    <xfill>true</xfill>
     <animation>0</animation>
-    <name>EXCPT [0/3]</name>
-    <source>0/3@1</source>
+    <name>DRC Exception [111/0]</name>
+    <source>'DRC Exception' 111/0@1</source>
    </group-members>
   </group-members>
+ </properties>
+ <properties>
+  <expanded>false</expanded>
+  <frame-color>#0000ff</frame-color>
+  <fill-color>#0000ff</fill-color>
+  <frame-brightness>0</frame-brightness>
+  <fill-brightness>0</fill-brightness>
+  <dither-pattern>I5</dither-pattern>
+  <line-style/>
+  <valid>true</valid>
+  <visible>true</visible>
+  <transparent>false</transparent>
+  <width/>
+  <marked>false</marked>
+  <xfill>false</xfill>
+  <animation>0</animation>
+  <name/>
+  <source>10/0@1</source>
  </properties>
  <name/>
  <custom-dither-pattern>
