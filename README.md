@@ -10,18 +10,22 @@ The current fabrication process of the TII qfoundry, uses the following process 
 
 Parameter | Value | Comment
 --- | --- | --- | 
-$R_n^\ast$ | 87.9 $\Omega$ | Junction total resistance correction (to fit qubit frequencies)
-$\rho_n^\ast$ | 3.073e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
+$R_n^\ast$ | -210 $\Omega$ | Junction total resistance correction (to fit qubit frequencies)
+$\rho_n^\ast$ | 5.9e-10 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $T_c$ | $1.14 K$ | Superconductive critical temperature, from Literature
 $\Delta_{sc}$ | $2.78E-23 C$ | Superconductive bandgap, from Literature
 $\varepsilon_{r,Si}$ | $11.6883$ | Cold relative permittivity of Silicon, based on resonator measurements
 
+<p align="center"><img width="500" alt="Qubit Frequency Ambegaokar-Baratoff relations" src="https://github.com/user-attachments/assets/68768c38-5a7b-45d5-9296-9132e47d8712"> </p>
+
+
+
 ### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
 
 $$
-\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^{\ast}} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
+\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^{\ast}} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
 Where $R^{\ast}= \rho^{\ast}/A_{JJ}+R_0^{\ast}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the junction (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
