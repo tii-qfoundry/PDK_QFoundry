@@ -108,8 +108,8 @@ Minimum Feature Size (Junctions) | 200 $nm$ |
 Maximum Feature Size (Junctions) | 300 $nm$ |
 Metal Thickness | 200 $nm$ |
 
-#### Layer 3/0 - Positive Lithography - Laser   
-Second metalization layer using low resolution lithography for the fabrication of metal patches or other metal features.
+#### Layer 3/0 - Positive Lithography - EBeam   
+Second metalization layer using high resolution lithography for the fabrication of metal patches or other metal features.
 > ``📝``
 > Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. You can definbe layout strctures in Layer 3/0 or 4/0 but not both.
 
@@ -121,8 +121,8 @@ Alignement Accuracy | $3 \mu m$ | Standard alignement marks need to be placed in
 Metal Thickness | $200 nm$ | Measured
 
 
-#### Layer 4/0 - Positive Lithography - EBeam   
-Second metalization layer using medium resolution lithogrpahy for the fabrication of metal patches or other metal featrues.
+#### Layer 4/0 - Positive Lithography - Laser   
+Second metalization layer using low resolution lithography for the fabrication of metal patches or other metal featrues.
 > ``📝``
 > Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. You can definbe layout strctures in Layer 3/0 or 4/0 but not both.
 
