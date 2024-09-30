@@ -50,7 +50,7 @@ With $R_n$ the measured junction resistance in $k\Omega$.
 We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, here used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Both following the form:
 
 $$
-  R_n = \rho\cdot A_{JJ} + R_0
+  R_n = \rho/ A_{JJ} + R_0
 $$
 
 Patched junctions
