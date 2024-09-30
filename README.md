@@ -140,9 +140,9 @@ The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of t
 
 PCB Type | Die Size | Max Number of Ports | Launcher Type | Comments
 --- | --- | --- | --- | --- 
-P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  
-P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  Available in August 2024
-P003* | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  PCB not yet available for production
+P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  Available
+P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  Available
+P003* | 10 x 10 mm | 16 (4 in each side) | 300 x 200 um |  Available
 
 ## KLayout PDK Installation
 
