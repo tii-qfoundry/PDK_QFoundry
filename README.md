@@ -211,5 +211,5 @@ A series of rules now need to be checked before your layout is ready for submiss
 > This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
 
 ## Creating your own components
-To allow the cnsistnecy of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library.
+To allow the consistency of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library. In addition, every component need to be inside a polygon in the DevRec layer (68/0) that is used to test component overlaps in pre-production. Make sure that all overlapping polygons in the same layer are merged to avoid double exposure during fabrication, resulting in low quality lithography.
 
