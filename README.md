@@ -10,18 +10,22 @@ The current fabrication process of the TII qfoundry, uses the following process 
 
 Parameter | Value | Comment
 --- | --- | --- | 
-$R_n^\ast$ | 87.9 $\Omega$ | Junction total resistance correction (to fit qubit frequencies)
-$\rho_n^\ast$ | 3.073e-6 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
+$R_n^\ast$ | -210 $\Omega$ | Junction total resistance correction (to fit qubit frequencies)
+$\rho_n^\ast$ | 5.9e-10 $\Omega \cdot {cm}^2$ | Junction resisitivty leakage correction (to fit qubit frequencies)
 $\gamma$ | 4.513e7 $F/{cm}^2$ | Junction Capacitance per unit Area
 $T_c$ | $1.14 K$ | Superconductive critical temperature, from Literature
 $\Delta_{sc}$ | $2.78E-23 C$ | Superconductive bandgap, from Literature
 $\varepsilon_{r,Si}$ | $11.6883$ | Cold relative permittivity of Silicon, based on resonator measurements
 
+<p align="center"><img width="500" alt="Qubit Frequency Ambegaokar-Baratoff relations" src="https://github.com/user-attachments/assets/68768c38-5a7b-45d5-9296-9132e47d8712"> </p>
+
+
+
 ### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
 
 $$
-\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n-R^{\ast}} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
+\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^{\ast}} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
 $$
 
 Where $R^{\ast}= \rho^{\ast}/A_{JJ}+R_0^{\ast}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the junction (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
@@ -43,10 +47,10 @@ $$
 With $R_n$ the measured junction resistance in $k\Omega$. 
 
 #### Junction Resistance
-We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, hore used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Noth following the form:
+We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, here used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Both following the form:
 
 $$
-  R_n = \rho\cdot A_{JJ} + R_0
+  R_n = \rho/ A_{JJ} + R_0
 $$
 
 Patched junctions
@@ -55,7 +59,7 @@ Patched junctions
 Full EBL junctions
 <p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/b6d2be6c-73de-46ed-98b0-fdd69b9ea4c3"> </p>
 
-Values for $R_0$ and $\rho$ are derived from measurements over >70 functional test junctions carried on the 26/07/2024 for Pathced jucntions and 12/08/2024 for full EBL junctions. T
+Values for $R_0$ and $\rho$ are derived from measurements over >70 functional test junctions carried on the 26/07/2024 for Patched jucntions and 12/08/2024 for full EBL junctions.
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -104,8 +108,8 @@ Minimum Feature Size (Junctions) | 200 $nm$ |
 Maximum Feature Size (Junctions) | 300 $nm$ |
 Metal Thickness | 200 $nm$ |
 
-#### Layer 3/0 - Positive Lithography - Laser   
-Second metalization layer using low resolution lithography for the fabrication of metal patches or other metal features.
+#### Layer 3/0 - Positive Lithography - EBeam   
+Second metalization layer using high resolution lithography for the fabrication of metal patches or other metal features.
 > ``📝``
 > Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. You can definbe layout strctures in Layer 3/0 or 4/0 but not both.
 
@@ -117,8 +121,8 @@ Alignement Accuracy | $3 \mu m$ | Standard alignement marks need to be placed in
 Metal Thickness | $200 nm$ | Measured
 
 
-#### Layer 4/0 - Positive Lithography - EBeam   
-Second metalization layer using medium resolution lithogrpahy for the fabrication of metal patches or other metal featrues.
+#### Layer 4/0 - Positive Lithography - Laser   
+Second metalization layer using low resolution lithography for the fabrication of metal patches or other metal featrues.
 > ``📝``
 > Layout Components are specified as positive cells i.e. you draw the cells where metalization is desired. You can definbe layout strctures in Layer 3/0 or 4/0 but not both.
 
@@ -136,9 +140,9 @@ The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of t
 
 PCB Type | Die Size | Max Number of Ports | Launcher Type | Comments
 --- | --- | --- | --- | --- 
-P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  
-P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  Available in August 2024
-P003* | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  PCB not yet available for production
+P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  Available
+P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  Available
+P003* | 10 x 10 mm | 16 (4 in each side) | 300 x 200 um |  Available
 
 ## KLayout PDK Installation
 
@@ -207,5 +211,5 @@ A series of rules now need to be checked before your layout is ready for submiss
 > This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
 
 ## Creating your own components
-To allow the cnsistnecy of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library.
+To allow the consistency of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library. In addition, every component need to be inside a polygon in the DevRec layer (68/0) that is used to test component overlaps in pre-production. Make sure that all overlapping polygons in the same layer are merged to avoid double exposure during fabrication, resulting in low quality lithography.
 
