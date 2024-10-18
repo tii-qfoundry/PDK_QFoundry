@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <klayout-macro>
- <description/>
+ <description>QFoundry DRC</description>
  <version/>
  <category>drc</category>
  <prolog/>
@@ -9,14 +9,14 @@
  <autorun>false</autorun>
  <autorun-early>false</autorun-early>
  <priority>0</priority>
- <shortcut>D</shortcut>
+ <shortcut>R</shortcut>
  <show-in-menu>true</show-in-menu>
  <group-name>drc_scripts</group-name>
- <menu-path>qfoundry.drc</menu-path>
+ <menu-path>tools_menu.drc.end</menu-path>
  <interpreter>dsl</interpreter>
  <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
- <text># DRC checks for the qfoundry PDK
-
+ <text>
+# DRC checks for the qfoundry PDK
 # Read about DRC scripts in the User Manual under "Design Rule Check (DRC)"
 # http://klayout.de/doc/manual/drc_basic.html
 # https://klayout.de/doc/about/drc_ref_drc.html
@@ -50,7 +50,7 @@ tol = 1e-1
 
 # Dimensions of aluminum superconductive layer
 poly_sc_pos.width(6.micron-tol,angle_limit(0.01)).output("wg width","Waveguide width minimum feature size violation; min 6 um")
-spacing_errors = poly_sc_pos.clean.space(3.micron-tol,angle_limit(60))
+spacing_errors = poly_sc_pos.clean.space(2.micron-tol,angle_limit(60))
 output(spacing_errors, "wg space","Waveguide width minimum feature size violation; min 3000 nm")
 
 poly_al_jj.width(0.2.micron-tol).output("jj width","Waveguide width minimum feature size violation; min 250 nm")
@@ -60,5 +60,8 @@ poly_al_jj.space(0.2.micron-tol,angle_limit(60)).output("jj space","Waveguide wi
 #result = writeField.drc(excluding(poly_al_jj)&gt;0.2.um).output("jj positioning","EBL polygons for junctions must be contained within a single writefield.")
 
 
-# = al_sc.space(0.4.um, props_eq + props_copy).output("Positioning","Connected.")</text>
+# = al_sc.space(0.4.um, props_eq + props_copy).output("Positioning","Connected.")
+
+
+</text>
 </klayout-macro>
