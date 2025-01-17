@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Export for FAB</description>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name/>
+ <menu-path>kqcircuits_menu.begin</menu-path>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+'''
+This script is used to export the layout for fabrication
+Based on the export_for_fabrication.lym script from SiEPIC-Tools
+'''
+import pya
+import os
+
+def export_for_fabrication(format = 'OASIS'):
+    # Save the layout prior to exporting, if there are changes.
+    mw = pya.Application.instance().main_window()
+    if mw.manager().has_undo():
+        mw.cm_save()
+    layout_filename = mw.current_view().active_cellview().filename()
+    if len(layout_filename) == 0:
+        pya.MessageBox.warning("Error.", "LThe layoiut needs to be saved in system before export.", pya.MessageBox.Ok)
+        return
+   
+
+    # Save the layout, without PCell info, for fabrication
+    save_options = pya.SaveLayoutOptions()
+    save_options.write_context_info=False  # remove $$$CONTEXT_INFO$$$
+    save_options.format=format # OASIS has a smaller file size
+    save_options.oasis_compression_level=10
+    save_options.oasis_permissive=True
+    file_out = os.path.join(os.path.dirname(layout_filename), os.path.splitext(os.path.basename(layout_filename))[0]+'_static.'+save_options.format[0:3].lower())
+    
+    ly = mw.current_view().active_cellview().layout()
+    ly.cell_character_replacement(forbidden_cell_characters = '=', replacement_cell_character = '_')
+    ly.cell_character_replacement(forbidden_cell_characters = ',', replacement_cell_character = '_')
+
+    try:
+        ly.write(file_out,save_options)
+    except:
+        raise Exception("Problem exporting your layout.")
+    
+    pya.MessageBox.warning("Success.", "Layout exported successfully: \n%s" %file_out, pya.MessageBox.Ok)
+
+export_for_fabrication()
+
+</text>
+</klayout-macro>

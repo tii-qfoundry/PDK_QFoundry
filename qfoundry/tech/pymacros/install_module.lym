@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Install the qfoundry module when is not available</description>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>true</autorun-early>
+ <priority>10</priority>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+import pya
+import sys
+from os import path 
+
+pdk_module_dir = path.dirname(path.realpath(__file__)) #path.join(path.dirname(path.realpath(__file__)), 'qfoundry')
+print(f'{pdk_module_dir} -- path: {sys.path}')
+
+# Make sure that the module is included in the python path
+if pdk_module_dir not in sys.path:
+    sys.path.append(pdk_module_dir)</text>
+</klayout-macro>

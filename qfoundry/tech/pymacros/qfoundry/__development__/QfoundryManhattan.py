@@ -1,24 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>true</autorun>
- <autorun-early>false</autorun-early>
- <priority>0</priority>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya
+import pya
 from numpy import cos, sin, radians, linspace, sign
 from math import pi
-
+from pya import Region
 # Parametric Manhattan Josephson Junction
 # Copyright: TII QRC/QFoundry 2023
 # Juan E. Villegas, Nov. 2023
@@ -303,6 +286,7 @@ class QfoundryManhattan(pya.PCellDeclarationHelper):
     finger_shapes = self._draw_junction(pya.DPoint(0, 0)) 
     conn_shapes = self._draw_connectors(pya.DPoint(0, 0))
     layer = self.layout.layer(self.l_layer)
+    print(finger_shapes)
     self._add_shapes(finger_shapes, layer)
     self._add_shapes(conn_shapes, layer)
     
@@ -346,7 +330,7 @@ class QfoundryManhattan(pya.PCellDeclarationHelper):
           
   def _add_shapes(self, shapes, layer):
           """Merge shapes into a region and add it to layer."""
-          region = pya.Region(shapes).merged()
+          region = Region(shapes).merged()
           self.cell.shapes(layer).insert(region)
           return region    
           
@@ -354,27 +338,4 @@ class QfoundryManhattan(pya.PCellDeclarationHelper):
           """Merge shapes into a region and add it to layer."""
           region = pya.Region(shapesA).merged()-pya.Region(shapesB).merged()
           self.cell.shapes(layer).insert(region)
-          return region    
-          
-# The PCell library declaration
-class PCellLib(pya.Library):
-
-  def __init__(self):
-  
-    # TODO: change the description
-    self.description = "QFoundry Development library"
-    
-    # register the PCell declarations
-    self.layout().register_pcell("QfoundryManhattan", QfoundryManhattan())
-    # TODO: register more PCell declarations
-    
-    # register our library with the name "PCellLib"
-    # TODO: change the library name
-    self.register("DevelopmentLib")
-    
-# instantiate and register the library
-# TODO: change the library name
-PCellLib()
-
-</text>
-</klayout-macro>
+          return region

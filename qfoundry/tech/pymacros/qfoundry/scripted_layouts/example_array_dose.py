@@ -3,7 +3,7 @@
 # Copyright TII QFoundry 2023
 # Juan E. Villegas
 
-# Array with mul;tiplejucntion widths (symmetric) and multiple dose factors
+# Array with multiplejucntion widths (symmetric) and multiple dose factors
 
 from pya import *
 import numpy as np

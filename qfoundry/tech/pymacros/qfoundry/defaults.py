@@ -66,4 +66,3 @@ default_launcher_assignement['mQRC12'] = {1: "NW", 2: "N", 3: "NE",
 default_launcher_enabled['QRC6'] = ["W","E", "N", "NE", "S", "SW" ]   
 default_launcher_enabled['QRC8'] = ["N", "NE", "EN", "E","S", "SW", "WS","W"]                       
 default_launcher_enabled['QRC12'] = ["NW","N", "NE", "EN", "E","ES","SE","S", "SW", "WS","W", "WN"]                          
-default_launcher_enabled['mQRC12']= ["NW","N", "NE", "EN", "E","ES","SE","S", "SW", "WS","W", "WN"]  
