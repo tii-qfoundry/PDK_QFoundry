@@ -275,7 +275,7 @@ class Manhattan(pya.PCellDeclarationHelper):
             
     def _add_shapes(self, shapes, layer):
             """Merge shapes into a region and add it to layer."""
-            region = pya.Region(shapes).merged()
+            region:pya.Region = pya.Region(shapes).merged()
             self.cell.shapes(layer).insert(region)
             return region    
             
@@ -330,7 +330,7 @@ class Manhattan(pya.PCellDeclarationHelper):
   
 if __name__ == "__main__":
     # You need to reload the library to see the changes in the PCell 
-    from qfoundry.scripts import test_pcell, reload_library
+    from qfoundry.scripts import test_pcell, PDK_Lib
 
     pcell_decl = QfoundryManhattan
     pcell_params = {

@@ -1,7 +1,8 @@
 # This code is part of KQCircuits
-# Example XS Code from IQM, needs update to match QFoundry Processing
+# Based on XS code from IQM
 # Copyright (C) 2023 IQM Finland Oy
-#
+# Copyright (C) 2025 TII Abu Dhabi
+
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
 # License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
 # version.
@@ -20,7 +21,7 @@
 # Example XSection process description file
 # Can only render 1t1 and 2b1 faces
 
-chip_distance = 10.0 # distance between bottom chip and top chip
+chip_distance = 10.0 # distance between bottom chip and top chip for flip chip 
 wafer_thickness = 100.0
 
 # Basic options
@@ -50,7 +51,7 @@ layer_2b1_indium_bump = layer("21/2")
 
 # general parameters
 
-base_metal_height = 0.2
+base_metal_height = 0.3
 ubm_height = 0.02
 
 
