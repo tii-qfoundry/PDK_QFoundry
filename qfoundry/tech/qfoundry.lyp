@@ -1869,7 +1869,7 @@
     <marked>false</marked>
     <xfill>false</xfill>
     <animation>0</animation>
-    <name>Design Writefield [98/0]</name>
+    <name>EBL Writefield [98/0]</name>
     <source>98/0@1</source>
    </group-members>
    <group-members>
@@ -1887,7 +1887,7 @@
     <marked>false</marked>
     <xfill>false</xfill>
     <animation>0</animation>
-    <name>CHS Writefield [99/0]</name>
+    <name>Design Area [99/0]</name>
     <source>99/0@1</source>
    </group-members>
    <group-members>

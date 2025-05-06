@@ -4,8 +4,12 @@
 # It uses the KQcircuits library
 
 from kqcircuits.chips.chip import Chip
-from kqcircuits.defaults import default_layers, default_junction_type, default_mask_parameters, \
-                                default_bump_parameters
+from kqcircuits.defaults import (
+  default_layers, 
+  default_junction_type, 
+  default_mask_parameters,
+  default_bump_parameters
+)
                                 
 from kqcircuits.elements.chip_frame import ChipFrame
 from kqcircuits.chips.launchers import Launchers
@@ -25,8 +29,8 @@ from qfoundry.defaults import default_sampleholders, default_marker_type, defaul
 
 
 NAME_BRAND = "TII"
-NAME_MASK = "5Q"
-NAME_CHIP = "D##"
+NAME_MASK = "MASK"
+NAME_CHIP = "QPU-"
 
 #new paramters for launchers
 
@@ -36,7 +40,7 @@ sampleholder_type_choices = list(default_sampleholders.keys())
 Single face frame for 10 x 10 mm superconducting mask
 """
 class FrameQF10(Chip):
-    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", 'mQRC12', choices=sampleholder_type_choices)
+    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", 'QRC16', choices=sampleholder_type_choices)
     
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
     name_chip = Param(pdt.TypeString, "Name of the chip", "")
@@ -47,7 +51,7 @@ class FrameQF10(Chip):
     diagonal_squares = Param(pdt.TypeList, "Number of diagonal marker squares for each chip frame", 0, hidden=True)
     
     #dice_width
-    dice_width = Param(pdt.TypeDouble, "Width of dice edege", 200, unit="[μm]")
+    dice_width = Param(pdt.TypeDouble, "Width of dice edge", 200, unit="[μm]")
 
     #dice_grid_margin
 
@@ -57,7 +61,7 @@ class FrameQF10(Chip):
     #Global parameters for waveguides
     a = Param(pdt.TypeDouble, "Width of the center conductor", 15)
     b = Param(pdt.TypeDouble, "Width of gap", 7.5)
-    r = Param(pdt.TypeDouble, "Turn radius", 150, hidden=True)
+    r = Param(pdt.TypeDouble, "Turn radius", 50, hidden=True)
     
     def produce_structures(self):
         """Produces chip frame and possibly other structures before the ground grid.
@@ -99,7 +103,6 @@ class FrameQF10(Chip):
 
         if self.with_gnd_bumps:
             self._produce_ground_bumps()
-    
 
     def build(self):
       self.produce_n_launchers(**default_sampleholders[self.sampleholder_type], 

@@ -27,12 +27,13 @@ excpt = input(111)
 poly_al_sc = input("1","130/1").flatten.merged- excpt # &amp; input(130).flatten
 poly_al_jj = input("2/0").flatten - excpt
 
-devRec=input(68,0)
-floorPlan=input(99)
+devRec    =input(68,0).flatten
+floorPlan =input(99).flatten
 writeField = input(98).flatten
+airbridge_pads    = input(146,1).flatten - excpt
+airbridge_flyover = input(147,1).flatten - excpt
 
-
-poly_sc_pos = floorPlan.merged - (poly_al_sc )
+poly_sc_pos = floorPlan.merged - (poly_al_sc)
 
 
 # Check device overlaps (functional check)
@@ -43,7 +44,13 @@ output(overlaps, "Devices","Devices cannot be overlapping.")
 poly_al_sc.outside(floorPlan).output("Boundary","Devices are out of boundary")
 poly_al_jj.outside(floorPlan).output("Boundary","Junctions are out of boundary")
 
-poly_al_jj.outside(writeField).output("Writefield Boundary","Junctios are out of a writefield.")
+overlap = poly_al_jj.overlapping(writeField.raw,2)
+overlap.output("Writefield Alignment","The junction overlaps more than one EBL writefield. Junctions need to be fully enclosed by a single writefield.")
+outside = poly_al_jj.outside(writeField)
+outside.output("Writefield Alignment","Junctions must be defined within a writefield boundary.")
+
+# wf_overlap = writeField.merged(2)
+# wf_overlap.output("Writefield Alignment","It appears more than one type of writefield is being defined.")
 
 
 tol = 1e-1
@@ -57,10 +64,9 @@ poly_al_jj.width(0.2.micron-tol).output("jj width","Waveguide width minimum feat
 poly_al_jj.space(0.2.micron-tol,angle_limit(60)).output("jj space","Waveguide width minimum feature size violation; min 250 nm")
 
 
-#result = writeField.drc(excluding(poly_al_jj)&gt;0.2.um).output("jj positioning","EBL polygons for junctions must be contained within a single writefield.")
+airbridge_pads.and(poly_al_sc).output("Airbridges","Metalization in the airbridge pads is overlapping with the waveguide spacing.")
+airbridge_pads.select_not_inside(airbridge_flyover).output("Airbridges","The pads of the airbridges needs to be fully covered by the flyover region.")
 
-
-# = al_sc.space(0.4.um, props_eq + props_copy).output("Positioning","Connected.")
 
 
 </text>
