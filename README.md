@@ -19,7 +19,7 @@ $\varepsilon_{r,Si}$ | $11.6883$ | Cold relative permittivity of Silicon, based 
 
 <p align="center"><img width="500" alt="Qubit Frequency Ambegaokar-Baratoff relations" src="https://github.com/user-attachments/assets/68768c38-5a7b-45d5-9296-9132e47d8712"> </p>
 
-
+Standard coplanar waveguides used by the foundry are 15 $\mu m$ wide with 7.5 $\mu m$ spacing to the ground plane. This creates a waveguide with characteristic impedance of $Z_0 = 49.24 \Omega$ and effective permittivity of $\epsilon_{eff}=6.345$.
 
 ### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
@@ -69,6 +69,17 @@ $R_{0,patch}$ | -26.7 $\Omega$ | Total resistance correction
 $R_{0,ebl}$ | -2.958 $k\Omega$ | Total resistance correction
 
 Furthermore, the junctions R.T. resistance can tuned by annealing the fabricated device. Such process is normally carried to tune the R.T. resistance to match the design specification. 
+
+#### Airbridges
+Aluminum airbridges can be manufactured using a two step litography process, in which the base resist layer is heated to reflow it and generate a profile that serves as support structure during the metal deposition. Airbridges are a common way to remove parastic modes in waveguides and help make sure the ground plane remains equi-potential, and they can be used to build waveguide crossings. However, airbridges are know to cause losses related to impedance missmatch, additional scattering and will add a parasitic capacitance to the waveguide, that may have a strong effect on the system.
+
+The following parameters can be used to model the effect of the QFoundry's standard airbridges to your circuit
+Parameter | Value | Comment
+--- | --- | --- | 
+$C_{b}$ |  0.434 $fF$ | Bridge capacitance, from measured SC resonators
+$\delta_{b}$ |  0.0  | Additional loss tangent of the waveguide
+
+<p align="center"><img width="400" alt="airbridge" src="https://github.com/user-attachments/assets/c6e05ecf-8391-4bb0-8d88-428b8849526f"> </p>
 
 ## Layout Specification
 
