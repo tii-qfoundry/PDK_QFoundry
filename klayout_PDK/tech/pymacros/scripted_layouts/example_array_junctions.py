@@ -48,10 +48,10 @@ def array_junctions():
           
           trans = pya.Trans(pya.Trans.R0, (x0+dx*i)/dbu, (y0+dy*j)/dbu)
 
-          label = "a:%2.1f, w:%.2f"%(angle,width)
+          label = "a:%2.1f, w:%.2f"%(angle,width_t)
           cell_starfish_manhattan = ly.create_cell("Qfoundry%s" % "Manhattan", "DevelopmentLib", 
-            { "junction_width_t":width, 
-              "junction_width_b":width, 
+            { "junction_width_t":width_t, 
+              "junction_width_b":width_t, 
               "angle": angle,
               "draw_cap":True,
               "patch_scratch":True,
