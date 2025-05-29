@@ -274,10 +274,13 @@ class Manhattan(pya.PCellDeclarationHelper):
             polygon_list.append(polygon.to_itype(self.layout.dbu))  
             
     def _add_shapes(self, shapes, layer):
-            """Merge shapes into a region and add it to layer."""
-            region = pya.Region(shapes).merged()
-            self.cell.shapes(layer).insert(region)
-            return region    
+        """Merge shapes into a region and add it to layer."""
+        if type(shapes) == list:
+          region:pya.Region = pya.Region(array=shapes).merged()
+        else:
+          region:pya.Region = pya.Region(shapes).merged()
+        self.cell.shapes(layer).insert(region)
+        return region    
             
     def _substract_shapes(self, shapesA, shapesB, layer):
             """Merge shapes into a region and add it to layer."""
