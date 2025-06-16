@@ -18,46 +18,107 @@
  <text>import pya
 import csv
 
-def export_locations_to_csv(locations, parent_window):
+def read_parameter_from_csv(parent_window):
     """
-    Exports a list of junction locations and their parent cells to a CSV file.
-    It opens a file dialog for the user to choose the save location.
+    Opens a CSV file containing cell names and values for a parameter, and returns
+    the data as a dictionary for easy lookup.
 
     Args:
-        locations (list): A list of tuples, where each tuple is
-                          (x_coord, y_coord, parent_name).
-        parent_window (QMainWindow): The main KLayout window to parent the dialog.
-    """
-    if not locations:
-        print("No locations to export.")
-        return
+        parent_window (QMainWindow): The main KLayout window for the dialog.
 
-    # Open a file dialog to get the save path from the user
-    file_path = pya.QFileDialog.getSaveFileName(
+    Returns:
+        A dictionary mapping cell names to cparameter values, e.g.,
+        {'Qubit_A_design': '15.2'}, or an empty dictionary on failure/cancellation.
+    """
+    parameter_map = {}
+
+    # Open a file dialog for the user to select the critical current CSV
+    file_path = pya.QFileDialog.getOpenFileName(
         parent_window,
-        "Save Junction Locations as CSV",
-        "",  # Start directory
+        "Open a parameter CSV File",
+        "", # Start directory
         "CSV Files (*.csv)"
     )
 
-    # The dialog returns a tuple (path, filter), we only need the path.
-    # In some versions of Qt/PySide, it might just be a string.
     if isinstance(file_path, tuple):
         file_path = file_path[0]
 
     if file_path:
         try:
-            with open(file_path, 'w', newline='') as csvfile:
+            with open(file_path, 'r', newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+
+                # --- IMPORTANT ---
+                # These variables MUST match the column headers in your CSV file.
+                cell_name_column = 'parent_cell' # Or whatever you call the name column
+                current_column = 'value'   # Or whatever you call the value column
+                # -----------------
+
+                # Check if the required headers exist
+                if not all(col in reader.fieldnames for col in [cell_name_column, current_column]):
+                    pya.QMessageBox.critical(
+                        parent_window, "CSV Header Error",
+                        f"The CSV file must contain columns named '{cell_name_column}' and '{current_column}'. Please check the file and try again.",
+                        pya.QMessageBox.Ok
+                    )
+                    return {}
+
+                for row in reader:
+                    cell_name = row.get(cell_name_column)
+                    current = row.get(current_column)
+                    if cell_name and current:
+                        parameter_map[cell_name] = current
+                    else:
+                        print(f"Warning: Skipping row in parameter file due to missing data: {row}")
+
+            print(f"Successfully read {len(parameter_map)} values into a map.")
+            return parameter_map
+
+        except Exception as e:
+            print(f"Error reading critical current CSV: {e}")
+            return {}
+    else:
+        print("Reading parameter values cancelled by user.")
+        return {}
+
+
+def export_combined_data_to_csv(locations, critical_currents_map, parent_window):
+    """
+    Exports a combined list of junction locations and their matched critical
+    currents to a single CSV file.
+
+    Args:
+        locations (list): A list of tuples (x, y, parent_name).
+        critical_currents_map (dict): A dictionary mapping parent_name to a critical current.
+        parent_window (QMainWindow): The main KLayout window for the dialog.
+    """
+    if not locations:
+        print("No locations to export.")
+        return
+
+    file_path = pya.QFileDialog.getSaveFileName(
+        parent_window,
+        "Save Combined Junction Data as CSV",
+        "",
+        "CSV Files (*.csv)"
+    )
+
+    if isinstance(file_path, tuple):
+        file_path = file_path[0]
+
+    if file_path:
+        try:
+            with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
+                writer.writerow(["X Coordinate (um)", "Y Coordinate (um)", "Parent Cell", "Critical Current"])
 
-                # Write the header
-                writer.writerow(["X Coordinate (um)", "Y Coordinate (um)", "Parent Cell"])
-
-                # Write the data rows
                 for x, y, parent_name in locations:
-                    writer.writerow([f"{x:.6f}", f"{y:.6f}", parent_name])
+                    # Look up the critical current using the parent cell name.
+                    # .get() is used to avoid errors if a match is not found.
+                    current = critical_currents_map.get(parent_name, "NOT FOUND") # Default if not found
+                    writer.writerow([f"{x:.6f}", f"{y:.6f}", parent_name, current])
 
-            print(f"Successfully exported {len(locations)} locations to: {file_path}")
+            print(f"Successfully exported combined data to: {file_path}")
 
         except Exception as e:
             print(f"Error exporting to CSV: {e}")
@@ -65,31 +126,24 @@ def export_locations_to_csv(locations, parent_window):
         print("CSV export cancelled by user.")
 
 
-def find_junction_placeholders_with_parent(target_cell_name = "junction_placeholder"):
+def find_junction_placeholders_with_parent(target_cell_name = "default"):
     """
-    Finds all instances of the cell "junction_placeholder" in the current layout,
-    including those in arrays and nested cells, and returns their global
-    coordinates and the name of their parent cell.
+    (This function is unchanged)
+    Finds all instances of the cell target_cell_name and returns their
+    global coordinates and parent cell name.
     """
     app = pya.Application.instance()
     mw = app.main_window()
     lv = mw.current_view()
-    if lv is None:
-        raise Exception("No layout view found. Please open a layout.")
-
+    if lv is None: raise Exception("No layout view found.")
     layout = lv.active_cellview().layout()
     top_cell = lv.active_cellview().cell
-    if top_cell is None:
-        raise Exception("No top cell found in the current view.")
+    if top_cell is None: raise Exception("No top cell found.")
 
-    
     locations = []
 
-    # Recursive function to search for the target cell
     def search_cell(parent_cell, trans, depth):
-        if depth &gt; 2:
-            return
-
+        if depth &gt; 2: return
         for inst in parent_cell.each_inst():
             child_cell = inst.cell
             if inst.is_regular_array():
@@ -110,10 +164,8 @@ def find_junction_placeholders_with_parent(target_cell_name = "junction_placehol
                 else:
                     search_cell(child_cell, instance_trans, depth + 1)
 
-    # Start the search
     search_cell(top_cell, pya.Trans.new(), 0)
 
-    # Print the results table
     if locations:
         print("----------------------------------------------------------------------")
         print(f"Found {len(locations)} instances of '{target_cell_name}':")
@@ -126,26 +178,27 @@ def find_junction_placeholders_with_parent(target_cell_name = "junction_placehol
     else:
         print(f"No instances of cell '{target_cell_name}' found.")
 
-    return locations, mw # Return both the list and the main window handle
+    return locations, mw
 
 # --- Main execution ---
 if __name__ == "__main__":
-    # Find the junctions and get the locations list
-    cell_name = "junction_placeholder"
-    found_locations, main_window = find_junction_placeholders_with_parent(cell_name)
+    target_cell_name = "junction_placeholder"
+    found_locations, main_window = find_junction_placeholders_with_parent(target_cell_name)
 
-    # If any locations were found, ask the user if they want to export to CSV
     if found_locations:
-        # This creates a simple "Yes/No" message box
         reply = pya.QMessageBox.question(
             main_window,
-            "Export to CSV",
-            f'A total of {len(found_locations)} {cell_name} locations were found. Do you want to export the list to a CSV file?',
+            "Export Data",
+            f"{len(found_locations)} {target_cell_name} locations were found. Do you want to merge this data with a parameter CSV and export it?",
             pya.QMessageBox.Yes | pya.QMessageBox.No,
-            pya.QMessageBox.No # Default button
+            pya.QMessageBox.No
         )
 
         if reply == pya.QMessageBox.Yes:
-            # Call the export function with the locations list
-            export_locations_to_csv(found_locations, main_window)</text>
+            # Read the critical current data from the CSV into a dictionary (map)
+            current_data_map = read_parameter_from_csv(main_window)
+
+            # Proceed only if the user selected a valid file
+            if current_data_map:
+                export_combined_data_to_csv(found_locations, current_data_map, main_window)</text>
 </klayout-macro>

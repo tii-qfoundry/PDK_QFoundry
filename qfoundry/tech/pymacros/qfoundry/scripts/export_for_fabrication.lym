@@ -15,45 +15,222 @@
  <menu-path>kqcircuits_menu.begin</menu-path>
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
- <text>
-'''
-This script is used to export the layout for fabrication
-Based on the export_for_fabrication.lym script from SiEPIC-Tools
-'''
-import pya
-import os
+ <text>import pya
 
-def export_for_fabrication(format = 'OASIS'):
-    # Save the layout prior to exporting, if there are changes.
-    mw = pya.Application.instance().main_window()
-    if mw.manager().has_undo():
-        mw.cm_save()
-    layout_filename = mw.current_view().active_cellview().filename()
-    if len(layout_filename) == 0:
-        pya.MessageBox.warning("Error.", "LThe layoiut needs to be saved in system before export.", pya.MessageBox.Ok)
-        return
-   
+def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_flatten_cell_list = ['fill_8p'], final_layer_styles = None):
+    """
+    This script prepares the currently active layout for fabrication by:
+    1. Creating a new "static" layout with a flattened hierarchy.
+    2. Selectively flattening the contents of cells instanced in the top cell,
+       while preserving a list of specified cells (e.g., fill cells).
+    3. Moving and merging specified layers to their final fabrication layers
+       based on a configurable dictionary.
+    4. Deleting all shapes on non-fabrication layers.
+    """
+    print("--- Starting Fabrication Preparation Script ---")
 
-    # Save the layout, without PCell info, for fabrication
-    save_options = pya.SaveLayoutOptions()
-    save_options.write_context_info=False  # remove $$$CONTEXT_INFO$$$
-    save_options.format=format # OASIS has a smaller file size
-    save_options.oasis_compression_level=10
-    save_options.oasis_permissive=True
-    file_out = os.path.join(os.path.dirname(layout_filename), os.path.splitext(os.path.basename(layout_filename))[0]+'_static.'+save_options.format[0:3].lower())
+    # --- 0. Setup and Configuration ---
+    app = pya.Application.instance()
+    mw = app.main_window()
+    lv = mw.current_view()
+
+    if not lv:
+        raise Exception("No layout view found. Please open a layout first.")
+
+    orig_layout = lv.active_cellview().layout()
+    orig_top_cell = lv.active_cellview().cell
+    dbu = orig_layout.dbu
+
+    # --- List of cell names that should NOT be flattened ---
+    #no_flatten_cell_list = ['fill_30p', 'fill_4p']
+    print(f"Cells to preserve (will not be flattened): {no_flatten_cell_list}")
+
     
-    ly = mw.current_view().active_cellview().layout()
-    ly.cell_character_replacement(forbidden_cell_characters = '=', replacement_cell_character = '_')
-    ly.cell_character_replacement(forbidden_cell_characters = ',', replacement_cell_character = '_')
+    
+    # List of target layers that should have their shapes merged after remapping.
+    layers_to_merge = [(1, 0)]
 
     try:
-        ly.write(file_out,save_options)
-    except:
-        raise Exception("Problem exporting your layout.")
+        # --- 1. Create a New "Static" Layout for Flattening ---
+        print("\nStep 1: Creating a new static layout for processing...")
+
+        # Create a new layout in a new view/tab and get its CellView object.
+        fab_cellview = mw.create_layout(1)
+        fab_layout = fab_cellview.layout()
+        fab_layout.dbu = dbu
+        
+        fab_layout.clear()
+
+        # Create a new top cell in the new layout
+        fab_top_cell_name = orig_top_cell.name + "_FAB"
+        fab_top_cell = fab_layout.create_cell(fab_top_cell_name)
+
+        # Copy the entire hierarchy from the original top cell to the new one
+        fab_top_cell.copy_tree(orig_top_cell)
+        print(f"Created new layout with top cell '{fab_top_cell_name}'.")
+
+        # --- 2. Selective Flattening ---
+        print("\nStep 2: Performing selective flattening...")
+        
+        preserved_instances_info = []
+
+        
+        # This list will store the actual instance objects to be deleted later.
+        all_instances_to_remove = []
+
+        # ** FIX: Part 1 - Find and Collect **
+        # Iterate through the hierarchy to find instances to preserve without modifying anything.
+        for top_inst in fab_top_cell.each_inst():
+            parent_cell = top_inst.cell
+            
+            for sub_inst in parent_cell.each_inst():
+                if sub_inst.cell.name in no_flatten_cell_list:
+                    # Store all parameters needed to fully reconstruct the instance
+                    instance_data = (
+                        sub_inst.trans,
+                        sub_inst.a,
+                        sub_inst.b,
+                        sub_inst.na,
+                        sub_inst.nb
+                    )
+                    preserved_instances_info.append(
+                        (parent_cell, sub_inst.cell.cell_index(), instance_data)
+                    )
+                    all_instances_to_remove.append(sub_inst)
+
+        # ** FIX: Part 2 - Delete **
+        # Now, iterate through the collected list to perform the deletions.
+        # This is safe because we are not iterating over a live database iterator.
+        if all_instances_to_remove:
+            print(f"  - Preserving {len(all_instances_to_remove)} instances by temporarily removing them.")
+            for inst_to_del in all_instances_to_remove:
+                inst_to_del.delete()
+
+        # ** FIX: Part 3 - Flatten **
+        # With protected instances gone, flatten the parent cells.
+        for top_inst in fab_top_cell.each_inst():
+            print(f"  - Flattening cell '{top_inst.cell.name}'...")
+            top_inst.cell.flatten(-1, True)
+
+        print("Cell flattening complete.")
+
+
+        if preserved_instances_info:
+            print(f"\nStep 2b: Re-inserting {len(preserved_instances_info)} preserved instances...")
+            for parent_cell, child_index, instance_data in preserved_instances_info:
+                # Unpack the stored parameters
+                trans, a, b, na, nb = instance_data
+                # Re-create the instance from the stored parameters
+                parent_cell.insert(pya.CellInstArray(child_index, trans, a, b, na, nb))
+            print("Re-insertion complete.")
+        
+        # --- 3. Process Layer Mapping ---
+        print("\nStep 3: Processing layer mappings...")
+
+        for target_spec, source_specs in layer_mapping.items():
+            print(f"  - Processing target layer {target_spec}")
+            target_layer_idx = fab_layout.layer(*target_spec)
+
+            for source_spec in source_specs:
+                # If source and target are the same, no move is needed.
+                if source_spec == target_spec:
+                    continue
+
+                print(f"    - Moving shapes from {source_spec} to {target_spec}")
+                source_layer_idx = fab_layout.layer(*source_spec)
+
+                # Use cell.move for efficiency, which moves shapes and clears the source.
+                for cell in fab_layout.each_cell():
+                    if not cell.shapes(source_layer_idx).is_empty():
+                        cell.move(source_layer_idx, target_layer_idx)
+
+            # Handle merging if this target layer is in the merge list
+            if target_spec in layers_to_merge:
+                print(f"    - Merging shapes on target layer {target_spec}")
+                for cell in fab_layout.each_cell():
+                    if not cell.shapes(target_layer_idx).is_empty():
+                        region = pya.Region(cell.shapes(target_layer_idx))
+                        region.merge()
+                        cell.clear(target_layer_idx)
+                        cell.shapes(target_layer_idx).insert(region)
+        
+        print("Layer mapping complete.")
+
+        # --- 4. Delete all non-fabrication layers ---
+        print("\nStep 4: Deleting all layers except for fabrication layers...")
+        
+        fab_layer_indices = {fab_layout.layer(*spec) for spec in layer_mapping.keys()}
+        all_layer_indices = fab_layout.layer_indexes()
+        
+        layers_to_delete = [idx for idx in all_layer_indices if idx not in fab_layer_indices]
+        
+        if layers_to_delete:
+            print(f"  - Deleting data from {len(layers_to_delete)} non-fab layers.")
+            for layer_idx in layers_to_delete:
+                for cell in fab_layout.each_cell():
+                    cell.clear(layer_idx)
+        else:
+            print("  - No other layers found to delete.")
+
+        print("Layer cleanup complete.")
     
-    pya.MessageBox.warning("Success.", "Layout exported successfully: \n%s" %file_out, pya.MessageBox.Ok)
+         # --- 5. Cleanup Unused Cell Definitions ---
+        print("\nStep 5: Cleaning up unused cell definitions...")
+        fab_layout.cleanup()
+        print("Unused cells have been removed.")
 
-export_for_fabrication()
+        # --- 6. Finalization ---
+        # The layout is already created and visible. We just need to
+        # set the view to our new top cell and zoom to fit.
+        fab_view = fab_cellview.view()
+        fab_view.clear_layers() # Remove all old layer styles
 
-</text>
+        # Define the new layer properties for our fab layers
+        # Format: (layer, datatype), name, fill_color, frame_color
+        if not(final_layer_styles == None):
+
+  
+          for spec, name, fill_color, frame_color in final_layer_styles:
+              node = pya.LayerPropertiesNode()
+              node.dither_pattern = 0 # Solid fill
+              node.fill_color = fill_color
+              node.frame_color = frame_color
+              node.source_layer = spec[0]
+              node.source_datatype = spec[1]
+              node.name = name
+              fab_view.insert_layer(fab_view.end_layers(), node)
+        
+        # Set the view to our new top cell and zoom to fit.
+        fab_cellview.cell_name = fab_top_cell.name
+        fab_view.zoom_fit()
+        
+        print("\n--- Script Finished Successfully ---")
+        print(f"New layout '{fab_top_cell_name}' is ready in a new tab.")
+
+    except Exception as e:
+        print(f"\n--- An Error Occurred ---")
+        pya.QMessageBox.critical(mw, "Script Error", str(e))
+
+
+# --- Run the main function ---
+if __name__ == "__main__":
+    # --- Layer Mapping Configuration ---
+    # Dictionary where:
+    #   - key:   is a tuple for the TARGET layer (layer, datatype)
+    #   - value: is a list of tuples for the SOURCE layers to be moved to the target.
+    layer_mapping = {
+        (1, 0): [(130, 1), (1, 0)],
+        (6, 0): [(146, 1), (6, 10)],
+        (7, 0): [(147, 1), (7, 10)]
+    }
+    
+    final_layer_styles = [
+            ((1, 0), "Fab Layer 1/0", 0x6d75ff, 0x6D75ff), # Darkblue
+            ((6, 0), "Fab Layer 6/0", 0xff0000, 0xff0000), # Red
+            ((7, 0), "Fab Layer 7/0", 0x00ff00, 0x00ff00), # Green
+        ]
+        
+    no_flatten_cell_list = ['test_cell']
+    
+    prepare_for_fabrication(layer_mapping, no_flatten_cell_list, final_layer_styles)</text>
 </klayout-macro>
