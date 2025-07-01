@@ -190,9 +190,9 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
         if not(final_layer_styles == None):
 
   
-          for spec, name, fill_color, frame_color in final_layer_styles:
+          for spec, name, fill_color, frame_color, pattern in final_layer_styles:
               node = pya.LayerPropertiesNode()
-              node.dither_pattern = 0 # Solid fill
+              node.dither_pattern = pattern # Solid fill
               node.fill_color = fill_color
               node.frame_color = frame_color
               node.source_layer = spec[0]
@@ -225,9 +225,10 @@ if __name__ == "__main__":
     }
     
     final_layer_styles = [
-            ((1, 0), "Fab Layer 1/0", 0x6d75ff, 0x6D75ff), # Darkblue
-            ((6, 0), "Fab Layer 6/0", 0xff0000, 0xff0000), # Red
-            ((7, 0), "Fab Layer 7/0", 0x00ff00, 0x00ff00), # Green
+            ((1, 0), "Fab Layer 1/0", 0x6d75ff, 0x6D75ff,0), # Darkblue
+            ((2, 0), "Fab Layer 2/0", 0x990000, 0x990000,0), # Red
+            ((6, 0), "Fab Layer 6/0", 0xaaffaa, 0xaaffaa,0), # Greenish
+            ((7, 0), "Fab Layer 7/0", 0x009900, 0x009900,2), # Green
         ]
         
     no_flatten_cell_list = ['test_cell']

@@ -113,10 +113,12 @@ def export_combined_data_to_csv(locations, critical_currents_map, parent_window)
                 writer.writerow(["X Coordinate (um)", "Y Coordinate (um)", "Parent Cell", "Critical Current"])
 
                 for x, y, parent_name in locations:
+                    x_mm = x/1e3
+                    y_mm = y/1e3
                     # Look up the critical current using the parent cell name.
                     # .get() is used to avoid errors if a match is not found.
                     current = critical_currents_map.get(parent_name, "NOT FOUND") # Default if not found
-                    writer.writerow([f"{x:.6f}", f"{y:.6f}", parent_name, current])
+                    writer.writerow([f"{x_mm:.6f}", f"{y_mm:.6f}", parent_name, current])
 
             print(f"Successfully exported combined data to: {file_path}")
 
