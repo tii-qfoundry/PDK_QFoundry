@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>drc_scripts</group-name>
+ <menu-path>tools_menu.drc.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
+ <text>
+# DRC checks for the qfoundry PDK
+# Read about DRC scripts in the User Manual under "Design Rule Check (DRC)"
+# http://klayout.de/doc/manual/drc_basic.html
+# https://klayout.de/doc/about/drc_ref_drc.html
+
+report("qfoundry-PDK DRC for QW")
+excpt = input(111)
+
+# --- Layer Definitions ---
+poly_al_sc = input("1","130/1").flatten.merged- excpt
+floorPlan  = input(99).flatten
+poly_sc_pos = floorPlan.merged - (poly_al_sc)
+poly_al_jj = input("50/0").flatten - excpt
+airbridge_pads    = input(6,0).flatten - excpt
+airbridge_flyover = input(7,0).flatten - excpt
+
+
+# Check junction overlap
+intersection = poly_al_jj.and(poly_al_sc)
+islands = intersection.merged
+fragmented_devices = poly_al_jj.covering(islands, 2)
+fragmented_devices.output("Jucntion Fragmented", "Junctions are extending multiple base aluminum sections.")
+
+</text>
+</klayout-macro>

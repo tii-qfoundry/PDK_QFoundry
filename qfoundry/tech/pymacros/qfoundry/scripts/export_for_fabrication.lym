@@ -34,11 +34,13 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
     mw = app.main_window()
     lv = mw.current_view()
 
+
     if not lv:
         raise Exception("No layout view found. Please open a layout first.")
 
     orig_layout = lv.active_cellview().layout()
     orig_top_cell = lv.active_cellview().cell
+
     dbu = orig_layout.dbu
 
     # --- List of cell names that should NOT be flattened ---
@@ -46,9 +48,8 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
     print(f"Cells to preserve (will not be flattened): {no_flatten_cell_list}")
 
     
-    
     # List of target layers that should have their shapes merged after remapping.
-    layers_to_merge = [(1, 0)]
+    layers_to_merge = [(1, 0), (2,0)]
 
     try:
         # --- 1. Create a New "Static" Layout for Flattening ---
@@ -176,7 +177,7 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
     
          # --- 5. Cleanup Unused Cell Definitions ---
         print("\nStep 5: Cleaning up unused cell definitions...")
-        fab_layout.cleanup()
+        fab_layout.cleanup(True)
         print("Unused cells have been removed.")
 
         # --- 6. Finalization ---
@@ -203,7 +204,7 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
         # Set the view to our new top cell and zoom to fit.
         fab_cellview.cell_name = fab_top_cell.name
         fab_view.zoom_fit()
-        
+        fab_layout.cleanup(True)
         print("\n--- Script Finished Successfully ---")
         print(f"New layout '{fab_top_cell_name}' is ready in a new tab.")
 
@@ -220,6 +221,7 @@ if __name__ == "__main__":
     #   - value: is a list of tuples for the SOURCE layers to be moved to the target.
     layer_mapping = {
         (1, 0): [(130, 1), (1, 0)],
+        (2, 0): [(2, 0), (50, 0)],
         (6, 0): [(146, 1), (6, 10)],
         (7, 0): [(147, 1), (7, 10)]
     }
@@ -231,7 +233,7 @@ if __name__ == "__main__":
             ((7, 0), "Fab Layer 7/0", 0x009900, 0x009900,2), # Green
         ]
         
-    no_flatten_cell_list = ['test_cell']
+    no_flatten_cell_list = ['fill_16p']
     
     prepare_for_fabrication(layer_mapping, no_flatten_cell_list, final_layer_styles)</text>
 </klayout-macro>
