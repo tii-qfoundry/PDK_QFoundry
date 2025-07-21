@@ -24,6 +24,11 @@
 report("qfoundry-PDK DRC")
 excpt = input(111)
 
+
+al_tol = 0.0.um
+jj_tol = 0.005.um
+
+# Geomteirs definition from layers
 poly_al_sc = input("1","130/1").flatten.merged- excpt # &amp; input(130).flatten
 poly_al_jj = input("2/0").flatten - excpt
 
@@ -41,21 +46,25 @@ poly_sc_pos = floorPlan.merged - (poly_al_sc)
 overlaps = devRec.merged(2)
 output(overlaps, "Devices","Devices cannot be overlapping.")
 
-# Make sure the devices are within the floor plan layer region;
-poly_al_sc.outside(floorPlan).output("Aluminum Boundary","Devices are out of the design boundary")
-poly_al_jj.outside(floorPlan).output("Junction Boundary","Junctions are out of the design boundary")
+# Positioning of Jucntions on leads
+junction_bb = poly_al_jj.extents().sized(-1.5.um)
+junction_extension = (poly_al_jj-junction_bb).sized(-0.3.um).sized(0.3.um)
+junction_extension_error = junction_extension.separation(poly_al_sc, 2.5.um - al_tol)
+junction_extension_error.output("Junction Extension Spacing Violation", "Junction extension must be at least 2.5 um from base aluminum.")
 
+#Positioning of jucntions to writefield
 overlap = poly_al_jj.overlapping(writeField.raw,2)
 overlap.output("Junction misaligned","The junction overlaps more than one EBL writefield. Junctions need to be fully enclosed by a single writefield.")
 outside = poly_al_jj.outside(writeField)
 outside.output("Junctions outside WF","Junctions must be defined within a writefield boundary.")
 
+# Make sure the devices are within the floor plan layer region;
+poly_al_sc.outside(floorPlan).output("Aluminum Boundary","Devices are out of the design boundary")
+poly_al_jj_outside = poly_al_jj.outside(floorPlan)
+poly_al_jj_outside.output("Junction Boundary","Junctions are out of the design boundary")
+
 wf_overlap = writeField.merged(2)
 wf_overlap.output("WF Instance ill defined","It appears that more than one type of writefield is being defined or WF cells are overlapping.")
-
-
-al_tol = 0.05
-jj_tol = 0.005
 
 # Dimensions of aluminum superconductive layer
 poly_sc_pos.width(3.micron-al_tol,angle_limit(0.01)).output("wg width","Waveguide width minimum feature size violation; min 3 um")
