@@ -112,14 +112,14 @@ class BenasqueBridge(pya.PCellDeclarationHelper):
 
 if __name__ == "__main__":
     # You need to reload the library to see the changes in the PCell 
-    from qfoundry.scripts.utils import test_pcell
-    from qfoundry.scripts.library import PDK_Lib
-    PDK_Lib()
+      from qfoundry.scripts import reload_library
+      from qfoundry.utils import test_pcell
+      reload_library()
 
-    pcell_decl = BenasqueBridge
-    pcell_params = {
-              "length":60.0, 
-              }
-    pcell_trans = pya.Trans(pya.Trans.R0, 0.0, 0.0)
+      pcell_decl = BenasqueBridge
+      pcell_params = {
+                  "length":60.0, 
+                  }
+      pcell_trans = pya.Trans(pya.Trans.R0, 0.0, 0.0)
 
-    test_pcell(pcell_decl, pcell_params, pcell_trans)
+      test_pcell(pcell_decl, pcell_params, pcell_trans)

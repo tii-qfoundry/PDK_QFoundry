@@ -100,3 +100,24 @@ class FrameQF5(Chip):
       print(self)
 
 
+if __name__ == "__main__":
+    # You need to reload the library to see the changes in the PCell 
+    from qfoundry.scripts import reload_library
+    from qfoundry.utils import test_pcell
+    reload_library()
+
+    pcell_decl = FrameQF5
+    pcell_params = {
+        "sampleholder_type": "mQRC12",
+        "name_mask": NAME_MASK,
+        "name_chip": NAME_CHIP,
+        "name_brand": NAME_BRAND,
+        "frames_marker_dist": [800, 400],
+        "frames_diagonal_squares": [0, 0],
+        "a": 15,
+        "b": 7.5,
+        "r": 150
+    }
+    pcell_trans = pya.Trans(pya.Trans.R0, 0.0, 0.0)
+    test_pcell(pcell_decl, pcell_params, pcell_trans)
+

@@ -5,9 +5,11 @@ import pya
 import qfoundry as pdk
 from kqcircuits.util.library_helper import load_libraries 
 
+def reload_library():
+  return __PDK_Lib__()
 
 # The PCell library declaration
-class PDK_Lib(pya.Library):
+class __PDK_Lib__(pya.Library):
 
   def __init__(self, technology = 'qfoundry'):
     self.description = "QFoundry Library"
@@ -34,9 +36,17 @@ class PDK_Lib(pya.Library):
           #exec(open(os.path.join(root, file)).read())
           cell_name = file_name[:-3]
           cell_module= import_module_from_path(cell_name, os.path.join(root, file_name))
-          obj = getattr(cell_module, cell_name)
-          self.layout().register_pcell(cell_module.__name__, obj())
-    
+          
+          
+          try:
+            obj = getattr(cell_module, cell_name)
+            if issubclass(obj,pya.PCellDeclarationHelper) or issubclass(obj, pya._PCellDeclarationHelperMixin): #Check if the type of the cell is a Klayout PCellDeclaration
+              self.layout().register_pcell(cell_module.__name__, obj())
+          except AttributeError as e:
+            print(f"Module {cell_module} may not be a PCell (no {cell_name} attribute) : {e}")
+          except Exception as e:
+             raise Exception(f"Error importing {cell_name} from {file_name}: {e}")
+
     # TODO: The different cells need to be registered in accordance to their respective library fodlers to match KQCircuits Specification
     load_libraries(flush = True)
     self.register("qfoundry")
@@ -62,5 +72,6 @@ def import_module_from_path(module_name, file_path):
              
         return module    
 
+
 if __name__ == "__main__":
-  lib = PDK_Lib()
+  lib = reload_library()

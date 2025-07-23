@@ -20,8 +20,8 @@ import os
 
 import pya
 import qfoundry as pdk
-from qfoundry.scripts.library import PDK_Lib
+from qfoundry.scripts.library import reload_library
 
 # The PCell library declaration
-PDK_Lib()</text>
+reload_library()</text>
 </klayout-macro>

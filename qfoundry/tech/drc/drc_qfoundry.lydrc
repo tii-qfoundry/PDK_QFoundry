@@ -24,11 +24,11 @@
 report("qfoundry-PDK DRC")
 excpt = input(111)
 
-
+ 
 al_tol = 0.0.um
 jj_tol = 0.005.um
 
-# Geomteirs definition from layers
+
 poly_al_sc = input("1","130/1").flatten.merged- excpt # &amp; input(130).flatten
 poly_al_jj = input("2/0").flatten - excpt
 
@@ -52,7 +52,13 @@ junction_extension = (poly_al_jj-junction_bb).sized(-0.3.um).sized(0.3.um)
 junction_extension_error = junction_extension.separation(poly_al_sc, 2.5.um - al_tol)
 junction_extension_error.output("Junction Extension Spacing Violation", "Junction extension must be at least 2.5 um from base aluminum.")
 
-#Positioning of jucntions to writefield
+# Check junction overlap
+intersection = poly_al_jj.and(poly_al_sc)
+islands = intersection.merged
+fragmented_devices = poly_al_jj.covering(islands, 2)
+fragmented_devices.output("Junction Fragmented", "Junctions are extending multiple base aluminum sections.")
+
+#Positioning of junctions to writefield
 overlap = poly_al_jj.overlapping(writeField.raw,2)
 overlap.output("Junction misaligned","The junction overlaps more than one EBL writefield. Junctions need to be fully enclosed by a single writefield.")
 outside = poly_al_jj.outside(writeField)
@@ -83,3 +89,4 @@ qw_airbridge_pad.and(poly_al_sc).output("Airbridges","Metalization in the airbri
 
 </text>
 </klayout-macro>
+`
