@@ -20,10 +20,10 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         return "ManhattanFatLead: A parameteric manhattan josephson junction"
 
     def coerce_parameters_impl(self):
-        if(self.angle < -60):
-            self.angle = -60
-        elif(self.angle > 60):
-            self.angle = 60
+        if(self.angle < -15):
+            self.angle = -15
+        elif(self.angle > 15):
+            self.angle = 15
         self.overlap = self.conn_width
         
 
@@ -65,6 +65,11 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             dbu = self.layout.dbu
             jj_layer = self.layout.layer(self.l_layer)
             _angle = radians(self.angle)
+            size = self.finger_size
+            conn_height= self.conn_height
+            conn_width = self.conn_width
+            gap = self.patch_gap
+            
             #Junction
             finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
               finger_overlap = self.conn_width, 
@@ -73,29 +78,52 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             
             
             # Connector leads
+            self.top_dx = (size+conn_width/2)*cos(_angle)
+            self.top_dy = (size+conn_width/2)*sin(_angle)
+            self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy
+            
+            self.bot_dx = size*sin(_angle)
+            self.bot_lead_height = (max(gap/2.+size, 0.) + conn_height)
+            self.bot_dy = -size*cos(_angle)-self.bot_lead_height
+            
             conn_shapes = self.draw_connectors(pya.DPoint(0, 0))
             _add_shapes(self.cell, conn_shapes, jj_layer)
             
             
             # Pads
             if self.draw_cap:
-                top_dx = self.conn_width*cos(_angle)/2
                 cap_shape = draw_pad(self.cap_w, self.cap_h, self.cap_gap, dbu)
                 patch_open_shape = []
                 patch_shape = []
                 # Patches
                 if self.draw_patch:
-                    patch_open_shape = draw_patch_openning( self.finger_size, 
-                                                            self.conn_width, 
-                                                            self.conn_height, 
-                                                            self.angle, 
-                                                            self.inner_angle, 
-                                                            self.cap_gap, 
-                                                            gap = self.patch_gap, 
-                                                            center = pya.DPoint(0, 0),
-                                                            dbu = dbu)
-                    patch_shape = draw_patch(self.finger_size, self.cap_gap, self.conn_width, self.conn_height, self.angle, self.inner_angle, self.patch_scratch, self.patch_clearance, center = pya.DPoint(0, 0), dbu = dbu)
-                
+                    # Patch opening in base metal layer
+                    center = pya.DPoint(0, 0)
+
+                    patch_top = draw_patch_openning(
+                        self.finger_size+self.conn_width/2, 
+                        self.conn_width, 
+                        self.top_lead_height, 
+                        self.angle, 
+                        self.inner_angle, 
+                        gap = self.patch_gap
+                    )
+                       
+                    patch_bot = draw_patch_openning(
+                        self.finger_size, 
+                        self.conn_width, 
+                        self.bot_lead_height, 
+                        self.angle-self.inner_angle, 
+                        self.inner_angle,   
+                        gap = self.patch_gap,
+                        direction = -1
+                    )
+
+                    patch_open_shape = [
+                      (pya.DTrans(0, False, center.x,center.y+1) * patch_top).to_itype(dbu),
+                      (pya.DTrans(0, False, center.x,center.y+1) * patch_bot).to_itype(dbu)
+                    ]
+                    
                 layerm = self.layout.layer(pya.LayerInfo(1, 0))
                 
                 trans = pya.Trans(pya.Trans.R0, (-self.cap_w/2+10)/dbu, (self.cap_h-10)/dbu)     
@@ -125,12 +153,12 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         size = self.finger_size
         _angle = radians(self.angle)
         _inner_angle = radians(self.inner_angle)
-        
-        top_lead_height = self.conn_height+self.cap_gap/2
-        bot_lead_height = max(gap/2.-size, 0.) + self.conn_height
         conn_width = self.conn_width
         
-        bot_dy = size*cos(_angle)
+        top_dx, top_dy = self.top_dx, self.top_dy
+        top_lead_height = self.top_lead_height
+        bot_dx, bot_dy = self.bot_dx, self.bot_dy
+        bot_lead_height = self.bot_lead_height
         
         rounding_params = {
             "rinner": 10,  # inner corner rounding radius
@@ -146,20 +174,18 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                 return arc(heigth/2.0, width/2.0, angle, rot)
             else:
                 return pya.DTrans(rot,False, 0, 0)*pya.DPolygon([
-                    pya.DPoint(-x0, -heigth/2.0-y0),
-                    pya.DPoint(x0, -heigth/2.0+y0),
-                    pya.DPoint(x0, heigth/2.0),
-                    pya.DPoint(-x0, heigth/2.0),
+                    pya.DPoint(-x0, -y0),
+                    pya.DPoint(x0, y0),
+                    pya.DPoint(x0, heigth),
+                    pya.DPoint(-x0, heigth),
                 ])
 
-        top_dx = conn_width*cos(_angle)/2
-        top_dy = top_lead_height/2+(size+conn_width/2)*sin(_angle)
-        conn_top = pya.DTrans(0,False,size*cos(_angle)+top_dx, top_dy) * (connector_points(
+        conn_top = pya.DTrans(0,False,top_dx, top_dy) * (connector_points(
                             heigth=top_lead_height,
                             width=conn_width,
                             angle=_angle))
                         
-        conn_bot = pya.DTrans(0,False,size*sin(_angle), -bot_lead_height/2-bot_dy) * (connector_points(
+        conn_bot = pya.DTrans(0,False,bot_dx, bot_dy) * (connector_points(
                         heigth=bot_lead_height,
                         width=conn_width,
                         angle=0))

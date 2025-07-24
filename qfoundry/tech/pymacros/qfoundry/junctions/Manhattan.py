@@ -7,31 +7,10 @@ from math import pi
 # Juan E. Villegas, Nov. 2023
 
 from kqcircuits.util.symmetric_polygons import polygon_with_vsym
-from qfoundry.junctions.utils import arc, draw_junction, draw_pad, draw_patch, draw_pad
+from qfoundry.junctions.utils import arc, draw_junction, draw_pad, draw_patch, draw_pad, draw_patch_openning
 from qfoundry.utils import _add_shapes
 
-def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap=2) -> pya.DPolygon:
-    size = finger_size
-    _angle = radians(angle)
-    _inner_angle = radians(inner_angle)
-    
-    def patch_points(heigth, size, angle,rot=0, round = True):
-        end_x = size*cos(angle)
-        end_y = size*sin(angle)
-    
-        polygon = pya.DTrans(0,False, end_x, end_y) * pya.DPolygon([
-            pya.DPoint(-conn_width/2-gap, 0),
-            pya.DPoint(-conn_width/2-gap, heigth+gap),
-            pya.DPoint(conn_width/2+gap, heigth+gap),
-            pya.DPoint(conn_width/2+gap, 0),
-        ])
-        if True:
-            polygon = polygon.round_corners(1, 1, 32)
-        return polygon
-        
-    patch = pya.DTrans(0,False,0, -1) * (patch_points(heigth=heigth, size=size,angle=_angle))
-    
-    return patch
+
     
 class Manhattan(pya.PCellDeclarationHelper):
 
@@ -102,8 +81,10 @@ class Manhattan(pya.PCellDeclarationHelper):
                 _angle = radians(self.angle)
                 patch_open_shape = []
                 patch_shape = []
+                
                 # Patches
                 if self.draw_patch:
+                    # Patch opening in base metal layer
                     center = pya.DPoint(0, 0)
                     top_height = self.conn_height+self.cap_gap/2-self.finger_size*sin(_angle)
                     patch_top = draw_patch_openning(

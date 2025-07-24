@@ -151,7 +151,7 @@ def draw_patch(finger_size, cap_gap, conn_width, conn_height, angle, inner_angle
 
     return patches
 
-def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap=2) -> pya.DPolygon:
+def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap=2, direction = +1) -> pya.DPolygon:
     size = finger_size
     _angle = radians(angle)
     _inner_angle = radians(inner_angle)
@@ -159,11 +159,11 @@ def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap
     def patch_points(heigth, size, angle,rot=0, round = True):
         end_x = size*cos(angle)
         end_y = size*sin(angle)
-    
+        y_size = heigth+gap if direction>0 else -(heigth+gap)
         polygon = pya.DTrans(0,False, end_x, end_y) * pya.DPolygon([
             pya.DPoint(-conn_width/2-gap, 0),
-            pya.DPoint(-conn_width/2-gap, heigth+gap),
-            pya.DPoint(conn_width/2+gap, heigth+gap),
+            pya.DPoint(-conn_width/2-gap, y_size),
+            pya.DPoint(conn_width/2+gap, y_size),
             pya.DPoint(conn_width/2+gap, 0),
         ])
         if True:
