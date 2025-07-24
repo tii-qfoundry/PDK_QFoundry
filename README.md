@@ -1,12 +1,29 @@
 # QFoundry 2D - PDK
-TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK layout tools are built on top of KQcircuits circuit package.
+
+TII QFoundry standard PDK for superconducting qubit fabrication. The KLayout PDK layout tools are built on top of the KQCircuits circuit package, providing a comprehensive design environment for quantum device development.
+
+**Latest Version**: v2.0 | **Technology Node**: QFoundry Process v1.2 | **KQCircuits Compatibility**: v4.7+
+
+## Quick Start
+
+1. **Install KQCircuits** via KLayout Package Manager
+2. **Clone this repository** to your local machine
+3. **Import technology** in KLayout: Tools → Manage Technologies → Import → Select `qfoundry.lyt`
+4. **Start designing** with parametric quantum components
 
 ## Design Guide
-The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson junction micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
 
-<p align="center"><img width="200" alt="image" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/6645d804-900d-4106-accd-3f97fbc301ad"> </p>
+The QFoundry microfabrication process is a single-layer superconducting aluminum manufacturing process with medium and high-resolution lithography steps. The high-resolution lithography is used **exclusively** for Josephson junction micro-fabrication, while standard resolution is suitable for resonators, transmission lines, and capacitive elements.
 
-The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
+### Process Overview
+
+The superconducting layer consists of low kinetic inductance Aluminum (Al) deposited on float-zone intrinsic Silicon substrate. Metallization is achieved through electron-beam evaporation of high-purity aluminum, providing excellent superconducting properties and low loss characteristics.
+
+<p align="center"><img width="200" alt="QFoundry Process Flow" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/6645d804-900d-4106-accd-3f97fbc301ad"> </p>
+
+### Process Parameters
+
+Current fabrication process parameters derived from device characterization and modeling:
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -146,6 +163,27 @@ Metal Thickness | $200 nm$ | Measured
 
 ### Standard Components
 
+The QFoundry PDK provides a comprehensive library of parametric components:
+
+#### Junctions
+- **Manhattan**: Basic Manhattan Josephson junction with configurable geometry
+- **ManhattanFatLead**: Enhanced junction with wider leads for SQUID configurations
+  - Single junction, SQUID pair, and SQUID reflected configurations
+  - Automatic lead compensation for complex geometries
+  - Integrated capacitive test structures
+
+#### Elements  
+- **BenasqueBridge**: Catenary-shaped airbridge for waveguide crossings
+- **QfoundryMarkerCross**: Precision alignment markers for lithography
+
+#### Chips
+- **FrameQF5**: 5×5mm chip frame with standard launcher configuration
+- **FrameQF10**: 10×10mm chip frame with expanded I/O capabilities
+
+All components are fully parametric and include design rule checking for fabrication compatibility.
+
+### Waveguide Standards
+
 ### Standard PCB design
 The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of the following standard launcher configurations. 
 
@@ -183,7 +221,14 @@ If you cannot see the custom cells of the QFoundry PDK (if you didnt accept runn
 
 <p align="center"> <img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/41c81ad7-5c1d-4aa4-8cac-cbe46b4be78c">  </p>
 
-Now you are redy to design!
+Now you are ready to design!
+
+## Documentation
+
+- **[Quick Reference](QUICK_REFERENCE.md)** - Essential commands and component guide
+- **[API Reference](API_REFERENCE.md)** - Complete component parameter documentation  
+- **[Developer Guide](developper.md)** - Creating custom components and contributing
+- **[Process Specifications](#design-guide)** - Fabrication parameters and design rules
 
 ## Design a basic layout
 

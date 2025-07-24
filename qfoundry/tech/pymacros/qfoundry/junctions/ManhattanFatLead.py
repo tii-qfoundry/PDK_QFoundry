@@ -12,15 +12,48 @@ NEGATIVE_LAYERS = [
 ]
 
 class ManhattanFatLead(pya.PCellDeclarationHelper):
+    """
+    A parametric Manhattan Josephson junction with fat leads for improved connectivity.
+    
+    This PCell creates a Manhattan-style Josephson junction with wider connector leads
+    and optional SQUID configurations. It supports both single junctions and SQUID pairs
+    with various geometric parameters for fine-tuning the junction characteristics.
+    
+    Features:
+    - Single junction or SQUID configurations (pair/reflected)
+    - Parametric junction widths and angles
+    - Configurable finger geometries
+    - Optional capacitive test pads
+    - Patch layer support for fabrication
+    - Automatic lead compensation for SQUID geometries
+    
+    Args:
+        l_layer: Junction layer (default: LayerInfo(2, 0))
+        junction_type: 0=Single, 1=SQUID Pair, 2=SQUID Reflected
+        angle: Junction rotation angle in degrees (-15 to +15)
+        inner_angle: Angle between junction pads in degrees
+        junction_width_t/b: Top/bottom junction widths in μm
+        finger_size: Length of junction fingers in μm
+        conn_width: Width of connector leads in μm
+        cap_w/h: Capacitor dimensions in μm
+    """
 
     def __init__(self):
+        """Initialize the ManhattanFatLead PCell with default parameters."""
         super(ManhattanFatLead, self).__init__()
-        self.set_paramters()
+        self.set_parameters()
 
     def display_text_impl(self):
+        """Return descriptive text for the cell in the layout browser."""
         return "ManhattanFatLead: A parameteric manhattan josephson junction"
 
     def coerce_parameters_impl(self):
+        """
+        Validate and constrain parameter values to acceptable ranges.
+        
+        Ensures junction angle stays within fabrication limits (-15° to +15°)
+        and sets overlap parameter based on connector width.
+        """
         if(self.angle < -15):
             self.angle = -15
         elif(self.angle > 15):
@@ -29,9 +62,20 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         
 
     def produce_impl(self):
+        """Generate the junction geometry by calling the main production method."""
         self.produceManhattanFatLead()
   
-    def set_paramters(self):
+    def set_parameters(self):
+        """
+        Define all PCell parameters with their types, defaults, and descriptions.
+        
+        Sets up the parameter interface for the junction including:
+        - Layer assignments
+        - Geometric parameters (widths, angles, sizes)
+        - Junction type selection
+        - Capacitor and patch options
+        - Display and fabrication options
+        """
         self.param("l_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(2, 0))
         choices = [("Single Junction",0),("SQUID Pair",1), ("SQUID Reflected",2)]
         self.param("junction_type", self.TypeList, "Junction Type", choices=choices, default=0)
@@ -66,114 +110,131 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         self.param("label",self.TypeString, "Label", default="",hidden=False)
 
     def produceManhattanFatLead(self): 
-            """Draws the Manhattan junction"""
-            dbu = self.layout.dbu
-            jj_layer = self.layout.layer(self.l_layer)
-            _angle = radians(self.angle)
-            _inner_angle = radians(self.inner_angle)
-            size = self.finger_size
-            conn_height= self.conn_height
-            conn_width = self.conn_width
+        """
+        Generate the complete Manhattan junction geometry including fingers, leads, and optional components.
+        
+        This method orchestrates the creation of all junction components:
+        1. Junction fingers (single or SQUID configuration)
+        2. Connector leads with proper positioning
+        3. Optional capacitive test pads
+        4. Optional patch layers for fabrication
+        5. Text labels and negative layer handling
+        
+        The method handles three junction types:
+        - Single Junction (type=0): Simple Manhattan junction
+        - SQUID Pair (type=1): Two junctions with shared leads
+        - SQUID Reflected (type=2): Mirror configuration for flux bias
+        
+        Returns:
+            None (modifies self.cell directly)
+        """
+        dbu = self.layout.dbu
+        jj_layer = self.layout.layer(self.l_layer)
+        _angle = radians(self.angle)
+        _inner_angle = radians(self.inner_angle)
+        size = self.finger_size
+        conn_height= self.conn_height
+        conn_width = self.conn_width
+        
+        #Junction
+        
+        if self.junction_type == 0:
+            finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+              finger_overlap = self.conn_width, 
+              center = pya.DPoint(0, 0), dbu=dbu)
+            _add_shapes(self.cell, finger_shapes, jj_layer)
+        else:  # SQUID cases
+            center1 = pya.DPoint(-self.squid_spacing / 2, 0)
+            finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+                finger_overlap = self.conn_width, 
+                center = center1, dbu=dbu,
+                bottom_lead_comp = -self.conn_width/2
+                )
             
-            #Junction
-            
-            if self.junction_type == 0:
-                finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
-                  finger_overlap = self.conn_width, 
-                  center = pya.DPoint(0, 0), dbu=dbu)
-                _add_shapes(self.cell, finger_shapes, jj_layer)
-            else:  # SQUID cases
-                center1 = pya.DPoint(-self.squid_spacing / 2, 0)
-                finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
-                    finger_overlap = self.conn_width, 
-                    center = center1, dbu=dbu,
-                    bottom_lead_comp = -self.conn_width/2
-                    )
-                
-                angle2 = self.angle-180 if self.junction_type == 2 else self.angle
-                inner_angle2 = 180+self.inner_angle if self.junction_type == 2 else self.inner_angle
-                if self.junction_type == 2:
-                  extension = self.squid_spacing/cos(radians(self.angle))-2*conn_width-size
-                  bottom_lead_comp = -extension+self.squid_spacing*sin(radians(self.angle))+self.finger_size
-                  finger_size2 = extension
-                  print(finger_size2, 'um, angle = ', self.angle)
-                else:
-                  bottom_lead_comp = self.squid_spacing*tan(radians(self.angle))
-                  finger_size2 = self.finger_size
-                  
-                center2 = pya.DPoint(self.squid_spacing / 2, self.squid_spacing*tan(radians(angle2)))
-                
-                finger_shapes2 = draw_junction(angle2, inner_angle2, 
-                                               self.junction_width_b, 
-                                               self.junction_width_t, 
-                                               finger_size2, 
-                                               self.mirror_offset, 
-                                               self.offset_compensation, 
-                                               self.finger_overshoot,
-                                               finger_overlap = self.conn_width,
-                                               center = center2, dbu=dbu,
-                                               bottom_lead_comp = bottom_lead_comp-   self.conn_width/2
-                                            )
-                _add_shapes(self.cell, finger_shapes1, jj_layer)
-                _add_shapes(self.cell, finger_shapes2, jj_layer)
-                
-                # Connecting loop for SQUID uses the capacitors as the loop path
-            
-            
-            # Connector leads
-            self.top_dx = (size+conn_width/2)*cos(_angle)
-            self.top_dy = (size+conn_width/2)*sin(_angle)
-            self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy+0
-            
-            bottom_finger_angle = _angle - _inner_angle
-            self.bot_dx = size*sin(bottom_finger_angle+pi/2)
-            self.bot_dy = -size*cos(bottom_finger_angle+pi/2)
-            self.bot_lead_height = -(conn_height + self.cap_gap/2)
-            
-               
-            if self.junction_type != 0:
-                dx2 = (finger_size2 + bottom_lead_comp)*sin(_angle)
-                dy2 = (self.squid_spacing)*tan(_angle)
-
-                conn_shapes = self.draw_connectors(center = pya.DPoint(-self.squid_spacing / 2, 0), 
-                                                   draw_top = True, 
-                                                   draw_bot = True,
-                                                   offsets = {'top_dx': self.top_dx, 
-                                                               'top_dy': self.top_dy, 
-                                                               'bot_dx': self.bot_dx, 
-                                                               'bot_dy': self.bot_dy},
-                                                    lead_height={'top': self.top_lead_height+self.top_dy, 
-                                                                'bot': self.bot_lead_height})
-                conn_shapes2 = self.draw_connectors(center = pya.DPoint(self.squid_spacing / 2, 0), 
-                                                    draw_top=True if self.junction_type == 1 else False, 
-                                                    draw_bot=True,
-                                                    offsets = {'top_dx': self.top_dx, 
-                                                               'top_dy': self.top_dy + dy2, 
-                                                               'bot_dx': self.bot_dx +dx2, 
-                                                               'bot_dy': self.bot_dy},
-                                                    lead_height={'top': self.top_lead_height+ self.top_dy, 
-                                                                 'bot': self.bot_lead_height})
-                                                    
-                # ompensate the y offset in the bottom-right lead
-                # Compensate the x ioffset in the bottom-right lead
-                # conn_shapes2 = [conn_shapes2[0], 
-                #                 conn_shapes2[1]*pya.DTrans(0, False, dx2/dbu, 0)]
-                                
-                _add_shapes(self.cell, conn_shapes, jj_layer)
-                _add_shapes(self.cell, conn_shapes2, jj_layer)
+            angle2 = self.angle-180 if self.junction_type == 2 else self.angle
+            inner_angle2 = 180+self.inner_angle if self.junction_type == 2 else self.inner_angle
+            if self.junction_type == 2:
+              extension = self.squid_spacing/cos(radians(self.angle))-2*conn_width-size
+              bottom_lead_comp = -extension+self.squid_spacing*sin(radians(self.angle))+self.finger_size
+              finger_size2 = extension
+              print(finger_size2, 'um, angle = ', self.angle)
             else:
-                conn_shapes = self.draw_connectors(pya.DPoint(0, 0),
-                                                   draw_top=True, draw_bot=True,
-                                                   lead_height={'top': self.top_lead_height+ self.top_dy, 
-                                                                'bot': self.bot_lead_height},
-                                                    offsets = {'top_dx': self.top_dx, 
-                                                               'top_dy': self.top_dy,
-                                                               'bot_dx': self.bot_dx,
-                                                               'bot_dy': self.bot_dy})
-                _add_shapes(self.cell, conn_shapes, jj_layer)
+              bottom_lead_comp = self.squid_spacing*tan(radians(self.angle))
+              finger_size2 = self.finger_size
+              
+            center2 = pya.DPoint(self.squid_spacing / 2, self.squid_spacing*tan(radians(angle2)))
             
-            # Pads
-            if self.draw_cap:
+            finger_shapes2 = draw_junction(angle2, inner_angle2, 
+                                           self.junction_width_b, 
+                                           self.junction_width_t, 
+                                           finger_size2, 
+                                           self.mirror_offset, 
+                                           self.offset_compensation, 
+                                           self.finger_overshoot,
+                                           finger_overlap = self.conn_width,
+                                           center = center2, dbu=dbu,
+                                           bottom_lead_comp = bottom_lead_comp-   self.conn_width/2
+                                        )
+            _add_shapes(self.cell, finger_shapes1, jj_layer)
+            _add_shapes(self.cell, finger_shapes2, jj_layer)
+            
+            # Connecting loop for SQUID uses the capacitors as the loop path
+        
+        
+        # Connector leads
+        self.top_dx = (size+conn_width/2)*cos(_angle)
+        self.top_dy = (size+conn_width/2)*sin(_angle)
+        self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy+0
+        
+        bottom_finger_angle = _angle - _inner_angle
+        self.bot_dx = size*sin(bottom_finger_angle+pi/2)
+        self.bot_dy = -size*cos(bottom_finger_angle+pi/2)
+        self.bot_lead_height = -(conn_height + self.cap_gap/2)
+        
+           
+        if self.junction_type != 0:
+            dx2 = (finger_size2 + bottom_lead_comp)*sin(_angle)
+            dy2 = (self.squid_spacing)*tan(_angle)
+
+            conn_shapes = self.draw_connectors(center = pya.DPoint(-self.squid_spacing / 2, 0), 
+                                               draw_top = True, 
+                                               draw_bot = True,
+                                               offsets = {'top_dx': self.top_dx, 
+                                                           'top_dy': self.top_dy, 
+                                                           'bot_dx': self.bot_dx, 
+                                                           'bot_dy': self.bot_dy},
+                                                lead_height={'top': self.top_lead_height+self.top_dy, 
+                                                            'bot': self.bot_lead_height})
+            conn_shapes2 = self.draw_connectors(center = pya.DPoint(self.squid_spacing / 2, 0), 
+                                                draw_top=True if self.junction_type == 1 else False, 
+                                                draw_bot=True,
+                                                offsets = {'top_dx': self.top_dx, 
+                                                           'top_dy': self.top_dy + dy2, 
+                                                           'bot_dx': self.bot_dx +dx2, 
+                                                           'bot_dy': self.bot_dy},
+                                                lead_height={'top': self.top_lead_height+ self.top_dy, 
+                                                             'bot': self.bot_lead_height})
+                                                
+            # ompensate the y offset in the bottom-right lead
+            # Compensate the x ioffset in the bottom-right lead
+            # conn_shapes2 = [conn_shapes2[0], 
+            #                 conn_shapes2[1]*pya.DTrans(0, False, dx2/dbu, 0)]
+                            
+            _add_shapes(self.cell, conn_shapes, jj_layer)
+            _add_shapes(self.cell, conn_shapes2, jj_layer)
+        else:
+            conn_shapes = self.draw_connectors(pya.DPoint(0, 0),
+                                               draw_top=True, draw_bot=True,
+                                               lead_height={'top': self.top_lead_height+ self.top_dy, 
+                                                            'bot': self.bot_lead_height},
+                                                offsets = {'top_dx': self.top_dx, 
+                                                           'top_dy': self.top_dy,
+                                                           'bot_dx': self.bot_dx,
+                                                           'bot_dy': self.bot_dy})
+            _add_shapes(self.cell, conn_shapes, jj_layer)
+        
+        # Pads
+        if self.draw_cap:
                 cap_shape = draw_pad(self.cap_w, self.cap_h, self.cap_gap, dbu)
                 patch_open_shape = []
                 patch_shape = []
@@ -274,6 +335,23 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
     def draw_connectors(self, center=pya.DPoint(0, 0), draw_top=True, draw_bot=True, 
           offsets = {'top_dx': 0, 'top_dy': 0, 'bot_dx': 0, 'bot_dy': 0},
           lead_height={'top': 5, 'bot': 5}):
+        """
+        Generate connector lead geometries for junction terminals.
+        
+        Creates polygonal connector shapes that link the junction fingers to
+        the external circuitry. Supports both top and bottom connectors with
+        independent positioning and height control.
+        
+        Args:
+            center (DPoint): Center position for the connectors
+            draw_top (bool): Whether to generate top connector
+            draw_bot (bool): Whether to generate bottom connector  
+            offsets (dict): X,Y offset adjustments for each connector
+            lead_height (dict): Height specifications for each connector
+            
+        Returns:
+            list[Polygon]: List of connector polygons in integer coordinates
+        """
         dbu = self.layout.dbu
         _angle = radians(self.angle)
         conn_width = self.conn_width
