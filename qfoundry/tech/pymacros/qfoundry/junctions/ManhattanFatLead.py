@@ -2,13 +2,14 @@ import pya
 from numpy import cos, sin, tan, radians, linspace, sign, linspace
 from math import pi
 
-# Parametric Manhattan Josephson Junction
-# Copyright: TII QRC/QFoundry 2023
-# Juan E. Villegas, Nov. 2023
-
 from kqcircuits.util.symmetric_polygons import polygon_with_vsym
 from qfoundry.junctions.utils import arc, draw_junction, draw_pad, draw_patch_openning, draw_patch
-from qfoundry.utils import _add_shapes
+from qfoundry.utils import _add_shapes, _substract_shapes
+
+NEGATIVE_LAYERS = [
+    pya.LayerInfo(1, 0),
+    pya.LayerInfo(130, 1),
+]
 
 class ManhattanFatLead(pya.PCellDeclarationHelper):
 
@@ -32,6 +33,8 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
   
     def set_paramters(self):
         self.param("l_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(2, 0))
+        self.param("is_squid", self.TypeBoolean, "Make a SQUID (2 junctions)", default=False)
+        self.param("squid_spacing", self.TypeDouble, "Spacing between SQUID junctions", default=20.0, unit="μm")
         self.param("angle", self.TypeDouble, "Junction angle", default = 0.0)
         
         self.param("inner_angle", self.TypeDouble, "Angle between junction pads", default = 90.0)
@@ -40,15 +43,18 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         self.param("junction_y_offset", self.TypeDouble, "Vertical Offset of the junction position", default = 0.0, unit="μm",hidden=False)    
         self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=False)
         self.param("finger_size",self.TypeDouble, "Length of fingers (without overshoot).", default=5.0, unit="μm")
+        
         self.param("round_pad", self.TypeBoolean, "Pad has round edges", default=False, hidden=True)
         self.param("pad_radius", self.TypeDouble, "Pad edge radius", default=2.0, hidden=True)
-        self.param("conn_width", self.TypeDouble, "Connector lead width", default=5.0, hidden=True)
-        self.param("conn_height", self.TypeDouble, "Connector lead height inside the probe (capacitor)", default=5.0, hidden=False)
+        
+        self.param("conn_width", self.TypeDouble, "Connector lead width", default=9.0, hidden=False)
+        self.param("conn_height", self.TypeDouble, "Connector lead height inside the probe (capacitor)", default=10.0, hidden=False)
         self.param("draw_cap", self.TypeBoolean, "Include test pad", default=False)
         self.param("draw_patch", self.TypeBoolean, "Include patches", default=False)
-        self.param("patch_scratch", self.TypeBoolean, "Draw 45 deg scratches as patch", default=False)
-        self.param("patch_layer", self.TypeLayer, "Patch Layer", default = pya.LayerInfo(4, 0))
+        self.param("patch_scratch", self.TypeBoolean, "Draw 45 deg scratches as patch", default=False, hidden=True)
+        self.param("patch_layer", self.TypeLayer, "Patch Layer", default = pya.LayerInfo(4, 0), hidden=True)
         self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0, hidden = True)
+        
         self.param("patch_clearance", self.TypeDouble, "Patch clearance", default=5.0)
         self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
         self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=False)
@@ -65,16 +71,32 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             dbu = self.layout.dbu
             jj_layer = self.layout.layer(self.l_layer)
             _angle = radians(self.angle)
+            _inner_angle = radians(self.inner_angle-90)
             size = self.finger_size
             conn_height= self.conn_height
             conn_width = self.conn_width
             gap = self.patch_gap
             
             #Junction
-            finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
-              finger_overlap = self.conn_width, 
-              center = pya.DPoint(0, 0), dbu=dbu)
-            _add_shapes(self.cell, finger_shapes, jj_layer)
+            if self.is_squid:
+                center1 = pya.DPoint(-self.squid_spacing / 2, 0)
+                center2 = pya.DPoint(self.squid_spacing / 2, 0)
+                
+                finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+                    finger_overlap = self.conn_width, 
+                    center = center1, dbu=dbu)
+                finger_shapes2 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot,
+                    finger_overlap = self.conn_width,
+                    center = center2, dbu=dbu)
+                _add_shapes(self.cell, finger_shapes1, jj_layer)
+                _add_shapes(self.cell, finger_shapes2, jj_layer)
+                
+                # Connecting loop for SQUID uses the capacitors as the loop path
+            else:
+                finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+                  finger_overlap = self.conn_width, 
+                  center = pya.DPoint(0, 0), dbu=dbu)
+                _add_shapes(self.cell, finger_shapes, jj_layer)
             
             
             # Connector leads
@@ -82,12 +104,19 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             self.top_dy = (size+conn_width/2)*sin(_angle)
             self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy
             
-            self.bot_dx = size*sin(_angle)
+            self.bot_dx = size*sin(_angle-_inner_angle)
             self.bot_lead_height = (max(gap/2.+size, 0.) + conn_height)
             self.bot_dy = -size*cos(_angle)-self.bot_lead_height
             
-            conn_shapes = self.draw_connectors(pya.DPoint(0, 0))
-            _add_shapes(self.cell, conn_shapes, jj_layer)
+            if self.is_squid:
+                conn_shapes = self.draw_connectors(pya.DPoint(-self.squid_spacing / 2, 0), draw_top=True, draw_bot=True)
+                conn_shapes2 = self.draw_connectors(pya.DPoint(self.squid_spacing / 2, 0), draw_top=True, draw_bot=True)
+                _add_shapes(self.cell, conn_shapes, jj_layer)
+                _add_shapes(self.cell, conn_shapes2, jj_layer)
+
+            else:
+                conn_shapes = self.draw_connectors(pya.DPoint(0, 0))
+                _add_shapes(self.cell, conn_shapes, jj_layer)
             
             
             # Pads
@@ -99,66 +128,99 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                 if self.draw_patch:
                     # Patch opening in base metal layer
                     center = pya.DPoint(0, 0)
+                   
+                    if self.is_squid:
+                        center1 = pya.DPoint(-self.squid_spacing / 2, 0)
+                        center2 = pya.DPoint(self.squid_spacing / 2, 0)
 
-                    patch_top = draw_patch_openning(
-                        self.finger_size+self.conn_width/2, 
-                        self.conn_width, 
-                        self.top_lead_height, 
-                        self.angle, 
-                        self.inner_angle, 
-                        gap = self.patch_gap
-                    )
-                       
-                    patch_bot = draw_patch_openning(
-                        self.finger_size, 
-                        self.conn_width, 
-                        self.bot_lead_height, 
-                        self.angle-self.inner_angle, 
-                        self.inner_angle,   
-                        gap = self.patch_gap,
-                        direction = -1
-                    )
+                        patch_top = draw_patch_openning(
+                            self.finger_size + self.conn_width / 2,
+                            self.conn_width,
+                            self.top_lead_height,
+                            self.angle,
+                            self.inner_angle,
+                            gap=self.patch_gap
+                        )
 
-                    patch_open_shape = [
-                      (pya.DTrans(0, False, center.x,center.y+1) * patch_top).to_itype(dbu),
-                      (pya.DTrans(0, False, center.x,center.y+1) * patch_bot).to_itype(dbu)
-                    ]
+                        patch_bot = draw_patch_openning(
+                            self.finger_size,
+                            self.conn_width,
+                            self.bot_lead_height,
+                            self.angle - self.inner_angle,
+                            self.inner_angle,
+                            gap=self.patch_gap,
+                            direction=-1
+                        )
+
+                        patch_open_shape = [
+                            (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap / 2) * patch_top).to_itype(dbu),
+                            (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap / 2) * patch_bot).to_itype(dbu),
+                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap / 2) * patch_top).to_itype(dbu),
+                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap / 2) * patch_bot).to_itype(dbu)
+                        ]
+                    else: 
+                        patch_top = draw_patch_openning(
+                            self.finger_size+self.conn_width/2, 
+                            self.conn_width, 
+                            self.top_lead_height, 
+                            self.angle, 
+                            self.inner_angle, 
+                            gap = self.patch_gap
+                        )
+                        
+                        patch_bot = draw_patch_openning(
+                            self.finger_size, 
+                            self.conn_width, 
+                            self.bot_lead_height, 
+                            self.angle-self.inner_angle, 
+                            self.inner_angle,   
+                            gap = self.patch_gap,
+                            direction = -1
+                        )
+
+                        patch_open_shape = [
+                        (pya.DTrans(0, False, center.x,center.y+self.patch_gap/2) * patch_top).to_itype(dbu),
+                        (pya.DTrans(0, False, center.x,center.y+self.patch_gap/2) * patch_bot).to_itype(dbu)
+                        ]
                     
-                layerm = self.layout.layer(pya.LayerInfo(1, 0))
+                layerm = self.layout.layer(self.cap_layer)
                 
-                trans = pya.Trans(pya.Trans.R0, (-self.cap_w/2+10)/dbu, (self.cap_h-10)/dbu)     
+                  
+                
+                label_trans = pya.Trans(pya.Trans.R0, (-self.cap_w/2+10)/dbu, (self.cap_h-10)/dbu)     
                 cell_label = self.layout.create_cell("TEXT", "Basic", {"text":self.label, "mag":20,"layer": pya.LayerInfo(1, 0) })
-                cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),trans)
-                self.cell.insert(cell_instance_lbl)  
-
+                cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),label_trans)
                 
                 metal_neg = pya.Box(-(self.cap_w+80)/dbu/2, -(self.cap_h+40+self.cap_gap/2)/dbu,
-                                    (self.cap_w+80)/dbu/2, (self.cap_h+40+self.cap_gap/2)/dbu)
-                
-                layer_add = self.layout.layer(pya.LayerInfo(131, 1))
-                
+                                      (self.cap_w+80)/dbu/2, (self.cap_h+40+self.cap_gap/2)/dbu)
+                                      
                 region_pos = pya.Region(cap_shape).merged() - pya.Region(patch_open_shape).merged()
-                self.cell.shapes(layer_add).insert(region_pos) 
-                    
                 region_neg = pya.Region(metal_neg).merged()- pya.Region(cap_shape).merged() + pya.Region(patch_open_shape).merged()
-                self.cell.shapes(layerm).insert(region_neg)  
                 
+                if self.cap_layer in NEGATIVE_LAYERS  : 
+                  layer_add = self.layout.layer(pya.LayerInfo(131, 1))
+                  self.cell.shapes(layer_add).insert(region_pos) 
+                  self.cell.shapes(layerm).insert(region_neg)
+                  self.cell.insert(cell_instance_lbl)    
+                else:
+                  # Convert cell_instance_lbl to a region
+                    self.cell.insert(cell_instance_lbl).flatten()
+                    # Subtract the label region from region_pos if label_region is not empt
+                    
+                    self.cell.shapes(layerm).insert(region_pos)
+                  #self.cell.shapes(layerm).insert(region_pos) 
+                  
                 layer = self.layout.layer(self.patch_layer)
-                _add_shapes(self.cell, patch_shape, layer)  
+                _add_shapes(self.cell, patch_shape, layer)
   
 
-    def draw_connectors(self, center=pya.DPoint(0, 0)):
+    def draw_connectors(self, center=pya.DPoint(0, 0), draw_top=True, draw_bot=True):
         dbu = self.layout.dbu
         gap = self.cap_gap
         size = self.finger_size
         _angle = radians(self.angle)
         _inner_angle = radians(self.inner_angle)
         conn_width = self.conn_width
-        
-        top_dx, top_dy = self.top_dx, self.top_dy
-        top_lead_height = self.top_lead_height
-        bot_dx, bot_dy = self.bot_dx, self.bot_dy
-        bot_lead_height = self.bot_lead_height
         
         rounding_params = {
             "rinner": 10,  # inner corner rounding radius
@@ -180,18 +242,24 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                     pya.DPoint(-x0, heigth),
                 ])
 
-        conn_top = pya.DTrans(0,False,top_dx, top_dy) * (connector_points(
-                            heigth=top_lead_height,
+        conn_shapes = []
+        if draw_top:
+            top_dx, top_dy = self.top_dx, self.top_dy
+            top_lead_height = self.top_lead_height
+            conn_top = pya.DTrans(0,False,top_dx, top_dy) * (connector_points(
+                                heigth=top_lead_height,
+                                width=conn_width,
+                                angle=_angle))
+            conn_shapes.append((pya.DTrans(0, False, center.x,center.y) * conn_top).to_itype(dbu))
+
+        if draw_bot:
+            bot_dx, bot_dy = self.bot_dx, self.bot_dy
+            bot_lead_height = self.bot_lead_height
+            conn_bot = pya.DTrans(0,False,bot_dx, bot_dy) * (connector_points(
+                            heigth=bot_lead_height,
                             width=conn_width,
-                            angle=_angle))
-                        
-        conn_bot = pya.DTrans(0,False,bot_dx, bot_dy) * (connector_points(
-                        heigth=bot_lead_height,
-                        width=conn_width,
-                        angle=0))
-                        
-        conn_shapes = [ (pya.DTrans(0, False, center.x,center.y) * conn_top).to_itype(dbu),
-                            (pya.DTrans(0, False, center.x,center.y) * conn_bot).to_itype(dbu)]
+                            angle=0))
+            conn_shapes.append((pya.DTrans(0, False, center.x,center.y) * conn_bot).to_itype(dbu))
         
         return conn_shapes
 

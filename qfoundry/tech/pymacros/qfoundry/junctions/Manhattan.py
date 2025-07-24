@@ -44,7 +44,7 @@ class Manhattan(pya.PCellDeclarationHelper):
         
         self.param("round_pad", self.TypeBoolean, "Pad has round edges", default=True, hidden=True)
         self.param("pad_radius", self.TypeDouble, "Pad edge radius", default=2.0, hidden=True)
-        self.param("conn_width", self.TypeDouble, "Connector pad width", default=5.0, hidden=True)
+        self.param("conn_width", self.TypeDouble, "Connector pad width", default=5.0, hidden=False)
         self.param("conn_height", self.TypeDouble, "Connector pad height", default=20.0, hidden=False)
 
         # add separator

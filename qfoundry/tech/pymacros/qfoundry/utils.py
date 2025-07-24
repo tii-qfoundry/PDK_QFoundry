@@ -1,6 +1,11 @@
 
 import pya
 
+NEGATIVE_LAYERS = [
+    pya.LayerInfo(1, 0),
+    pya.LayerInfo(130, 1),
+]
+
 def _round_corners_and_append(polygon: pya.DPolygon, polygon_list: list[pya.DPolygon] = None, rounding_params: dict = None, dbu = 0.001) -> list[pya.DPolygon]:
     """ Helper function to round corners of a polygon and append it to a list.
         If the polygon is empty, it returns the polygon list unchanged.
@@ -83,3 +88,20 @@ def test_pcell(pcell_decl: pya.PCellDeclarationHelper,pcell_params:dict = None, 
     # Select the top cell in the view   
     lv = mw.current_view()
     lv.select_cell(top_cell.cell_index(), 0)
+
+def layer_by_name(ly: pya.Layout, layer_name: str) -> pya.LayerInfo:
+    """
+    Get a layer by its name from the Technology specification (PDK).
+    
+    Args:
+        ly (pya.Layout): The layout to search in.
+        layer_name (str): The name of the layer to find.
+        
+    Returns:
+        pya.Layer: The found layer or None if not found.
+    """
+
+    for layer in pya.Technology.technology_by_name("qfoundry").layers():
+        if layer.name == layer_name:
+            return layer
+    return None
