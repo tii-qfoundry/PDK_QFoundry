@@ -23,5 +23,6 @@ import qfoundry as pdk
 from qfoundry.scripts.library import reload_library
 
 # The PCell library declaration
-reload_library()</text>
+reload_library()
+</text>
 </klayout-macro>

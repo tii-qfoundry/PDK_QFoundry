@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <klayout-macro>
- <description>QFoundry DRC</description>
+ <description/>
  <version/>
  <category>drc</category>
  <prolog/>
@@ -9,48 +9,44 @@
  <autorun>false</autorun>
  <autorun-early>false</autorun-early>
  <priority>0</priority>
- <shortcut>R</shortcut>
+ <shortcut/>
  <show-in-menu>true</show-in-menu>
  <group-name>drc_scripts</group-name>
  <menu-path>tools_menu.drc.end</menu-path>
  <interpreter>dsl</interpreter>
  <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
- <text>
-# DRC checks for the qfoundry PDK
-# Read about DRC scripts in the User Manual under "Design Rule Check (DRC)"
-# http://klayout.de/doc/manual/drc_basic.html
-# https://klayout.de/doc/about/drc_ref_drc.html
-
-report("qfoundry-PDK DRC")
+ <text>report("qfoundry-PDK DRC")
 excpt = input(111)
-
  
 al_tol = 0.0.um
 jj_tol = 0.005.um
 
-
-poly_al_sc = input("1","130/1").flatten.merged- excpt # &amp; input(130).flatten
+poly_al_sc = input("1","130/1").flatten.merged- excpt
 poly_al_jj = input("2/0").flatten - excpt
 
-devRec    =input(68,0).flatten
-floorPlan =input(99).flatten
+devRec    = input(68,0).flatten
+floorPlan = input(99).flatten
 writeField = input(98).flatten
 airbridge_pads    = input(146,1).flatten - excpt
 airbridge_flyover = input(147,1).flatten - excpt
-qw_airbridge_pad = input(6,10).flatten
+qw_airbridge_pad  = input(6,10).flatten
 
 poly_sc_pos = floorPlan.merged - (poly_al_sc)
 
-
 # Check device overlaps (functional check)
-overlaps = devRec.merged(2)
-output(overlaps, "Devices","Devices cannot be overlapping.")
+dev_overlaps = devRec.merged(2)
+output(dev_overlaps, "Devices Overlap","Devices cannot be overlapping.")
 
 # Positioning of Jucntions on leads
 junction_bb = poly_al_jj.extents().sized(-1.5.um)
 junction_extension = (poly_al_jj-junction_bb).sized(-0.3.um).sized(0.3.um)
 junction_extension_error = junction_extension.separation(poly_al_sc, 2.5.um - al_tol)
 junction_extension_error.output("Junction Extension Spacing Violation", "Junction extension must be at least 2.5 um from base aluminum.")
+
+# Junctions overlapping
+jj_overlap = poly_al_jj.merged(2)
+jj_overlap.output("Junctions Overlap","It appears that multiple junctions are overlapping.")
+
 
 # Check junction overlap
 intersection = poly_al_jj.and(poly_al_sc)
@@ -86,7 +82,5 @@ airbridge_pads.select_not_inside(airbridge_flyover).output("Airbridges","The pad
 
 qw_airbridge_pad.and(poly_al_sc).output("Airbridges","Metalization in the airbridge pads is overlapping with the waveguide spacing.")
 
-
 </text>
 </klayout-macro>
-`

@@ -1,5 +1,5 @@
 import pya
-from numpy import cos, sin, tan, radians, linspace, sign, linspace
+from numpy import cos, sin, tan, radians, linspace, sign, linspace, pi
 from math import pi
 
 from kqcircuits.util.symmetric_polygons import polygon_with_vsym
@@ -33,14 +33,15 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
   
     def set_paramters(self):
         self.param("l_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(2, 0))
-        self.param("is_squid", self.TypeBoolean, "Make a SQUID (2 junctions)", default=False)
+        choices = [("Single Junction",0),("SQUID Pair",1), ("SQUID Reflected",2)]
+        self.param("junction_type", self.TypeList, "Junction Type", choices=choices, default=0)
         self.param("squid_spacing", self.TypeDouble, "Spacing between SQUID junctions", default=20.0, unit="μm")
         self.param("angle", self.TypeDouble, "Junction angle", default = 0.0)
         
         self.param("inner_angle", self.TypeDouble, "Angle between junction pads", default = 90.0)
         self.param("junction_width_t", self.TypeDouble, "Top junction width", default = 0.3, unit="μm",hidden=False)
         self.param("junction_width_b", self.TypeDouble, "Bottom junction width", default = 0.3, unit="μm",hidden=False)
-        self.param("junction_y_offset", self.TypeDouble, "Vertical Offset of the junction position", default = 0.0, unit="μm",hidden=False)    
+
         self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=False)
         self.param("finger_size",self.TypeDouble, "Length of fingers (without overshoot).", default=5.0, unit="μm")
         
@@ -64,39 +65,41 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         self.param("mirror_offset",self.TypeDouble, "Length of fingers (without overshoot).", default=False, unit="μm",hidden=True)
         self.param("label",self.TypeString, "Label", default="QFOUNDRY",hidden=True)
 
-
-
     def produceManhattanFatLead(self): 
             """Draws the Manhattan junction"""
             dbu = self.layout.dbu
             jj_layer = self.layout.layer(self.l_layer)
             _angle = radians(self.angle)
-            _inner_angle = radians(self.inner_angle-90)
+            _inner_angle = radians(self.inner_angle)
             size = self.finger_size
             conn_height= self.conn_height
             conn_width = self.conn_width
             gap = self.patch_gap
             
             #Junction
-            if self.is_squid:
+            if self.junction_type == 0:
+                finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+                  finger_overlap = self.conn_width, 
+                  center = pya.DPoint(0, 0), dbu=dbu)
+                _add_shapes(self.cell, finger_shapes, jj_layer)
+            else:  # SQUID cases
                 center1 = pya.DPoint(-self.squid_spacing / 2, 0)
-                center2 = pya.DPoint(self.squid_spacing / 2, 0)
-                
                 finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
                     finger_overlap = self.conn_width, 
                     center = center1, dbu=dbu)
-                finger_shapes2 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot,
+                
+                angle2 = self.angle-180 if self.junction_type == 2 else self.angle
+                inner_angle2 = 180+self.inner_angle if self.junction_type == 2 else self.inner_angle
+                finger_size2 = self.finger_size + self.squid_spacing*tan(radians(angle2)) if self.junction_type == 2 else self.inner_angle
+                center2 = pya.DPoint(self.squid_spacing / 2, self.squid_spacing*tan(radians(angle2)))
+                
+                finger_shapes2 = draw_junction(angle2, inner_angle2, self.junction_width_b, self.junction_width_t, finger_size2, self.mirror_offset, self.offset_compensation, self.finger_overshoot,
                     finger_overlap = self.conn_width,
                     center = center2, dbu=dbu)
                 _add_shapes(self.cell, finger_shapes1, jj_layer)
                 _add_shapes(self.cell, finger_shapes2, jj_layer)
                 
                 # Connecting loop for SQUID uses the capacitors as the loop path
-            else:
-                finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
-                  finger_overlap = self.conn_width, 
-                  center = pya.DPoint(0, 0), dbu=dbu)
-                _add_shapes(self.cell, finger_shapes, jj_layer)
             
             
             # Connector leads
@@ -104,20 +107,23 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             self.top_dy = (size+conn_width/2)*sin(_angle)
             self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy
             
-            self.bot_dx = size*sin(_angle-_inner_angle)
-            self.bot_lead_height = conn_height + self.cap_gap/2 - size*cos(_angle-_inner_angle)
-            self.bot_dy = -size*cos(_angle-_inner_angle)-self.bot_lead_height
+            self.bot_dx = size*sin(_angle-_inner_angle+pi/2)
+            self.bot_lead_height = conn_height + self.cap_gap/2 - size*cos(_angle-_inner_angle+pi/2)
+            self.bot_dy = -size*cos(_angle-_inner_angle+pi/2)-self.bot_lead_height
             
-            if self.is_squid:
-                conn_shapes = self.draw_connectors(pya.DPoint(-self.squid_spacing / 2, 0), draw_top=True, draw_bot=True)
-                conn_shapes2 = self.draw_connectors(pya.DPoint(self.squid_spacing / 2, 0), draw_top=True, draw_bot=True)
+            if self.junction_type != 0:
+                conn_shapes = self.draw_connectors(pya.DPoint(-self.squid_spacing / 2, 0), 
+                                                   draw_top=True, 
+                                                   draw_bot=True)
+                conn_shapes2 = self.draw_connectors(pya.DPoint(self.squid_spacing / 2, 0), 
+                                                    draw_top=True if self.junction_type == 1 else False, 
+                                                    draw_bot=True)
                 _add_shapes(self.cell, conn_shapes, jj_layer)
                 _add_shapes(self.cell, conn_shapes2, jj_layer)
 
             else:
                 conn_shapes = self.draw_connectors(pya.DPoint(0, 0))
                 _add_shapes(self.cell, conn_shapes, jj_layer)
-            
             
             # Pads
             if self.draw_cap:
@@ -129,7 +135,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                     # Patch opening in base metal layer
                     center = pya.DPoint(0, 0)
                    
-                    if self.is_squid:
+                    if self.junction_type != 0:
                         center1 = pya.DPoint(-self.squid_spacing / 2, 0)
                         center2 = pya.DPoint(self.squid_spacing / 2, 0)
 
@@ -155,9 +161,12 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                         patch_open_shape = [
                             (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap) * patch_top).to_itype(dbu),
                             (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap) * patch_bot).to_itype(dbu),
-                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap) * patch_top).to_itype(dbu),
                             (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap) * patch_bot).to_itype(dbu)
                         ]
+                        if self.junction_type == 1:
+                            patch_open_shape.append(
+                                (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap) * patch_top).to_itype(dbu)
+                            )
                     else: 
                         patch_top = draw_patch_openning(
                             self.finger_size+self.conn_width/2, 
@@ -179,8 +188,8 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                         )
 
                         patch_open_shape = [
-                        (pya.DTrans(0, False, center.x,center.y+self.patch_gap/2) * patch_top).to_itype(dbu),
-                        (pya.DTrans(0, False, center.x,center.y+self.patch_gap/2) * patch_bot).to_itype(dbu)
+                        (pya.DTrans(0, False, center.x,center.y+self.patch_gap) * patch_top).to_itype(dbu),
+                        (pya.DTrans(0, False, center.x,center.y+self.patch_gap) * patch_bot).to_itype(dbu)
                         ]
                     
                 layerm = self.layout.layer(self.cap_layer)
