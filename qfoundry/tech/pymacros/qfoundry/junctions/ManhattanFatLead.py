@@ -1,5 +1,5 @@
 import pya
-from numpy import cos, sin, tan, radians, linspace, sign, linspace, pi
+from numpy import cos, sin, arctan,tan, radians, linspace, sign, linspace, pi
 from math import pi
 
 from kqcircuits.util.symmetric_polygons import polygon_with_vsym
@@ -63,7 +63,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         self.param("cap_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
         self.param("offset_compensation",self.TypeDouble, "Compensation for top junction.", default=0.0, unit="μm",hidden=True)
         self.param("mirror_offset",self.TypeDouble, "Length of fingers (without overshoot).", default=False, unit="μm",hidden=True)
-        self.param("label",self.TypeString, "Label", default="QFOUNDRY",hidden=True)
+        self.param("label",self.TypeString, "Label", default="",hidden=False)
 
     def produceManhattanFatLead(self): 
             """Draws the Manhattan junction"""
@@ -74,9 +74,9 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             size = self.finger_size
             conn_height= self.conn_height
             conn_width = self.conn_width
-            gap = self.patch_gap
             
             #Junction
+            
             if self.junction_type == 0:
                 finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
                   finger_overlap = self.conn_width, 
@@ -86,16 +86,34 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                 center1 = pya.DPoint(-self.squid_spacing / 2, 0)
                 finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
                     finger_overlap = self.conn_width, 
-                    center = center1, dbu=dbu)
+                    center = center1, dbu=dbu,
+                    bottom_lead_comp = -self.conn_width/2
+                    )
                 
                 angle2 = self.angle-180 if self.junction_type == 2 else self.angle
                 inner_angle2 = 180+self.inner_angle if self.junction_type == 2 else self.inner_angle
-                finger_size2 = self.finger_size + self.squid_spacing*tan(radians(angle2)) if self.junction_type == 2 else self.inner_angle
+                if self.junction_type == 2:
+                  extension = self.squid_spacing/cos(radians(self.angle))-2*conn_width-size
+                  bottom_lead_comp = -extension+self.squid_spacing*sin(radians(self.angle))+self.finger_size
+                  finger_size2 = extension
+                  print(finger_size2, 'um, angle = ', self.angle)
+                else:
+                  bottom_lead_comp = self.squid_spacing*tan(radians(self.angle))
+                  finger_size2 = self.finger_size
+                  
                 center2 = pya.DPoint(self.squid_spacing / 2, self.squid_spacing*tan(radians(angle2)))
                 
-                finger_shapes2 = draw_junction(angle2, inner_angle2, self.junction_width_b, self.junction_width_t, finger_size2, self.mirror_offset, self.offset_compensation, self.finger_overshoot,
-                    finger_overlap = self.conn_width,
-                    center = center2, dbu=dbu)
+                finger_shapes2 = draw_junction(angle2, inner_angle2, 
+                                               self.junction_width_b, 
+                                               self.junction_width_t, 
+                                               finger_size2, 
+                                               self.mirror_offset, 
+                                               self.offset_compensation, 
+                                               self.finger_overshoot,
+                                               finger_overlap = self.conn_width,
+                                               center = center2, dbu=dbu,
+                                               bottom_lead_comp = bottom_lead_comp-   self.conn_width/2
+                                            )
                 _add_shapes(self.cell, finger_shapes1, jj_layer)
                 _add_shapes(self.cell, finger_shapes2, jj_layer)
                 
@@ -105,24 +123,53 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             # Connector leads
             self.top_dx = (size+conn_width/2)*cos(_angle)
             self.top_dy = (size+conn_width/2)*sin(_angle)
-            self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy
+            self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy+0
             
-            self.bot_dx = size*sin(_angle-_inner_angle+pi/2)
-            self.bot_lead_height = conn_height + self.cap_gap/2 - size*cos(_angle-_inner_angle+pi/2)
-            self.bot_dy = -size*cos(_angle-_inner_angle+pi/2)-self.bot_lead_height
+            bottom_finger_angle = _angle - _inner_angle
+            self.bot_dx = size*sin(bottom_finger_angle+pi/2)
+            self.bot_dy = -size*cos(bottom_finger_angle+pi/2)
+            self.bot_lead_height = -(conn_height + self.cap_gap/2)
             
+               
             if self.junction_type != 0:
-                conn_shapes = self.draw_connectors(pya.DPoint(-self.squid_spacing / 2, 0), 
-                                                   draw_top=True, 
-                                                   draw_bot=True)
-                conn_shapes2 = self.draw_connectors(pya.DPoint(self.squid_spacing / 2, 0), 
+                dx2 = (finger_size2 + bottom_lead_comp)*sin(_angle)
+                dy2 = (self.squid_spacing)*tan(_angle)
+
+                conn_shapes = self.draw_connectors(center = pya.DPoint(-self.squid_spacing / 2, 0), 
+                                                   draw_top = True, 
+                                                   draw_bot = True,
+                                                   offsets = {'top_dx': self.top_dx, 
+                                                               'top_dy': self.top_dy, 
+                                                               'bot_dx': self.bot_dx, 
+                                                               'bot_dy': self.bot_dy},
+                                                    lead_height={'top': self.top_lead_height+self.top_dy, 
+                                                                'bot': self.bot_lead_height})
+                conn_shapes2 = self.draw_connectors(center = pya.DPoint(self.squid_spacing / 2, 0), 
                                                     draw_top=True if self.junction_type == 1 else False, 
-                                                    draw_bot=True)
+                                                    draw_bot=True,
+                                                    offsets = {'top_dx': self.top_dx, 
+                                                               'top_dy': self.top_dy + dy2, 
+                                                               'bot_dx': self.bot_dx +dx2, 
+                                                               'bot_dy': self.bot_dy},
+                                                    lead_height={'top': self.top_lead_height+ self.top_dy, 
+                                                                 'bot': self.bot_lead_height})
+                                                    
+                # ompensate the y offset in the bottom-right lead
+                # Compensate the x ioffset in the bottom-right lead
+                # conn_shapes2 = [conn_shapes2[0], 
+                #                 conn_shapes2[1]*pya.DTrans(0, False, dx2/dbu, 0)]
+                                
                 _add_shapes(self.cell, conn_shapes, jj_layer)
                 _add_shapes(self.cell, conn_shapes2, jj_layer)
-
             else:
-                conn_shapes = self.draw_connectors(pya.DPoint(0, 0))
+                conn_shapes = self.draw_connectors(pya.DPoint(0, 0),
+                                                   draw_top=True, draw_bot=True,
+                                                   lead_height={'top': self.top_lead_height+ self.top_dy, 
+                                                                'bot': self.bot_lead_height},
+                                                    offsets = {'top_dx': self.top_dx, 
+                                                               'top_dy': self.top_dy,
+                                                               'bot_dx': self.bot_dx,
+                                                               'bot_dy': self.bot_dy})
                 _add_shapes(self.cell, conn_shapes, jj_layer)
             
             # Pads
@@ -136,6 +183,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                     center = pya.DPoint(0, 0)
                    
                     if self.junction_type != 0:
+                        
                         center1 = pya.DPoint(-self.squid_spacing / 2, 0)
                         center2 = pya.DPoint(self.squid_spacing / 2, 0)
 
@@ -151,7 +199,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                         patch_bot = draw_patch_openning(
                             self.finger_size,
                             self.conn_width,
-                            self.bot_lead_height,
+                            abs(self.bot_lead_height+size*cos(_angle)),
                             self.angle - self.inner_angle,
                             self.inner_angle,
                             gap=self.patch_gap,
@@ -161,7 +209,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                         patch_open_shape = [
                             (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap) * patch_top).to_itype(dbu),
                             (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap) * patch_bot).to_itype(dbu),
-                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap) * patch_bot).to_itype(dbu)
+                            (pya.DTrans(0, False, center2.x+dx2, center2.y + self.patch_gap) * patch_bot).to_itype(dbu)
                         ]
                         if self.junction_type == 1:
                             patch_open_shape.append(
@@ -169,7 +217,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                             )
                     else: 
                         patch_top = draw_patch_openning(
-                            self.finger_size+self.conn_width/2, 
+                            self.finger_size+self.conn_width/2, # This dimension size extends to the center of the connector
                             self.conn_width, 
                             self.top_lead_height, 
                             self.angle, 
@@ -180,7 +228,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                         patch_bot = draw_patch_openning(
                             self.finger_size, 
                             self.conn_width, 
-                            self.bot_lead_height, 
+                            abs(self.bot_lead_height+size*cos(_angle)), 
                             self.angle-self.inner_angle, 
                             self.inner_angle,   
                             gap = self.patch_gap,
@@ -223,12 +271,11 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                 _add_shapes(self.cell, patch_shape, layer)
   
 
-    def draw_connectors(self, center=pya.DPoint(0, 0), draw_top=True, draw_bot=True):
+    def draw_connectors(self, center=pya.DPoint(0, 0), draw_top=True, draw_bot=True, 
+          offsets = {'top_dx': 0, 'top_dy': 0, 'bot_dx': 0, 'bot_dy': 0},
+          lead_height={'top': 5, 'bot': 5}):
         dbu = self.layout.dbu
-        gap = self.cap_gap
-        size = self.finger_size
         _angle = radians(self.angle)
-        _inner_angle = radians(self.inner_angle)
         conn_width = self.conn_width
         
         rounding_params = {
@@ -237,37 +284,39 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             "n": 64,  # number of point per rounded corner
         }
         
-        def connector_points(heigth, width, angle, rot=0, round = False):
+        def connector_points(heigth, width, angle, rot=0, round = False, offsets = {'dx': 0, 'dy': 0}):
             x0 = width/2.
             y0 = width/2.*tan(angle)
             
             if round:
                 return arc(heigth/2.0, width/2.0, angle, rot)
             else:
-                return pya.DTrans(rot,False, 0, 0)*pya.DPolygon([
-                    pya.DPoint(-x0, -y0),
-                    pya.DPoint(x0, y0),
+                return pya.DTrans(rot,False, offsets['dx'], 0)*pya.DPolygon([
+                    pya.DPoint(-x0, -y0 + offsets['dy']),
+                    pya.DPoint(x0, y0 + offsets['dy']),
                     pya.DPoint(x0, heigth),
                     pya.DPoint(-x0, heigth),
                 ])
 
         conn_shapes = []
         if draw_top:
-            top_dx, top_dy = self.top_dx, self.top_dy
-            top_lead_height = self.top_lead_height
-            conn_top = pya.DTrans(0,False,top_dx, top_dy) * (connector_points(
-                                heigth=top_lead_height,
+            conn_top = pya.DTrans(0,False,0, 0) * connector_points(
+                                heigth=lead_height['top'],
                                 width=conn_width,
-                                angle=_angle))
+                                angle=_angle,
+                                offsets = {'dx': offsets['top_dx'], 
+                                           'dy': offsets['top_dy']},
+                                )
             conn_shapes.append((pya.DTrans(0, False, center.x,center.y) * conn_top).to_itype(dbu))
 
         if draw_bot:
-            bot_dx, bot_dy = self.bot_dx, self.bot_dy
-            bot_lead_height = self.bot_lead_height
-            conn_bot = pya.DTrans(0,False,bot_dx, bot_dy) * (connector_points(
-                            heigth=bot_lead_height,
+            conn_bot = pya.DTrans(0,False,0, 0) * connector_points(
+                            heigth=lead_height['bot'],
                             width=conn_width,
-                            angle=0))
+                            angle=_angle,
+                            offsets = {'dx': offsets['bot_dx'], 
+                                       'dy': offsets['bot_dy']},
+                            )
             conn_shapes.append((pya.DTrans(0, False, center.x,center.y) * conn_bot).to_itype(dbu))
         
         return conn_shapes

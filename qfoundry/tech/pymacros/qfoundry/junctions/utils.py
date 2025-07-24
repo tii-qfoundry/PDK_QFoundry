@@ -21,7 +21,7 @@ def arc(r, start=0, stop=pi/2, n=64):
     return points
 
 def draw_junction(angle, inner_angle, junction_width_b, junction_width_t, finger_size, mirror_offset, offset_compensation, finger_overshoot, finger_overlap, 
-  center=pya.DPoint(0, 0), dbu = 0.001) -> pya.DPolygon:
+  bottom_lead_comp = 0, center=pya.DPoint(0, 0), dbu = 0.001) -> pya.DPolygon:
     _angle = radians(angle)
     _inner_angle = radians(inner_angle)
 
@@ -34,11 +34,11 @@ def draw_junction(angle, inner_angle, junction_width_b, junction_width_t, finger
     else:
         ddb += offset_compensation * cos(_angle)
     
-    def finger_points(size,width, angle):
+    def finger_points(size,width, angle, lead_comp=0):
         fo_x = (finger_overshoot) * cos(angle) 
         fo_y = finger_overshoot * sin(angle) 
-        pl_x = (finger_overlap) * cos(angle)   
-        pl_y = (finger_overlap) * sin(angle)   
+        pl_x = (finger_overlap + lead_comp) * cos(angle)   
+        pl_y = (finger_overlap + lead_comp) * sin(angle)   
         
         dx = width/2*sin(angle)
         dy = width/2*cos(angle)
@@ -53,7 +53,7 @@ def draw_junction(angle, inner_angle, junction_width_b, junction_width_t, finger
             pya.DPoint(end_x-dx+pl_x, end_y+dy+pl_y),
         ]
 
-    finger_bottom = pya.DTrans(0, 0) * pya.DPolygon(finger_points(size,ddb,_angle-(_inner_angle)))
+    finger_bottom = pya.DTrans(0, 0) * pya.DPolygon(finger_points(size,ddb,_angle-(_inner_angle), lead_comp=bottom_lead_comp))
     finger_top = pya.DTrans(0, 0) * pya.DPolygon(finger_points(size,ddt, _angle))
     
     junction_shapes = [ (pya.DTrans(0, False, center.x,center.y) * finger_top).to_itype(dbu),
