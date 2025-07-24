@@ -53,9 +53,9 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         self.param("draw_patch", self.TypeBoolean, "Include patches", default=False)
         self.param("patch_scratch", self.TypeBoolean, "Draw 45 deg scratches as patch", default=False, hidden=True)
         self.param("patch_layer", self.TypeLayer, "Patch Layer", default = pya.LayerInfo(4, 0), hidden=True)
-        self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0, hidden = True)
+        self.param("patch_gap", self.TypeDouble, "Patch gap", default=1.0, hidden = False)
         
-        self.param("patch_clearance", self.TypeDouble, "Patch clearance", default=5.0)
+        self.param("patch_clearance", self.TypeDouble, "Patch clearance", default=5.0, hidden = True)
         self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
         self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=False)
         self.param("cap_h", self.TypeDouble, "Capacitor height", default=200.0,hidden=False)
@@ -105,8 +105,8 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             self.top_lead_height = conn_height+self.cap_gap/2-self.top_dy
             
             self.bot_dx = size*sin(_angle-_inner_angle)
-            self.bot_lead_height = (max(gap/2.+size, 0.) + conn_height)
-            self.bot_dy = -size*cos(_angle)-self.bot_lead_height
+            self.bot_lead_height = conn_height + self.cap_gap/2 - size*cos(_angle-_inner_angle)
+            self.bot_dy = -size*cos(_angle-_inner_angle)-self.bot_lead_height
             
             if self.is_squid:
                 conn_shapes = self.draw_connectors(pya.DPoint(-self.squid_spacing / 2, 0), draw_top=True, draw_bot=True)
@@ -153,10 +153,10 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                         )
 
                         patch_open_shape = [
-                            (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap / 2) * patch_top).to_itype(dbu),
-                            (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap / 2) * patch_bot).to_itype(dbu),
-                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap / 2) * patch_top).to_itype(dbu),
-                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap / 2) * patch_bot).to_itype(dbu)
+                            (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap) * patch_top).to_itype(dbu),
+                            (pya.DTrans(0, False, center1.x, center1.y + self.patch_gap) * patch_bot).to_itype(dbu),
+                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap) * patch_top).to_itype(dbu),
+                            (pya.DTrans(0, False, center2.x, center2.y + self.patch_gap) * patch_bot).to_itype(dbu)
                         ]
                     else: 
                         patch_top = draw_patch_openning(
