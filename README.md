@@ -262,9 +262,8 @@ A series of rules now need to be checked before your layout is ready for submiss
 > ~ DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:~
 
 ## Exporting your design
-[Export for Fabrication is not yet supported in the PDK]
-> Go to KQCircuits > QFoundry > Export for fabrication
-> This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
+Go to KQCircuits > Export for fabrication
+This will generate an new GDS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The layer mapping for the fabrication conversion can be only modified in the script code at the moment. The generate layout has a cell depth of 1, preserving all first depth cells in the top cell of the original layout.
 
 ## Creating your own components
 To allow the consistency of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library. In addition, every component need to be inside a polygon in the DevRec layer (68/0) that is used to test component overlaps in pre-production. Make sure that all overlapping polygons in the same layer are merged to avoid double exposure during fabrication, resulting in low quality lithography.
