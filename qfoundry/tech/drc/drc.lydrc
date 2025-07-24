@@ -9,7 +9,7 @@
  <autorun>false</autorun>
  <autorun-early>false</autorun-early>
  <priority>0</priority>
- <shortcut/>
+ <shortcut>Shift+D</shortcut>
  <show-in-menu>true</show-in-menu>
  <group-name>drc_scripts</group-name>
  <menu-path>tools_menu.drc.end</menu-path>
