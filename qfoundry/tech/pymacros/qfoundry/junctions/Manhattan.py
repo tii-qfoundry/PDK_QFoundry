@@ -105,19 +105,21 @@ class Manhattan(pya.PCellDeclarationHelper):
                 # Patches
                 if self.draw_patch:
                     center = pya.DPoint(0, 0)
+                    top_height = self.conn_height+self.cap_gap/2-self.finger_size*sin(_angle)
                     patch_top = draw_patch_openning(
                         self.finger_size, 
                         self.conn_width, 
-                        self.conn_height+self.cap_gap/2-self.finger_size*sin(_angle), 
+                        top_height, 
                         self.angle, 
                         self.inner_angle, 
                         gap = self.patch_gap
                     )
                     
+                    bot_height = self.conn_height+self.cap_gap/2-self.finger_size*cos(_angle)
                     patch_bot = draw_patch_openning(
                         self.finger_size, 
                         self.conn_width, 
-                        self.conn_height+self.finger_size*cos(_angle)+self.cap_gap/2, 
+                        bot_height, 
                         self.angle-90, 
                         self.inner_angle,   
                         gap = self.patch_gap
@@ -125,7 +127,7 @@ class Manhattan(pya.PCellDeclarationHelper):
 
                     patch_open_shape = [
                       (pya.DTrans(0, False, center.x,center.y) * patch_top).to_itype(dbu),
-                      (pya.DTrans(0, False, center.x,center.y-self.finger_size*sin(_angle)-self.cap_gap) * patch_bot).to_itype(dbu)
+                      (pya.DTrans(0, False, center.x,center.y-bot_height) * patch_bot).to_itype(dbu)
                     ]
 
    
