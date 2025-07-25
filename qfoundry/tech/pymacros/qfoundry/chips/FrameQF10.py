@@ -1,5 +1,5 @@
-# This code is part of KQFoundry
-# Copyright (C) 2024 TII
+# This code is part of KQFoundry PDK
+# Copyright (C) 2025 TII
 #
 # It uses the KQcircuits library
 

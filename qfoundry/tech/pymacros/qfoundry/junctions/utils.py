@@ -167,7 +167,7 @@ def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap
             pya.DPoint(conn_width/2+gap, 0),
         ])
         if True:
-            polygon = polygon.round_corners(1, 1, 32)
+            polygon = polygon.round_corners(0, 0, 32)
         return polygon
         
     patch = pya.DTrans(0,False,0, -1) * (patch_points(heigth=heigth, size=size,angle=_angle))

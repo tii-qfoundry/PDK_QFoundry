@@ -183,6 +183,7 @@ if __name__ == "__main__":
     # You need to reload the library to see the changes in the PCell 
     from qfoundry.scripts import reload_library
     from qfoundry.utils import test_pcell
+    reload_library()
 
     pcell_decl = Manhattan
     pcell_params = {
