@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya
+import csv
+
+def read_parameter_from_csv(parent_window):
+    """
+    Opens a CSV file containing cell names and values for a parameter, and returns
+    the data as a dictionary for easy lookup.
+
+    Args:
+        parent_window (QMainWindow): The main KLayout window for the dialog.
+
+    Returns:
+        A dictionary mapping cell names to cparameter values, e.g.,
+        {'Qubit_A_design': '15.2'}, or an empty dictionary on failure/cancellation.
+    """
+    parameter_map = {}
+
+    # Open a file dialog for the user to select the critical current CSV
+    file_path = pya.QFileDialog.getOpenFileName(
+        parent_window,
+        "Open a parameter CSV File",
+        "", # Start directory
+        "CSV Files (*.csv)"
+    )
+
+    if isinstance(file_path, tuple):
+        file_path = file_path[0]
+
+    if file_path:
+        try:
+            with open(file_path, 'r', newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+
+                # --- IMPORTANT ---
+                # These variables MUST match the column headers in your CSV file.
+                cell_name_column = 'parent_cell' # Or whatever you call the name column
+                current_column = 'value'   # Or whatever you call the value column
+                # -----------------
+
+                # Check if the required headers exist
+                if not all(col in reader.fieldnames for col in [cell_name_column, current_column]):
+                    pya.QMessageBox.critical(
+                        parent_window, "CSV Header Error",
+                        f"The CSV file must contain columns named '{cell_name_column}' and '{current_column}'. Please check the file and try again.",
+                        pya.QMessageBox.Ok
+                    )
+                    return {}
+
+                for row in reader:
+                    cell_name = row.get(cell_name_column)
+                    current = row.get(current_column)
+                    if cell_name and current:
+                        parameter_map[cell_name] = current
+                    else:
+                        print(f"Warning: Skipping row in parameter file due to missing data: {row}")
+
+            print(f"Successfully read {len(parameter_map)} values into a map.")
+            return parameter_map
+
+        except Exception as e:
+            print(f"Error reading critical current CSV: {e}")
+            return {}
+    else:
+        print("Reading parameter values cancelled by user.")
+        return {}
+
+
+def export_combined_data_to_csv(locations, critical_currents_map, parent_window):
+    """
+    Exports a combined list of junction locations and their matched critical
+    currents to a single CSV file.
+
+    Args:
+        locations (list): A list of tuples (x, y, parent_name).
+        critical_currents_map (dict): A dictionary mapping parent_name to a critical current.
+        parent_window (QMainWindow): The main KLayout window for the dialog.
+    """
+    if not locations:
+        print("No locations to export.")
+        return
+
+    file_path = pya.QFileDialog.getSaveFileName(
+        parent_window,
+        "Save Combined Junction Data as CSV",
+        "",
+        "CSV Files (*.csv)"
+    )
+
+    if isinstance(file_path, tuple):
+        file_path = file_path[0]
+
+    if file_path:
+        try:
+            with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(["X Coordinate (um)", "Y Coordinate (um)", "Parent Cell", "Critical Current"])
+
+                for x, y, parent_name in locations:
+                    x_mm = x/1e3
+                    y_mm = y/1e3
+                    # Look up the critical current using the parent cell name.
+                    # .get() is used to avoid errors if a match is not found.
+                    current = critical_currents_map.get(parent_name, "NOT FOUND") # Default if not found
+                    writer.writerow([f"{x_mm:.6f}", f"{y_mm:.6f}", parent_name, current])
+
+            print(f"Successfully exported combined data to: {file_path}")
+
+        except Exception as e:
+            print(f"Error exporting to CSV: {e}")
+    else:
+        print("CSV export cancelled by user.")
+
+
+def find_junction_placeholders_with_parent(target_cell_name = "default"):
+    """
+    (This function is unchanged)
+    Finds all instances of the cell target_cell_name and returns their
+    global coordinates and parent cell name.
+    """
+    app = pya.Application.instance()
+    mw = app.main_window()
+    lv = mw.current_view()
+    if lv is None: raise Exception("No layout view found.")
+    layout = lv.active_cellview().layout()
+    top_cell = lv.active_cellview().cell
+    if top_cell is None: raise Exception("No top cell found.")
+
+    locations = []
+
+    def search_cell(parent_cell, trans, depth):
+        if depth &gt; 2: return
+        for inst in parent_cell.each_inst():
+            child_cell = inst.cell
+            if inst.is_regular_array():
+                for i in range(inst.na):
+                    for j in range(inst.nb):
+                        array_trans = pya.Trans(inst.a * i + inst.b * j)
+                        instance_trans = trans * inst.trans * array_trans
+                        if child_cell.name == target_cell_name:
+                            global_pos = instance_trans.disp
+                            locations.append((global_pos.x * layout.dbu, global_pos.y * layout.dbu, parent_cell.name))
+                        else:
+                            search_cell(child_cell, instance_trans, depth + 1)
+            else:
+                instance_trans = trans * inst.trans
+                if child_cell.name == target_cell_name:
+                    global_pos = instance_trans.disp
+                    locations.append((global_pos.x * layout.dbu, global_pos.y * layout.dbu, parent_cell.name))
+                else:
+                    search_cell(child_cell, instance_trans, depth + 1)
+
+    search_cell(top_cell, pya.Trans.new(), 0)
+
+    if locations:
+        print("----------------------------------------------------------------------")
+        print(f"Found {len(locations)} instances of '{target_cell_name}':")
+        print("----------------------------------------------------------------------")
+        print("{:&lt;20} {:&lt;20} {:&lt;30}".format("X Coordinate (µm)", "Y Coordinate (µm)", "Parent Cell"))
+        print("----------------------------------------------------------------------")
+        for x, y, parent_name in locations:
+            print("{:&lt;20.6f} {:&lt;20.6f} {:&lt;30}".format(x, y, parent_name))
+        print("----------------------------------------------------------------------")
+    else:
+        print(f"No instances of cell '{target_cell_name}' found.")
+
+    return locations, mw
+
+# --- Main execution ---
+if __name__ == "__main__":
+    target_cell_name = "junction_placeholder"
+    found_locations, main_window = find_junction_placeholders_with_parent(target_cell_name)
+
+    if found_locations:
+        reply = pya.QMessageBox.question(
+            main_window,
+            "Export Data",
+            f"{len(found_locations)} {target_cell_name} locations were found. Do you want to merge this data with a parameter CSV and export it?",
+            pya.QMessageBox.Yes | pya.QMessageBox.No,
+            pya.QMessageBox.No
+        )
+
+        if reply == pya.QMessageBox.Yes:
+            # Read the critical current data from the CSV into a dictionary (map)
+            current_data_map = read_parameter_from_csv(main_window)
+
+            # Proceed only if the user selected a valid file
+            if current_data_map:
+                export_combined_data_to_csv(found_locations, current_data_map, main_window)</text>
+</klayout-macro>

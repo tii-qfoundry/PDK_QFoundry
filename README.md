@@ -1,12 +1,29 @@
 # QFoundry 2D - PDK
-TII QFoundry standard PDK for superconductive qubit fabrication. The KLayout PDK layout tools are built on top of KQcircuits circuit package.
+
+TII QFoundry standard PDK for superconducting qubit fabrication. The KLayout PDK layout tools are built on top of the KQCircuits circuit package, providing a comprehensive design environment for quantum device development.
+
+**Latest Version**: v2.0 | **Technology Node**: QFoundry Process v1.2 | **KQCircuits Compatibility**: v4.7+
+
+## Quick Start
+
+1. **Install KQCircuits** via KLayout Package Manager
+2. **Clone this repository** to your local machine
+3. **Import technology** in KLayout: Tools → Manage Technologies → Import → Select `qfoundry.lyt`
+4. **Start designing** with parametric quantum components
 
 ## Design Guide
-The qfoundry microfabrication is a single layer superconductive aluminum manufacturing process with medium and high resolution lithography steps. The high resolution lithography is used **only** for josephson junction micro-fabrication, but under specific conditions can be used for the manufacturing of transmon capacitors and resonators. The superconductive layer is a low kinetic inductance Aluminum (Al) in a float-zone intrinsic Silicon substrate with no cladding. Metallization is done through ebeam evaporation of high purity aluminum. 
 
-<p align="center"><img width="200" alt="image" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/6645d804-900d-4106-accd-3f97fbc301ad"> </p>
+The QFoundry microfabrication process is a single-layer superconducting aluminum manufacturing process with medium and high-resolution lithography steps. The high-resolution lithography is used **exclusively** for Josephson junction micro-fabrication, while standard resolution is suitable for resonators, transmission lines, and capacitive elements.
 
-The current fabrication process of the TII qfoundry, uses the following process derived model parameters.
+### Process Overview
+
+The superconducting layer consists of low kinetic inductance Aluminum (Al) deposited on float-zone intrinsic Silicon substrate. Metallization is achieved through electron-beam evaporation of high-purity aluminum, providing excellent superconducting properties and low loss characteristics.
+
+<p align="center"><img width="200" alt="QFoundry Process Flow" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/6645d804-900d-4106-accd-3f97fbc301ad"> </p>
+
+### Process Parameters
+
+Current fabrication process parameters derived from device characterization and modeling:
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -19,7 +36,7 @@ $\varepsilon_{r,Si}$ | $11.6883$ | Cold relative permittivity of Silicon, based 
 
 <p align="center"><img width="500" alt="Qubit Frequency Ambegaokar-Baratoff relations" src="https://github.com/user-attachments/assets/68768c38-5a7b-45d5-9296-9132e47d8712"> </p>
 
-
+Standard coplanar waveguides used by the foundry are 15 $\mu m$ wide with 7.5 $\mu m$ spacing to the ground plane. This creates a waveguide with characteristic impedance of $Z_0 = 49.24 \Omega$ and effective permittivity of $\epsilon_{eff}=6.345$.
 
 ### Qubit design
 In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
@@ -47,10 +64,10 @@ $$
 With $R_n$ the measured junction resistance in $k\Omega$. 
 
 #### Junction Resistance
-We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, hore used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Noth following the form:
+We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, here used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Both following the form:
 
 $$
-  R_n = \rho\cdot A_{JJ} + R_0
+  R_n = \rho/ A_{JJ} + R_0
 $$
 
 Patched junctions
@@ -59,7 +76,7 @@ Patched junctions
 Full EBL junctions
 <p align="center"><img width="400" alt="image" src="https://github.com/user-attachments/assets/b6d2be6c-73de-46ed-98b0-fdd69b9ea4c3"> </p>
 
-Values for $R_0$ and $\rho$ are derived from measurements over >70 functional test junctions carried on the 26/07/2024 for Pathced jucntions and 12/08/2024 for full EBL junctions. T
+Values for $R_0$ and $\rho$ are derived from measurements over >70 functional test junctions carried on the 26/07/2024 for Patched jucntions and 12/08/2024 for full EBL junctions.
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -69,6 +86,17 @@ $R_{0,patch}$ | -26.7 $\Omega$ | Total resistance correction
 $R_{0,ebl}$ | -2.958 $k\Omega$ | Total resistance correction
 
 Furthermore, the junctions R.T. resistance can tuned by annealing the fabricated device. Such process is normally carried to tune the R.T. resistance to match the design specification. 
+
+#### Airbridges
+Aluminum airbridges can be manufactured using a two step litography process, in which the base resist layer is heated to reflow it and generate a profile that serves as support structure during the metal deposition. Airbridges are a common way to remove parastic modes in waveguides and help make sure the ground plane remains equi-potential, and they can be used to build waveguide crossings. However, airbridges are know to cause losses related to impedance missmatch, additional scattering and will add a parasitic capacitance to the waveguide, that may have a strong effect on the system.
+
+The following parameters can be used to model the effect of the QFoundry's standard airbridges to your circuit
+Parameter | Value | Comment
+--- | --- | --- | 
+$C_{b}$ |  0.434 $fF$ | Bridge capacitance, from measured SC resonators
+$\delta_{b}$ |  0.0  | Additional loss tangent of the waveguide
+
+<p align="center"><img width="400" alt="airbridge" src="https://github.com/user-attachments/assets/c6e05ecf-8391-4bb0-8d88-428b8849526f"> </p>
 
 ## Layout Specification
 
@@ -135,14 +163,35 @@ Metal Thickness | $200 nm$ | Measured
 
 ### Standard Components
 
+The QFoundry PDK provides a comprehensive library of parametric components:
+
+#### Junctions
+- **Manhattan**: Basic Manhattan Josephson junction with configurable geometry
+- **ManhattanFatLead**: Enhanced junction with wider leads for SQUID configurations
+  - Single junction, SQUID pair, and SQUID reflected configurations
+  - Automatic lead compensation for complex geometries
+  - Integrated capacitive test structures
+
+#### Elements  
+- **BenasqueBridge**: Catenary-shaped airbridge for waveguide crossings
+- **QfoundryMarkerCross**: Precision alignment markers for lithography
+
+#### Chips
+- **FrameQF5**: 5×5mm chip frame with standard launcher configuration
+- **FrameQF10**: 10×10mm chip frame with expanded I/O capabilities
+
+All components are fully parametric and include design rule checking for fabrication compatibility.
+
+### Waveguide Standards
+
 ### Standard PCB design
 The qfoundry can provide wirebonding of supercondcutive QPUs to PCBs in any of the following standard launcher configurations. 
 
 PCB Type | Die Size | Max Number of Ports | Launcher Type | Comments
 --- | --- | --- | --- | --- 
-P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  
-P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  Available in August 2024
-P003* | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  PCB not yet available for production
+P001 | 5 x 5 mm | 12 (3 in each side) | 300 x 200 um |  Available
+P002 | 10 x 10 mm | 12 (3 in each side) | 300 x 200 um |  Available
+P003* | 10 x 10 mm | 16 (4 in each side) | 300 x 200 um |  Available
 
 ## KLayout PDK Installation
 
@@ -172,7 +221,14 @@ If you cannot see the custom cells of the QFoundry PDK (if you didnt accept runn
 
 <p align="center"> <img width="449" alt="image" src="https://github.com/tii-qfoundry/PDK_QFoundry/assets/14344419/41c81ad7-5c1d-4aa4-8cac-cbe46b4be78c">  </p>
 
-Now you are redy to design!
+Now you are ready to design!
+
+## Documentation
+
+- **[Quick Reference](QUICK_REFERENCE.md)** - Essential commands and component guide
+- **[API Reference](API_REFERENCE.md)** - Complete component parameter documentation  
+- **[Developer Guide](developper.md)** - Creating custom components and contributing
+- **[Process Specifications](#design-guide)** - Fabrication parameters and design rules
 
 ## Design a basic layout
 
@@ -202,14 +258,12 @@ Drag and drop components in your layout, and connect them using 'paths' in the '
 A series of rules now need to be checked before your layout is ready for submission. Rules may be application-defined, like connectivity between components or making sure that two devices are not overlapping, or process defined, checking that two different elements are not too close to each other or making sure that an etching step has something to etch under it. 
 
 ### DRC verification
-[Design Verification is not yet supported in the PDK]
-> ~ DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the key 'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error:~
+DRC rules from TII QFoundry (basic component overlapping checks) can be tested using KLayout's native DRC Check engine. To run this just press the 'Shift'+'D', or select Tools > Verification > DRC. The current DRC's are updated to the QFoundry's most up to date process. When you run the DRC a database visualizer will open with the list of DRC check made and the number of errors found in eacah category. By selecting any one category or element from this list you can visualize the area where the error occurs and get a description of the error.
 
 ## Exporting your design
-[Export for Fabrication is not yet supported in the PDK]
-> Go to KQCircuits > QFoundry > Export for fabrication
-> This will generate an OASIS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The new file should be stored in the same location as your layout file.
+Go to KQCircuits > Export for fabrication
+This will generate an new GDS file where all cells except black boxes have been flattened and elements in layers not part of the Fabrication PDK are removed. The layer mapping for the fabrication conversion can be only modified in the script code at the moment. The generate layout has a cell depth of 1, preserving all first depth cells in the top cell of the original layout.
 
 ## Creating your own components
-To allow the cnsistnecy of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library.
+To allow the consistency of the Layout to System specification from KLayout, we need that  **all** elements in a circuit to be proper KQcirucits components. Because KQcirucits is a layout centric design tool, creating new components from the layout is very easy and can all be done using basic elements avaiable in the KLayout base library. In addition, every component need to be inside a polygon in the DevRec layer (68/0) that is used to test component overlaps in pre-production. Make sure that all overlapping polygons in the same layer are merged to avoid double exposure during fabrication, resulting in low quality lithography.
 

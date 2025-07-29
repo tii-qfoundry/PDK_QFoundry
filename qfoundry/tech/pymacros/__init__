@@ -1,0 +1,17 @@
+# $autorun
+# $show
+# $description: This script is executed when the module is loaded. It adds the module directory to the python path.
+
+import pya
+import sys
+from os import path 
+from qfoundry.scripts.library import PDK_Lib
+
+pdk_module_dir = path.dirname(path.realpath(__file__)) #path.join(path.dirname(path.realpath(__file__)), 'qfoundry')
+
+# Make sure that the module is included in the python path
+if pdk_module_dir not in sys.path:
+    sys.path.append(pdk_module_dir)
+
+# Load the PDK library
+PDK_Lib()

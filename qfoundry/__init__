@@ -1,0 +1,12 @@
+'''
+Qfoundry PDK is a Python-based PDK for KQCircuits. It is designed to be used with the KLayout layout editor.
+'''
+from . import pymacros
+
+import pya 
+import os
+
+tech = 'qfoundry'
+if not pya.Technology().has_technology(tech):
+    tech = pya.Technology().create_technology(tech)
+    tech.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), f"{tech}.lyt"))
