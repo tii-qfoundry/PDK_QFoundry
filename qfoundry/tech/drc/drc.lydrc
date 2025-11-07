@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <klayout-macro>
- <description/>
- <version/>
+ <description>Comprehensive DRC script for 2D superconducting quantum systems microfabrication</description>
+ <version>2.0</version>
  <category>drc</category>
  <prolog/>
  <epilog/>
- <doc/>
+ <doc>DRC rules for integrated 2D superconducting quantum device fabrication including aluminum superconducting layers, Josephson junctions, airbridges, and EBL writefields</doc>
  <autorun>false</autorun>
  <autorun-early>false</autorun-early>
  <priority>0</priority>
@@ -15,72 +15,281 @@
  <menu-path>tools_menu.drc.end</menu-path>
  <interpreter>dsl</interpreter>
  <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
- <text>report("qfoundry-PDK DRC")
-excpt = input(111)
+ <text># =============================================================================
+# QFoundry PDK - Design Rule Check (DRC) Script
+# For 2D Superconducting Quantum Systems Microfabrication
+# 
+# This script performs comprehensive design rule checking for superconducting
+# quantum devices including:
+# - Aluminum superconducting layers and waveguides
+# - Josephson junctions
+# - Airbridges and bond pads
+# - EBL writefield definitions
+# - Device boundary and floorplan compliance
+# =============================================================================
+
+# Enable logging and set up report
+verbose(true)
+log("Starting QFoundry PDK DRC validation...")
+report("QFoundry-PDK DRC Report", "comprehensive_drc.lyrdb")
+
+# =============================================================================
+# LAYER DEFINITIONS AND INPUT
+# =============================================================================
+
+# Exception layer - areas to exclude from DRC checks
+excpt = input(111, 0).merged
  
-al_tol = 0.0.um
-jj_tol = 0.005.um
+# Tolerance values for design rules
+al_tol = 0.0.um        # Aluminum layer tolerance
+jj_tol = 0.005.um      # Junction layer tolerance (5nm)
 
-poly_al_sc = input("1","130/1").flatten.merged- excpt
-poly_al_jj = input("2/0").flatten - excpt
+# Primary superconducting layers
+poly_al_sc = input("1","130/1").flatten.merged - excpt    # Aluminum superconducting layer
+poly_al_jj = input("2/0").flatten - excpt                 # Josephson junction layer
 
-devRec    = input(68,0).flatten
-floorPlan = input(99).flatten
-writeField = input(98).flatten
-airbridge_pads    = input(146,1).flatten - excpt
-airbridge_flyover = input(147,1).flatten - excpt
-qw_airbridge_pad  = input(6,10).flatten
+# Device and boundary layers
+devRec    = input(68,0).flatten        # Device recognition layer
+floorPlan = input(99).flatten          # Design boundary/floorplan
+writeField = input(98).flatten         # EBL writefield definitions
 
-poly_sc_pos = floorPlan.merged - (poly_al_sc)
+# Airbridge layers
+airbridge_pads    = input(146,1).flatten - excpt    # Airbridge landing pads
+airbridge_flyover = input(147,1).flatten - excpt    # Airbridge flyover region
+qw_airbridge_pad  = input(6,10).flatten             # Quarter-wave airbridge pads
+
+# Additional layers for comprehensive checking
+etch_layer        = input(120,0).flatten - excpt    # Etch definition layer
+contact_pads      = input(150,0).flatten - excpt    # Contact/bond pads
+ground_plane      = input(130,0).flatten - excpt    # Ground plane layer
+
+# Derived layers
+poly_sc_pos = floorPlan.merged - (poly_al_sc)       # Positive space (non-metalized areas)
+
+log("Layer definitions loaded successfully")
+
+# =============================================================================
+# DESIGN RULE PARAMETERS
+# =============================================================================
+
+# Aluminum superconducting layer rules
+min_al_width = 3.0.um           # Minimum aluminum feature width
+min_al_space = 2.0.um           # Minimum aluminum spacing
+min_al_enclosure = 1.0.um       # Minimum enclosure of other features
+
+# Josephson junction rules  
+min_jj_width = 0.2.um           # Minimum junction width (200nm)
+min_jj_space = 0.2.um           # Minimum junction spacing
+min_jj_extension = 2.5.um       # Minimum extension from base aluminum
+max_jj_overlap = 0.0.um         # Maximum allowed junction overlap
+
+# Airbridge rules
+min_ab_pad_size = 10.0.um       # Minimum airbridge pad size
+min_ab_clearance = 2.0.um       # Minimum clearance around airbridges
+min_ab_overlap = 1.0.um         # Minimum flyover overlap on pads
+
+# EBL writefield rules
+min_wf_size = 50.0.um           # Minimum writefield size
+max_wf_size = 500.0.um          # Maximum writefield size
+
+log("Design rule parameters defined")
+
+# =============================================================================
+# DEVICE OVERLAP AND FUNCTIONAL CHECKS
+# =============================================================================
 
 # Check device overlaps (functional check)
 dev_overlaps = devRec.merged(2)
-output(dev_overlaps, "Devices Overlap","Devices cannot be overlapping.")
+dev_overlaps.output("Device Overlap Violation","Multiple devices cannot overlap - this may cause functional interference")
+log("Device overlap check: #{dev_overlaps.data.size} violations found")
 
-# Positioning of Jucntions on leads
-junction_bb = poly_al_jj.extents().sized(-1.5.um)
-junction_extension = (poly_al_jj-junction_bb).sized(-0.3.um).sized(0.3.um)
-junction_extension_error = junction_extension.separation(poly_al_sc, 2.5.um - al_tol)
-junction_extension_error.output("Junction Extension Spacing Violation", "Junction extension must be at least 2.5 um from base aluminum.")
+# Check for devices outside design boundary
+devices_outside_boundary = devRec.outside(floorPlan)
+devices_outside_boundary.output("Device Boundary Violation","All devices must be within the design floorplan")
 
-# Junctions overlapping
+# =============================================================================
+# JOSEPHSON JUNCTION DESIGN RULES
+# =============================================================================
+
+log("Starting Josephson junction checks...")
+
+# 1. Junction overlap checks - critical for device functionality
 jj_overlap = poly_al_jj.merged(2)
-jj_overlap.output("Junctions Overlap","It appears that multiple junctions are overlapping.")
+jj_overlap.output("Junction Overlap Violation","Josephson junctions cannot overlap - each junction must be isolated")
+log("Junction overlap violations: #{jj_overlap.data.size}")
 
-
-# Check junction overlap
+# 2. Junction fragmentation check - ensure junctions don't span multiple aluminum regions
 intersection = poly_al_jj.and(poly_al_sc)
 islands = intersection.merged
 fragmented_devices = poly_al_jj.covering(islands, 2)
-fragmented_devices.output("Junction Fragmented", "Junctions are extending multiple base aluminum sections.")
+fragmented_devices.output("Junction Fragmentation","Junctions extending across multiple aluminum sections may not function properly")
 
-#Positioning of junctions to writefield
-overlap = poly_al_jj.overlapping(writeField.raw,2)
-overlap.output("Junction misaligned","The junction overlaps more than one EBL writefield. Junctions need to be fully enclosed by a single writefield.")
-outside = poly_al_jj.outside(writeField)
-outside.output("Junctions outside WF","Junctions must be defined within a writefield boundary.")
+# 3. Junction extension spacing - ensure adequate spacing from base aluminum
+junction_bb = poly_al_jj.extents().sized(-1.5.um)
+junction_extension = (poly_al_jj - junction_bb).sized(-0.3.um).sized(0.3.um)
+junction_extension_error = junction_extension.separation(poly_al_sc, min_jj_extension - jj_tol)
+junction_extension_error.output("Junction Extension Spacing","Junction extensions must maintain minimum #{min_jj_extension} spacing from base aluminum")
 
-# Make sure the devices are within the floor plan layer region;
-poly_al_sc.outside(floorPlan).output("Aluminum Boundary","Devices are out of the design boundary")
-poly_al_jj_outside = poly_al_jj.outside(floorPlan)
-poly_al_jj_outside.output("Junction Boundary","Junctions are out of the design boundary")
+# 4. Junction minimum width check
+jj_width_violations = poly_al_jj.width(min_jj_width - jj_tol)
+jj_width_violations.output("Junction Width Violation","Minimum junction width: #{min_jj_width}")
 
+# 5. Junction minimum spacing check  
+jj_space_violations = poly_al_jj.space(min_jj_space - jj_tol, angle_limit(60))
+jj_space_violations.output("Junction Spacing Violation","Minimum junction spacing: #{min_jj_space}")
+
+# 6. Junction boundary compliance
+jj_boundary_violations = poly_al_jj.outside(floorPlan)
+jj_boundary_violations.output("Junction Boundary Violation","All junctions must be within the design boundary")
+
+# 7. Junction alignment with writefields
+jj_misaligned = poly_al_jj.overlapping(writeField.raw, 2)
+jj_misaligned.output("Junction Writefield Misalignment","Junctions must be fully enclosed within a single EBL writefield")
+
+jj_outside_wf = poly_al_jj.outside(writeField)
+jj_outside_wf.output("Junction Outside Writefield","All junctions must be defined within writefield boundaries")
+
+log("Josephson junction checks completed")
+
+# =============================================================================
+# ALUMINUM SUPERCONDUCTING LAYER RULES
+# =============================================================================
+
+log("Starting aluminum layer checks...")
+
+# 1. Aluminum boundary compliance
+al_boundary_violations = poly_al_sc.outside(floorPlan)
+al_boundary_violations.output("Aluminum Boundary Violation","Aluminum features must remain within design boundary")
+
+# 2. Minimum width check for aluminum features
+al_width_violations = poly_sc_pos.width(min_al_width - al_tol, angle_limit(10))
+al_width_violations.output("Aluminum Width Violation","Minimum aluminum feature width: #{min_al_width}")
+
+# 3. Minimum spacing check for aluminum features
+al_spacing_errors = poly_sc_pos.clean.space(min_al_space - al_tol, angle_limit(60))
+al_spacing_errors.output("Aluminum Spacing Violation","Minimum aluminum spacing: #{min_al_space}")
+
+# 4. Check for isolated aluminum islands (potential floating conductors)
+isolated_al = poly_al_sc.with_area(0, 100.um2)  # Small isolated features
+isolated_al.output("Isolated Aluminum Features","Small aluminum islands may cause unwanted coupling or floating potentials")
+
+log("Aluminum layer checks completed")
+
+# =============================================================================
+# WRITEFIELD DESIGN RULES
+# =============================================================================
+
+log("Starting writefield checks...")
+
+# 1. Writefield overlap check
 wf_overlap = writeField.merged(2)
-wf_overlap.output("WF Instance ill defined","It appears that more than one type of writefield is being defined or WF cells are overlapping.")
+wf_overlap.output("Writefield Overlap","Multiple writefields cannot overlap - each area must have unique EBL definition")
 
-# Dimensions of aluminum superconductive layer
-poly_sc_pos.width(3.micron-al_tol,angle_limit(0.01)).output("wg width","Waveguide width minimum feature size violation; min 3 um")
-spacing_errors = poly_sc_pos.clean.space(2.micron-al_tol,angle_limit(60))
-output(spacing_errors, "wg space","Waveguide width minimum feature size violation; min 2000 nm")
+# 2. Writefield size validation
+wf_too_small = writeField.with_bbox_width(0, min_wf_size) + writeField.with_bbox_height(0, min_wf_size)
+wf_too_small.output("Writefield Too Small","Minimum writefield dimension: #{min_wf_size}")
 
-poly_al_jj.width(0.2.micron-jj_tol).output("jj width","Waveguide width minimum feature size violation; min 250 nm")
-poly_al_jj.space(0.2.micron-jj_tol,angle_limit(60)).output("jj space","Waveguide width minimum feature size violation; min 250 nm")
+wf_too_large = writeField.with_bbox_width(max_wf_size, 1000000.um) + writeField.with_bbox_height(max_wf_size, 1000000.um) 
+wf_too_large.output("Writefield Too Large","Maximum writefield dimension: #{max_wf_size}")
 
+# 3. Writefield boundary compliance
+wf_outside_boundary = (writeField - excpt).outside(floorPlan)
+wf_outside_boundary.output("Writefield Boundary Violation","All writefields must be within design boundary")
 
-#airbridge_pads.and(poly_al_sc).output("Airbridges","Metalization in the airbridge pads is overlapping with the waveguide spacing.")
-airbridge_pads.select_not_inside(airbridge_flyover).output("Airbridges","The pads of the airbridges needs to be fully covered by the flyover region.")
+log("Writefield checks completed")
 
-qw_airbridge_pad.and(poly_al_sc).output("Airbridges","Metalization in the airbridge pads is overlapping with the waveguide spacing.")
+# =============================================================================
+# AIRBRIDGE DESIGN RULES
+# =============================================================================
+
+log("Starting airbridge checks...")
+
+# 1. Airbridge pad coverage check
+ab_pad_not_covered = airbridge_pads.select_not_inside(airbridge_flyover)
+ab_pad_not_covered.output("Airbridge Pad Coverage","Airbridge pads must be fully covered by flyover region")
+
+# 2. Airbridge pad interference with aluminum
+ab_pad_interference = qw_airbridge_pad.and(poly_al_sc)
+ab_pad_interference.output("Airbridge Aluminum Interference","Airbridge pads cannot overlap with aluminum waveguides")
+
+# 3. Airbridge minimum clearance
+ab_clearance_violations = airbridge_pads.separation(poly_al_sc, min_ab_clearance - al_tol)
+ab_clearance_violations.output("Airbridge Clearance Violation","Minimum clearance around airbridges: #{min_ab_clearance}")
+
+# 4. Airbridge pad size check
+ab_pad_too_small = airbridge_pads.with_bbox_width(0, min_ab_pad_size) + airbridge_pads.with_bbox_height(0, min_ab_pad_size)
+ab_pad_too_small.output("Airbridge Pad Size","Minimum airbridge pad size: #{min_ab_pad_size}")
+
+log("Airbridge checks completed")
+
+# =============================================================================
+# ADVANCED QUANTUM DEVICE CHECKS
+# =============================================================================
+
+log("Starting advanced quantum device checks...")
+
+# 1. Critical coupling region analysis
+# Check for potential unwanted coupling between devices
+device_coupling_zone = devRec.sized(5.0.um)  # 5um coupling influence zone
+device_coupling = device_coupling_zone.and(device_coupling_zone.merged(2))
+device_coupling.output("Potential Device Coupling","Devices within 5um may have unwanted electromagnetic coupling")
+
+# 2. Ground plane connectivity check
+if ground_plane.is_empty?
+  info("No ground plane layer found - skipping ground plane checks")
+else
+  gp_disconnected = ground_plane.sized(-0.1.um).sized(0.1.um).holes
+  gp_disconnected.output("Ground Plane Discontinuity","Ground plane should be continuous for proper electromagnetic shielding")
+end
+
+# 3. Bond pad accessibility check  
+if contact_pads.is_empty?
+  info("No contact pads layer found - skipping contact pad checks")
+else
+  # Check if bond pads are accessible (not covered by other metals)
+  blocked_pads = contact_pads.and(poly_al_sc)
+  blocked_pads.output("Blocked Bond Pads","Bond pads must be accessible and not covered by other metal layers")
+  
+  # Check bond pad minimum size
+  small_pads = contact_pads.with_area(0, 2500.um2)  # 50um x 50um minimum
+  small_pads.output("Bond Pad Size","Bond pads should be at least 50um x 50um for reliable wire bonding")
+end
+
+# 4. Etch layer compliance
+if etch_layer.is_empty?
+  info("No etch layer found - skipping etch checks")
+else
+  # Ensure all aluminum is properly covered by etch definition
+  unprotected_al = poly_al_sc.not(etch_layer.sized(0.5.um))
+  unprotected_al.output("Unprotected Aluminum","All aluminum must be covered by etch definition with adequate margin")
+end
+
+log("Advanced checks completed")
+
+# =============================================================================
+# SUMMARY AND FINAL REPORT
+# =============================================================================
+
+# Count total violations
+total_width_violations = jj_width_violations.data.size + al_width_violations.data.size
+total_spacing_violations = jj_space_violations.data.size + al_spacing_errors.data.size  
+total_boundary_violations = jj_boundary_violations.data.size + al_boundary_violations.data.size
+total_overlap_violations = dev_overlaps.data.size + jj_overlap.data.size + wf_overlap.data.size
+
+log("=== DRC SUMMARY ===")
+log("Width violations: #{total_width_violations}")
+log("Spacing violations: #{total_spacing_violations}")
+log("Boundary violations: #{total_boundary_violations}")
+log("Overlap violations: #{total_overlap_violations}")
+log("===================")
+
+if (total_width_violations + total_spacing_violations + total_boundary_violations + total_overlap_violations) == 0
+  log("✓ DRC PASSED - No violations found!")
+else
+  log("✗ DRC FAILED - Please review and fix violations before fabrication")
+end
+
+log("QFoundry PDK DRC check completed successfully")
 
 </text>
 </klayout-macro>

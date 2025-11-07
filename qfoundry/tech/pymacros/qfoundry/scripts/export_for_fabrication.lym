@@ -208,6 +208,12 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
         print("\n--- Script Finished Successfully ---")
         print(f"New layout '{fab_top_cell_name}' is ready in a new tab.")
 
+        for cell in fab_layout.top_cells():
+            if cell.name != fab_top_cell_name:
+                print(f"removing cell {cell.name}")
+                fab_layout.prune_cell(fab_layout.cell_by_name(cell.name), -1)
+
+
     except Exception as e:
         print(f"\n--- An Error Occurred ---")
         pya.QMessageBox.critical(mw, "Script Error", str(e))

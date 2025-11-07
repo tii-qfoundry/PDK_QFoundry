@@ -1,0 +1,143 @@
+# =============================================================================
+# QFoundry PDK - DRC Configuration File
+# Design Rule Parameters for 2D Superconducting Quantum Systems
+# =============================================================================
+# 
+# This file contains all the configurable design rule parameters.
+# Include this file in your main DRC script using: %include drc_config.lydrc
+#
+# All dimensions are specified in micrometers unless otherwise noted.
+# =============================================================================
+
+# =============================================================================
+# LAYER MAPPING AND EXCEPTIONS
+# =============================================================================
+
+# Exception layer for areas to exclude from DRC (layer 111/0)
+EXCEPTION_LAYER = "111/0"
+
+# Primary device layers
+ALUMINUM_SC_LAYER = "1,130/1"     # Aluminum superconducting layer
+JUNCTION_LAYER = "2/0"            # Josephson junction layer
+DEVICE_REC_LAYER = "68/0"         # Device recognition layer
+FLOORPLAN_LAYER = "99/0"          # Design boundary/floorplan
+WRITEFIELD_LAYER = "98/0"         # EBL writefield definitions
+
+# Airbridge layers
+AIRBRIDGE_PAD_LAYER = "146/1"     # Airbridge landing pads
+AIRBRIDGE_FLYOVER_LAYER = "147/1" # Airbridge flyover region
+QW_AIRBRIDGE_PAD_LAYER = "6/10"   # Quarter-wave airbridge pads
+
+# Optional layers
+ETCH_LAYER = "120/0"              # Etch definition layer
+CONTACT_PAD_LAYER = "150/0"       # Contact/bond pads
+GROUND_PLANE_LAYER = "130/0"      # Ground plane layer
+
+# =============================================================================
+# TOLERANCE VALUES
+# =============================================================================
+
+# Manufacturing tolerances
+ALUMINUM_TOLERANCE = 0.0          # Aluminum layer tolerance (μm)
+JUNCTION_TOLERANCE = 0.005        # Junction layer tolerance (μm) - 5nm
+
+# =============================================================================
+# ALUMINUM SUPERCONDUCTING LAYER RULES
+# =============================================================================
+
+# Basic aluminum design rules
+MIN_ALUMINUM_WIDTH = 3.0          # Minimum aluminum feature width (μm)
+MIN_ALUMINUM_SPACE = 2.0          # Minimum aluminum spacing (μm)
+MIN_ALUMINUM_ENCLOSURE = 1.0      # Minimum enclosure of other features (μm)
+
+# Advanced aluminum rules
+MAX_ALUMINUM_ISLAND_AREA = 100.0  # Maximum isolated aluminum area (μm²)
+MIN_ALUMINUM_CONNECTION_WIDTH = 1.0 # Minimum connection width (μm)
+
+# =============================================================================
+# JOSEPHSON JUNCTION RULES
+# =============================================================================
+
+# Critical junction dimensions
+MIN_JUNCTION_WIDTH = 0.2          # Minimum junction width (μm) - 200nm
+MIN_JUNCTION_SPACE = 0.2          # Minimum junction spacing (μm) - 200nm
+MIN_JUNCTION_EXTENSION = 2.5      # Minimum extension from base aluminum (μm)
+MAX_JUNCTION_OVERLAP = 0.0        # Maximum allowed junction overlap (μm)
+
+# Junction extension rules
+JUNCTION_BB_INSET = 1.5           # Bounding box inset for extension check (μm)
+JUNCTION_EXT_SIZE1 = 0.3          # First sizing for junction extension (μm)
+JUNCTION_EXT_SIZE2 = 0.3          # Second sizing for junction extension (μm)
+
+# =============================================================================
+# WRITEFIELD (EBL) RULES
+# =============================================================================
+
+# Writefield size constraints
+MIN_WRITEFIELD_SIZE = 50.0        # Minimum writefield dimension (μm)
+MAX_WRITEFIELD_SIZE = 500.0       # Maximum writefield dimension (μm)
+
+# Writefield alignment
+MIN_WF_JUNCTION_CLEARANCE = 1.0   # Minimum clearance from WF boundary (μm)
+
+# =============================================================================
+# AIRBRIDGE RULES
+# =============================================================================
+
+# Airbridge pad requirements
+MIN_AIRBRIDGE_PAD_SIZE = 10.0     # Minimum airbridge pad size (μm)
+MIN_AIRBRIDGE_CLEARANCE = 2.0     # Minimum clearance around airbridges (μm)
+MIN_AIRBRIDGE_OVERLAP = 1.0       # Minimum flyover overlap on pads (μm)
+
+# =============================================================================
+# ADVANCED QUANTUM DEVICE RULES
+# =============================================================================
+
+# Device coupling and isolation
+DEVICE_COUPLING_ZONE = 5.0        # Device coupling influence zone (μm)
+MIN_DEVICE_ISOLATION = 10.0       # Minimum isolation between devices (μm)
+
+# Bond pad requirements
+MIN_BOND_PAD_SIZE = 50.0          # Minimum bond pad dimension (μm)
+MIN_BOND_PAD_AREA = 2500.0        # Minimum bond pad area (μm²)
+
+# Ground plane rules
+MIN_GROUND_PLANE_WIDTH = 5.0      # Minimum ground plane width (μm)
+GROUND_PLANE_CLEARANCE = 2.0      # Clearance from ground plane (μm)
+
+# Etch definition rules
+ETCH_MARGIN = 0.5                 # Etch definition margin around aluminum (μm)
+
+# =============================================================================
+# ANGLE LIMITS FOR GEOMETRIC CHECKS
+# =============================================================================
+
+# Angle limits for various checks (degrees)
+ALUMINUM_ANGLE_LIMIT = 10         # For aluminum width checks
+SPACING_ANGLE_LIMIT = 60          # For spacing checks
+JUNCTION_ANGLE_LIMIT = 60         # For junction spacing checks
+
+# =============================================================================
+# QUALITY FACTORS AND THRESHOLDS
+# =============================================================================
+
+# Quality assessment thresholds
+MAX_VIOLATION_COUNT = 0           # Maximum allowed violations for passing DRC
+WARNING_THRESHOLD = 5             # Warning threshold for violation counts
+
+# Performance parameters
+TILE_SIZE = 1000.0                # Tile size for large layout processing (μm)
+THREAD_COUNT = 4                  # Number of CPU cores to use
+
+# =============================================================================
+# OUTPUT SETTINGS
+# =============================================================================
+
+# Report generation
+VERBOSE_OUTPUT = true             # Enable detailed logging
+GENERATE_SUMMARY = true           # Generate violation summary
+OUTPUT_DATABASE = "qfoundry_drc.lyrdb"  # Output database filename
+
+# Error categorization
+CRITICAL_ERRORS = ["Junction Overlap", "Device Overlap", "Junction Fragmentation"]
+WARNING_ERRORS = ["Isolated Aluminum", "Potential Device Coupling"]

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Modular DRC script for 2D superconducting quantum systems using external configuration</description>
+ <version>2.1</version>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <doc>Modular DRC rules using external configuration file for easy customization</doc>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut>Shift+Ctrl+D</shortcut>
+ <show-in-menu>true</show-in-menu>
+ <group-name>drc_scripts</group-name>
+ <menu-path>tools_menu.drc.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
+ <text># =============================================================================
+# QFoundry PDK - Modular DRC Script
+# For 2D Superconducting Quantum Systems Microfabrication
+# 
+# This script uses external configuration for easy parameter adjustment
+# Include the configuration file for all design rule parameters
+# =============================================================================
+
+# Include configuration file (uncomment when config file is in same directory)
+# %include drc_config.lydrc
+
+# Fallback configuration if external file not found
+begin
+  # Try to include config file
+  eval(File.read(File.join(File.dirname(__FILE__), "drc_config.lydrc")))
+rescue
+  # Fallback to embedded configuration
+  MIN_ALUMINUM_WIDTH = 3.0
+  MIN_ALUMINUM_SPACE = 2.0
+  MIN_JUNCTION_WIDTH = 0.2
+  MIN_JUNCTION_SPACE = 0.2
+  MIN_JUNCTION_EXTENSION = 2.5
+  ALUMINUM_TOLERANCE = 0.0
+  JUNCTION_TOLERANCE = 0.005
+  MIN_WRITEFIELD_SIZE = 50.0
+  MAX_WRITEFIELD_SIZE = 500.0
+  MIN_AIRBRIDGE_PAD_SIZE = 10.0
+  MIN_AIRBRIDGE_CLEARANCE = 2.0
+  DEVICE_COUPLING_ZONE = 5.0
+  MIN_BOND_PAD_AREA = 2500.0
+  ALUMINUM_ANGLE_LIMIT = 10
+  SPACING_ANGLE_LIMIT = 60
+  JUNCTION_ANGLE_LIMIT = 60
+  VERBOSE_OUTPUT = true
+  info("Using fallback DRC configuration")
+end
+
+# Enable logging
+verbose(VERBOSE_OUTPUT) if defined?(VERBOSE_OUTPUT)
+log("Starting QFoundry PDK Modular DRC validation...")
+report("QFoundry-PDK Modular DRC Report")
+
+# =============================================================================
+# LAYER DEFINITIONS
+# =============================================================================
+
+# Exception layer
+excpt = input(111, 0).merged
+
+# Primary layers with error handling
+begin
+  poly_al_sc = input("1","130/1").flatten.merged - excpt
+  poly_al_jj = input("2/0").flatten - excpt
+  devRec = input(68,0).flatten
+  floorPlan = input(99).flatten
+  writeField = input(98).flatten
+  
+  # Airbridge layers
+  airbridge_pads = input(146,1).flatten - excpt
+  airbridge_flyover = input(147,1).flatten - excpt
+  qw_airbridge_pad = input(6,10).flatten
+  
+  # Optional layers (with empty check)
+  contact_pads = input(150,0).flatten - excpt rescue polygons
+  ground_plane = input(130,0).flatten - excpt rescue polygons
+  etch_layer = input(120,0).flatten - excpt rescue polygons
+  
+  log("All layers loaded successfully")
+rescue => e
+  error("Failed to load layers: #{e.message}")
+end
+
+# Derived layers
+poly_sc_pos = floorPlan.merged - poly_al_sc
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+# Function to perform width check with configurable parameters
+def width_check(layer, min_width, tolerance, angle_limit, rule_name, description)
+  violations = layer.width(min_width - tolerance, angle_limit(angle_limit))
+  violations.output(rule_name, "#{description}: minimum #{min_width}μm")
+  log("#{rule_name}: #{violations.data.size} violations")
+  return violations.data.size
+end
+
+# Function to perform spacing check
+def space_check(layer, min_space, tolerance, angle_limit, rule_name, description)
+  violations = layer.space(min_space - tolerance, angle_limit(angle_limit))
+  violations.output(rule_name, "#{description}: minimum #{min_space}μm") 
+  log("#{rule_name}: #{violations.data.size} violations")
+  return violations.data.size
+end
+
+# Function to check boundary compliance
+def boundary_check(layer, boundary, rule_name, description)
+  violations = layer.outside(boundary)
+  violations.output(rule_name, description)
+  log("#{rule_name}: #{violations.data.size} violations")
+  return violations.data.size
+end
+
+# =============================================================================
+# MAIN DRC CHECKS
+# =============================================================================
+
+total_violations = 0
+
+# Device overlap check
+log("Checking device overlaps...")
+dev_overlaps = devRec.merged(2)
+dev_overlaps.output("Device Overlap", "Multiple devices cannot overlap")
+total_violations += dev_overlaps.data.size
+
+# Aluminum layer checks
+log("Checking aluminum layer rules...")
+total_violations += width_check(poly_sc_pos, MIN_ALUMINUM_WIDTH, ALUMINUM_TOLERANCE, ALUMINUM_ANGLE_LIMIT, 
+                                "Aluminum Width", "Minimum aluminum width")
+total_violations += space_check(poly_sc_pos.clean, MIN_ALUMINUM_SPACE, ALUMINUM_TOLERANCE, SPACING_ANGLE_LIMIT,
+                                "Aluminum Spacing", "Minimum aluminum spacing")
+total_violations += boundary_check(poly_al_sc, floorPlan, "Aluminum Boundary", "Aluminum must be within design boundary")
+
+# Junction checks
+log("Checking Josephson junction rules...")
+jj_overlap = poly_al_jj.merged(2)
+jj_overlap.output("Junction Overlap", "Junctions cannot overlap")
+total_violations += jj_overlap.data.size
+
+total_violations += width_check(poly_al_jj, MIN_JUNCTION_WIDTH, JUNCTION_TOLERANCE, JUNCTION_ANGLE_LIMIT,
+                                "Junction Width", "Minimum junction width")
+total_violations += space_check(poly_al_jj, MIN_JUNCTION_SPACE, JUNCTION_TOLERANCE, JUNCTION_ANGLE_LIMIT,
+                                "Junction Spacing", "Minimum junction spacing")
+total_violations += boundary_check(poly_al_jj, floorPlan, "Junction Boundary", "Junctions must be within design boundary")
+
+# Junction extension check
+junction_bb = poly_al_jj.extents().sized(-1.5.um)
+junction_extension = (poly_al_jj - junction_bb).sized(-0.3.um).sized(0.3.um)
+junction_ext_violations = junction_extension.separation(poly_al_sc, MIN_JUNCTION_EXTENSION - JUNCTION_TOLERANCE)
+junction_ext_violations.output("Junction Extension", "Junction extensions must maintain #{MIN_JUNCTION_EXTENSION}μm from base aluminum")
+total_violations += junction_ext_violations.data.size
+
+# Junction fragmentation check
+intersection = poly_al_jj.and(poly_al_sc)
+islands = intersection.merged
+fragmented = poly_al_jj.covering(islands, 2)
+fragmented.output("Junction Fragmentation", "Junctions cannot span multiple aluminum regions")
+total_violations += fragmented.data.size
+
+# Writefield checks
+log("Checking writefield rules...")
+wf_overlap = writeField.merged(2)
+wf_overlap.output("Writefield Overlap", "Writefields cannot overlap")
+total_violations += wf_overlap.data.size
+
+wf_too_small = writeField.with_bbox_width(0, MIN_WRITEFIELD_SIZE) + writeField.with_bbox_height(0, MIN_WRITEFIELD_SIZE)
+wf_too_small.output("Writefield Too Small", "Minimum writefield size: #{MIN_WRITEFIELD_SIZE}μm")
+total_violations += wf_too_small.data.size
+
+if defined?(MAX_WRITEFIELD_SIZE)
+  wf_too_large = writeField.with_bbox_width(MAX_WRITEFIELD_SIZE, 1000000.um) + writeField.with_bbox_height(MAX_WRITEFIELD_SIZE, 1000000.um)
+  wf_too_large.output("Writefield Too Large", "Maximum writefield size: #{MAX_WRITEFIELD_SIZE}μm")
+  total_violations += wf_too_large.data.size
+end
+
+# Junction-writefield alignment
+jj_misaligned = poly_al_jj.overlapping(writeField.raw, 2)
+jj_misaligned.output("Junction Writefield Misalignment", "Junctions must be fully within single writefield")
+total_violations += jj_misaligned.data.size
+
+jj_outside_wf = poly_al_jj.outside(writeField)
+jj_outside_wf.output("Junction Outside Writefield", "Junctions must be within writefield boundaries")
+total_violations += jj_outside_wf.data.size
+
+# Airbridge checks
+log("Checking airbridge rules...")
+ab_uncovered = airbridge_pads.select_not_inside(airbridge_flyover)
+ab_uncovered.output("Airbridge Coverage", "Airbridge pads must be covered by flyover")
+total_violations += ab_uncovered.data.size
+
+ab_interference = qw_airbridge_pad.and(poly_al_sc)
+ab_interference.output("Airbridge Interference", "Airbridge pads cannot overlap aluminum")
+total_violations += ab_interference.data.size
+
+if defined?(MIN_AIRBRIDGE_CLEARANCE)
+  ab_clearance = airbridge_pads.separation(poly_al_sc, MIN_AIRBRIDGE_CLEARANCE - ALUMINUM_TOLERANCE)
+  ab_clearance.output("Airbridge Clearance", "Minimum airbridge clearance: #{MIN_AIRBRIDGE_CLEARANCE}μm")
+  total_violations += ab_clearance.data.size
+end
+
+# Advanced checks (optional layers)
+if defined?(DEVICE_COUPLING_ZONE) && !devRec.is_empty?
+  log("Checking device coupling...")
+  coupling_zone = devRec.sized(DEVICE_COUPLING_ZONE)
+  coupling_violations = coupling_zone.and(coupling_zone.merged(2))
+  coupling_violations.output("Device Coupling Risk", "Devices within #{DEVICE_COUPLING_ZONE}μm may couple")
+  # Note: coupling is a warning, not added to total violations
+end
+
+# Bond pad checks
+if defined?(MIN_BOND_PAD_AREA) && defined?(contact_pads) && !contact_pads.is_empty?
+  log("Checking bond pad rules...")
+  small_pads = contact_pads.with_area(0, MIN_BOND_PAD_AREA)
+  small_pads.output("Bond Pad Size", "Minimum bond pad area: #{MIN_BOND_PAD_AREA}μm²")
+  total_violations += small_pads.data.size
+  
+  blocked_pads = contact_pads.and(poly_al_sc)
+  blocked_pads.output("Blocked Bond Pads", "Bond pads cannot be covered by aluminum")
+  total_violations += blocked_pads.data.size
+end
+
+# =============================================================================
+# FINAL REPORT
+# =============================================================================
+
+log("=== DRC SUMMARY ===")
+log("Total violations found: #{total_violations}")
+
+if total_violations == 0
+  log("✓ DRC PASSED - Design is ready for fabrication!")
+else
+  log("✗ DRC FAILED - #{total_violations} violations must be corrected")
+  if defined?(MAX_VIOLATION_COUNT) && total_violations > MAX_VIOLATION_COUNT
+    error("Violation count exceeds maximum allowed (#{MAX_VIOLATION_COUNT})")
+  end
+end
+
+log("QFoundry PDK DRC check completed")
+
+</text>
+</klayout-macro>
