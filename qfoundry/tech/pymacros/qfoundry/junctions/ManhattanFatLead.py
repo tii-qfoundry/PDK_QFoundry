@@ -45,7 +45,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
 
     def display_text_impl(self):
         """Return descriptive text for the cell in the layout browser."""
-        return "ManhattanFatLead: A parameteric manhattan josephson junction"
+        return "ManhattanFatLead: A parameteric manhattan josephson junction v2"
 
     def coerce_parameters_impl(self):
         """
@@ -89,8 +89,9 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         
         self.param("angle", self.TypeDouble, "Junction angle", default = 0.0)
         self.param("inner_angle", self.TypeDouble, "Angle between junction pads", default = 90.0)
-        self.param("junction_width_t", self.TypeDouble, "Top junction width", default = 0.3, unit="μm",hidden=False)
         self.param("junction_width_b", self.TypeDouble, "Bottom junction width", default = 0.3, unit="μm",hidden=False)
+        self.param("junction_width_t", self.TypeDouble, "Additional width to the top electrode", default = 0.05, unit="μm",hidden=False)
+
         self.param("squid_asymmetry", self.TypeDouble, "Asymmetry of the SQUID junctions", default=1.0)
         
         self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=False)
@@ -102,7 +103,10 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         self.param("conn_width", self.TypeDouble, "Connector lead width", default=9.0, hidden=False)
         self.param("conn_height", self.TypeDouble, "Connector lead height inside the probe (capacitor)", default=10.0, hidden=False)
         self.param("draw_cap", self.TypeBoolean, "Include test pad", default=False)
-        self.param("draw_patch", self.TypeBoolean, "Include patches", default=False)
+        self.param("draw_patch", self.TypeBoolean, "Include wet etch patches", default=False)
+        
+        self.param("draw_bandage", self.TypeBoolean, "Include bandages", default=False)        
+        
         self.param("patch_scratch", self.TypeBoolean, "Draw 45 deg scratches as patch", default=False, hidden=True)
         self.param("patch_layer", self.TypeLayer, "Patch Layer", default = pya.LayerInfo(4, 0), hidden=True)
         self.param("patch_gap", self.TypeDouble, "Patch gap", default=1.0, hidden = False)
@@ -147,13 +151,13 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         #Junction
         
         if self.junction_type == 0:
-            finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+            finger_shapes = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t+self.junction_width_b, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
               finger_overlap = self.conn_width, 
               center = pya.DPoint(0, 0), dbu=dbu)
             _add_shapes(self.cell, finger_shapes, jj_layer)
         else:  # SQUID cases
             center1 = pya.DPoint(-self.squid_spacing / 2, 0)
-            finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
+            finger_shapes1 = draw_junction(self.angle, self.inner_angle, self.junction_width_b, self.junction_width_t+self.junction_width_b, self.finger_size, self.mirror_offset, self.offset_compensation, self.finger_overshoot, 
                 finger_overlap = self.conn_width, 
                 center = center1, dbu=dbu,
                 bottom_lead_comp = -self.conn_width/2
@@ -175,7 +179,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             
             finger_shapes2 = draw_junction(angle2, inner_angle2, 
                                            self.junction_width_b*squid_asymmetry, 
-                                           self.junction_width_t, 
+                                           self.junction_width_b*squid_asymmetry+self.junction_width_t, 
                                            finger_size2, 
                                            self.mirror_offset, 
                                            self.offset_compensation, 
