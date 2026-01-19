@@ -45,7 +45,7 @@ al_tol = 0.0.um        # Aluminum layer tolerance
 jj_tol = 0.005.um      # Junction layer tolerance (5nm)
 
 # Primary superconducting layers
-poly_al_sc = input("1","130/1").flatten.merged - excpt    # Aluminum superconducting layer
+poly_al_sc = input("1","130/1").flatten.merged - excpt    # Aluminum superconducting layer (negative)
 poly_al_jj = input("2/0").flatten - excpt                 # Josephson junction layer
 
 # Device and boundary layers
@@ -64,7 +64,7 @@ contact_pads      = input(150,0).flatten - excpt    # Contact/bond pads
 ground_plane      = input(130,0).flatten - excpt    # Ground plane layer
 
 # Derived layers
-poly_sc_pos = floorPlan.merged - (poly_al_sc)       # Positive space (non-metalized areas)
+poly_sc_pos = floorPlan.merged - (poly_al_sc)       # Positive space (metalized areas)
 
 log("Layer definitions loaded successfully")
 
@@ -170,7 +170,7 @@ al_spacing_errors = poly_sc_pos.clean.space(min_al_space - al_tol, angle_limit(6
 al_spacing_errors.output("Aluminum Spacing Violation","Minimum aluminum spacing: #{min_al_space}")
 
 # 4. Check for isolated aluminum islands (potential floating conductors)
-isolated_al = poly_al_sc.with_area(0, 100.um2)  # Small isolated features
+isolated_al = poly_sc_pos.with_area(0, 100.um2)  # Small isolated features
 isolated_al.output("Isolated Aluminum Features","Small aluminum islands may cause unwanted coupling or floating potentials")
 
 log("Aluminum layer checks completed")
@@ -284,9 +284,9 @@ log("Overlap violations: #{total_overlap_violations}")
 log("===================")
 
 if (total_width_violations + total_spacing_violations + total_boundary_violations + total_overlap_violations) == 0
-  log("✓ DRC PASSED - No violations found!")
+  log("DRC PASSED - No violations found!")
 else
-  log("✗ DRC FAILED - Please review and fix violations before fabrication")
+  log("DRC FAILED - Please review and fix violations before fabrication")
 end
 
 log("QFoundry PDK DRC check completed successfully")
