@@ -76,7 +76,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         # Extend all coupler lists to match n_couplers
         self.coupler_depths = extend_list(self.coupler_depths, self.n_couplers)
         self.coupler_gaps = extend_list(self.coupler_gaps, self.n_couplers)
-        self.trap_base = extend_list(self.trap_base, self.n_couplers)
+        self.trap_bases = extend_list(self.trap_bases, self.n_couplers)
 
         # Auto-generate coupler_widths if empty (equal angular spacing)
         default_width = 360.0 / (2.0 * self.n_couplers)
@@ -143,7 +143,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
                    default=[20.0, 20.0, 20.0, 20.0, 20.0])
         self.param("coupler_widths", self.TypeList, "Angular width of cutouts [degrees] (auto if empty)",
                    default=[48.0, 48.0, 48.0, 48.0, 48.0])
-        self.param("trap_base", self.TypeList, "Trapezoid base width at inner edge [um]", 
+        self.param("trap_bases", self.TypeList, "Trapezoid base width at inner edge [um]", 
                    default=[20.0, 0.0, 0.0, 0.0, 0.0])
         
         
