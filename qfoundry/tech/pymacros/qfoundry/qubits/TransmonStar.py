@@ -44,9 +44,11 @@ class TransmonStar(pya.PCellDeclarationHelper):
         super(TransmonStar, self).__init__()
         self.set_parameters()
         
+    
     def display_text_impl(self):
         n = len(self.coupler_angles) if self.coupler_angles else 0
         return f"TransmonStar ({n} couplers)"
+    
     
     def coerce_parameters_impl(self):
         """Validate and coerce parameters to ensure consistency.
@@ -105,6 +107,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         """Generate the transmon geometry."""
         self._create_transmon_star()
         
+   
     def set_parameters(self):
         """Define all parameters for the PCell."""
         
@@ -115,12 +118,20 @@ class TransmonStar(pya.PCellDeclarationHelper):
                    default=pya.LayerInfo(2, 0))
         self.param("metal_n_layer", self.TypeLayer, "Metalization negative layer", 
                    default=pya.LayerInfo(1, 0))
+        self.param("port_layer", self.TypeLayer, "Port layer for waveguide connections", 
+                   default=pya.LayerInfo(997, 0), hidden=True)
+        self.param("devrec_layer", self.TypeLayer, "Device recognition layer", 
+                   default=pya.LayerInfo(68, 0), hidden=True)
+        self.param("ground_exclude_layer", self.TypeLayer, "Ground exclusion layer", 
+                   default=pya.LayerInfo(133, 1), hidden=True)
         
         # Geometric parameters for the central island
         self.param("outer_radius", self.TypeDouble, "Outer radius of qubit island [um]", 
                    default=150.0)
         self.param("ground_clearance", self.TypeDouble, "Additional clearance for ground plane [um]", 
                    default=20.0)
+        self.param("margin", self.TypeDouble, "Margin for ground exclusion beyond device [um]", 
+                   default=10.0)
         
         # Coupler configuration via lists
         # Each coupler defined by: angle, depth (from outer_radius), gap, angular width
@@ -157,8 +168,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         self.param("corner_radius", self.TypeDouble, "Corner rounding radius for inner cutouts [um]", 
                    default=0.0, hidden=False)
         
-        
-        
+    
     def _create_transmon_star(self):
         """Create the complete transmon star structure."""
         dbu = self.layout.dbu
@@ -190,12 +200,26 @@ class TransmonStar(pya.PCellDeclarationHelper):
         for i, region in enumerate(coupling_regions):
             self.cell.shapes(self.metal_layer).insert(region)
         
+        # Add ports at end of each connector
+        for i in range(self.n_couplers):
+            ports = self._make_ports(self.coupler_angles[i])
+            for port in ports:
+                self.cell.shapes(self.port_layer).insert(port)
+        
+        # Add device recognition layer (outer boundary excluding ports)
+        devrec = self._make_device_recognition(ground_cutout, inner_region)
+        self.cell.shapes(self.devrec_layer).insert(devrec)
+        
+        # Add ground exclusion layer (devrec + margin)
+        ground_exclude = self._make_ground_exclusion(devrec)
+        self.cell.shapes(self.ground_exclude_layer).insert(ground_exclude)
         
         # Add junction if specified
         # if 0 <= self.junction_at_coupler < self.n_couplers:
         #     junction_path = self._make_junction()
         #     if junction_path:
         #         self.cell.shapes(self.junction_layer).insert(junction_path)
+    
     
     def _make_circle(self, radius, center=pya.DPoint(0, 0), resolution=None):
         """Create a circular polygon."""
@@ -210,6 +234,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
             points.append(pya.DPoint(x, y))
         
         return pya.DPolygon(points)
+    
     
     def _make_trapezoid_cutout(self, angle_deg, gap, angular_width, depth=None, trap_offset=0):
         """Create trapezoid-shaped cutout for a coupler.
@@ -491,6 +516,73 @@ class TransmonStar(pya.PCellDeclarationHelper):
         trans = pya.DCplxTrans(1.0, angle_deg, False, 0, 0)
         return trans * rect_poly
     
+    def _make_ports(self, angle_deg):
+        """Create port markers at the end of a connector waveguide.
+        
+        Creates two path objects:
+        1. Inner path with width = connector_width (signal)
+        2. Outer path with width = connector_width + 2*connector_gap (signal + gap)
+        
+        Args:
+            angle_deg: Rotation angle for the port (degrees)
+        
+        Returns:
+            list[pya.DPath]: Two port path markers of length 1 um
+        """
+        # Port position at end of connector extension
+        port_y = self.outer_radius + self.ground_clearance + self.connector_extension
+        
+        # Create two paths of length 1 um
+        port_start = pya.DPoint(0, port_y-0.5)
+        port_end = pya.DPoint(0, port_y + 0.5)
+        
+        # Inner port (signal width)
+        port_inner = pya.DPath([port_start, port_end], self.connector_width)
+        
+        # Outer port (signal + gap width)
+        port_outer = pya.DPath([port_start, port_end], self.connector_width + 2*self.connector_gap)
+        
+        # Rotate both ports to the connector angle
+        trans = pya.DCplxTrans(1.0, angle_deg, False, 0, 0)
+        port_inner_rotated = trans * port_inner
+        port_outer_rotated = trans * port_outer
+        
+        return [port_inner_rotated, port_outer_rotated]
+    
+    def _make_device_recognition(self, ground_cutout, inner_region):
+        """Create device recognition layer showing device boundary.
+        
+        This is the outer edge of the complete geometry (qubit + connectors)
+        excluding the port regions.
+        
+        Args:
+            ground_cutout: Ground cutout region
+            inner_region: Inner qubit + connector region
+        
+        Returns:
+            pya.Region: Device boundary region
+        """
+        # Use the inner_region directly as device recognition
+        # This represents the actual device geometry
+        return (ground_cutout + inner_region).merged()
+    
+    def _make_ground_exclusion(self, devrec_region):
+        """Create ground exclusion layer with margin around device.
+        
+        Args:
+            devrec_region: Device recognition region to offset
+        
+        Returns:
+            pya.Region: Ground exclusion region (devrec + margin)
+        """
+        dbu = self.layout.dbu
+        margin_dbu = int(self.margin / dbu)
+        
+        # Offset the device recognition region by margin
+        ground_exclude = devrec_region.sized(margin_dbu)
+        
+        return ground_exclude.merged()
+    
     def _make_junction(self): # NOT IMPLEMENTED
         """
         Create the Josephson junction as a path.
@@ -517,12 +609,13 @@ if __name__ == "__main__":
         "coupler_angles": [0.0, 72.0, 144.0, 216.0, 288.0],
         "coupler_depths": [170.0, 45.0, 45.0, 45.0, 45.0],  # Readout extends deeper inward
         "coupler_gaps": [20.0, 20.0, 20.0, 20.0, 20.0],     # Readout with smaller gap
-        "coupler_widths": [48,48,48,48,48],  # Auto: 360/(2*5) = 36 degrees each
+        "coupler_widths": [48, 48, 48, 48, 48],
         "trap_offsets": [20.0, 0.0, 0.0, 0.0, 0.0],
         "corner_radius": 0.0,
         "resolution": 30,
         "ground_clearance": 20.0,
         "connector_wg": [15.0, 7.5],
+        "margin": 10.0,
     }
     pcell_trans = pya.Trans(pya.Trans.R0, 0, 0)
     
