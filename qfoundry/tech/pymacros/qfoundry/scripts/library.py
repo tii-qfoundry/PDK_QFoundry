@@ -45,7 +45,7 @@ class __PDK_Lib__(pya.Library):
           except AttributeError as e:
             print(f"Module {cell_module} may not be a PCell (no {cell_name} attribute) : {e}")
           except Exception as e:
-             raise Exception(f"Error importing {cell_name} from {file_name}: {e}")
+            print(f"Error importing {cell_name} from {file_name}: {e}")
 
     # TODO: The different cells need to be registered in accordance to their respective library fodlers to match KQCircuits Specification
     load_libraries(flush = True)
