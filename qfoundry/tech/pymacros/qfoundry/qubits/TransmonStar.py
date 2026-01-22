@@ -76,7 +76,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         # Extend all coupler lists to match n_couplers
         self.coupler_depths = extend_list(self.coupler_depths, self.n_couplers)
         self.coupler_gaps = extend_list(self.coupler_gaps, self.n_couplers)
-        self.trap_offsets = extend_list(self.trap_offsets, self.n_couplers)
+        self.trap_base = extend_list(self.trap_base, self.n_couplers)
 
         # Auto-generate coupler_widths if empty (equal angular spacing)
         default_width = 360.0 / (2.0 * self.n_couplers)
@@ -143,7 +143,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
                    default=[20.0, 20.0, 20.0, 20.0, 20.0])
         self.param("coupler_widths", self.TypeList, "Angular width of cutouts [degrees] (auto if empty)",
                    default=[48.0, 48.0, 48.0, 48.0, 48.0])
-        self.param("trap_offsets", self.TypeList, "Trapezoid taper for angled sidewalls [um]", 
+        self.param("trap_base", self.TypeList, "Trapezoid base width at inner edge [um]", 
                    default=[20.0, 0.0, 0.0, 0.0, 0.0])
         
         
@@ -236,11 +236,11 @@ class TransmonStar(pya.PCellDeclarationHelper):
         return pya.DPolygon(points)
     
     
-    def _make_trapezoid_cutout(self, angle_deg, gap, angular_width, depth=None, trap_offset=0):
+    def _make_trapezoid_cutout(self, angle_deg, gap, angular_width, depth=None, trap_base=0):
         """Create trapezoid-shaped cutout for a coupler.
         
         The trapezoid extends radially from (outer_radius - depth) to outer_radius,
-        with angular width defining the cutout opening and trap_offset creating
+        with angular width defining the cutout opening and trap_base creating
         angled sidewalls.
         
         Args:
@@ -248,7 +248,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
             gap: Additional spacing added around cutout (um) 
             angular_width: Angular span of cutout opening (degrees)
             depth: Radial depth from outer_radius (um)
-            trap_offset: Width at inner edge for sidewall taper (um)
+            trap_base: Width at inner edge for sidewall taper (um)
         
         Returns:
             pya.DPolygon: Trapezoid polygon rotated to specified angle
@@ -263,13 +263,13 @@ class TransmonStar(pya.PCellDeclarationHelper):
         outer_half_width = abs(self.outer_radius) * math.tan(half_angle_rad)
 
         # Calculate sidewall angle and gap compensation
-        sidewall_angle_rad = math.atan((outer_half_width - trap_offset/2) / (self.outer_radius - inner_radius))
+        sidewall_angle_rad = math.atan((outer_half_width - trap_base/2) / (self.outer_radius - inner_radius))
         gap_x = gap / math.cos(sidewall_angle_rad)
         xp = gap * math.tan(sidewall_angle_rad)
 
         # Calculate trapezoid coordinates based on angular width
         # Inner edge (at inner_radius)
-        inner_half_width = trap_offset/2
+        inner_half_width = trap_base/2
         
         
         # Create trapezoid in local coordinates (pointing up in +y direction)
@@ -308,7 +308,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
                                                gap = self.coupler_gaps[i], 
                                                angular_width=self.coupler_widths[i], 
                                                depth=self.coupler_depths[i], 
-                                               trap_offset=self.trap_offsets[i])
+                                               trap_base=self.trap_bases[i])
             trap_region = pya.Region(trap.to_itype(self.layout.dbu))
             qubit_region -= trap_region
         
@@ -364,12 +364,12 @@ class TransmonStar(pya.PCellDeclarationHelper):
                 angular_width=self.coupler_widths[i], 
                 depth=self.coupler_depths[i], 
                 gap=0,  # Gap handled in trapezoid cutout
-                trap_offset=self.trap_offsets[i]
+                trap_base=self.trap_bases[i]
             )
             for i in range(self.n_couplers)
         ]
     
-    def _make_single_connector(self, angle_deg, angular_width, depth, gap, trap_offset=0):
+    def _make_single_connector(self, angle_deg, angular_width, depth, gap, trap_base=0):
         """
         Create a single coupler connector.
         
@@ -385,7 +385,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         circle_region = pya.Region(circle.to_itype(dbu))
         
         # Create the trapezoid for this specific coupler with specified depth
-        trap = self._make_trapezoid_cutout(angle_deg, gap, angular_width=angular_width, depth=depth, trap_offset=trap_offset)
+        trap = self._make_trapezoid_cutout(angle_deg, gap, angular_width=angular_width, depth=depth, trap_base=trap_base)
         trap_region = pya.Region(trap.to_itype(dbu))
         
         # Subtract trapezoid from circle
@@ -607,7 +607,7 @@ if __name__ == "__main__":
         "coupler_depths": [170.0, 45.0, 45.0, 45.0, 45.0],  # Readout extends deeper inward
         "coupler_gaps": [20.0, 20.0, 20.0, 20.0, 20.0],     # Readout with smaller gap
         "coupler_widths": [48, 48, 48, 48, 48],
-        "trap_offsets": [20.0, 0.0, 0.0, 0.0, 0.0],
+        "trap_bases": [20.0, 0.0, 0.0, 0.0, 0.0],
         "corner_radius": 0.0,
         "resolution": 30,
         "ground_clearance": 20.0,
