@@ -535,7 +535,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         # Create two paths of length 1 um
         port_start = pya.DPoint(0, port_y-0.5)
         port_end = pya.DPoint(0, port_y + 0.5)
-        f
+        
         # Port (waveguide width)
         waveguide_width = self.connector_width + 2 * self.connector_gap
         port = pya.DPath([port_start, port_end], waveguide_width )
