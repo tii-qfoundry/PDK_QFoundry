@@ -535,19 +535,16 @@ class TransmonStar(pya.PCellDeclarationHelper):
         # Create two paths of length 1 um
         port_start = pya.DPoint(0, port_y-0.5)
         port_end = pya.DPoint(0, port_y + 0.5)
-        
-        # Inner port (signal width)
-        port_inner = pya.DPath([port_start, port_end], self.connector_width)
-        
-        # Outer port (signal + gap width)
-        port_outer = pya.DPath([port_start, port_end], self.connector_width + 2*self.connector_gap)
+        f
+        # Port (waveguide width)
+        waveguide_width = self.connector_width + 2 * self.connector_gap
+        port = pya.DPath([port_start, port_end], waveguide_width )
         
         # Rotate both ports to the connector angle
         trans = pya.DCplxTrans(1.0, angle_deg, False, 0, 0)
-        port_inner_rotated = trans * port_inner
-        port_outer_rotated = trans * port_outer
+        port_rotated = trans * port
         
-        return [port_inner_rotated, port_outer_rotated]
+        return [port_rotated]
     
     def _make_device_recognition(self, ground_cutout, inner_region):
         """Create device recognition layer showing device boundary.
