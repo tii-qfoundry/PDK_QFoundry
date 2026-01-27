@@ -40,7 +40,7 @@ sampleholder_type_choices = list(default_sampleholders.keys())
 Single face frame for 10 x 10 mm superconducting mask
 """
 class FrameQF10(Chip):
-    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", 'QRC16', choices=sampleholder_type_choices)
+    sampleholder_type = Param(pdt.TypeList, "Type of the launchers", 'QRC12', choices=sampleholder_type_choices)
     
     name_mask = Param(pdt.TypeString, "Name of the mask", NAME_MASK)
     name_chip = Param(pdt.TypeString, "Name of the chip", "")
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     from qfoundry.utils import test_pcell
     reload_library()
 
-    pcell_decl = FrameQF10
+    pcell_decl = FrameQF5
     pcell_params = {
               "name_mask": NAME_MASK, 
               "name_chip": NAME_CHIP,
@@ -125,7 +125,7 @@ if __name__ == "__main__":
               "dice_width": 200,
               "marker_dist": 800,
               "diagonal_squares": 0,
-              "sampleholder_type": 'QRC16',
+              "sampleholder_type": 'QRC12',
     }
     pcell_trans = pya.Trans(pya.Trans.R0, 0.0, 0.0)
     test_pcell(pcell_decl, pcell_params, pcell_trans)

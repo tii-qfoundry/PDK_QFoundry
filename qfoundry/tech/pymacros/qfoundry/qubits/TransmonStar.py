@@ -77,6 +77,8 @@ class TransmonStar(pya.PCellDeclarationHelper):
         self.coupler_depths = extend_list(self.coupler_depths, self.n_couplers)
         self.coupler_gaps = extend_list(self.coupler_gaps, self.n_couplers)
         self.trap_bases = extend_list(self.trap_bases, self.n_couplers)
+        if len(self.connector_extension)>1: # Allow a list of size 1 or to match the number of couplers only
+            self.connector_extension = extend_list(self.connector_extension, self.n_couplers)
 
         # Auto-generate coupler_widths if empty (equal angular spacing)
         default_width = 360.0 / (2.0 * self.n_couplers)
@@ -150,8 +152,8 @@ class TransmonStar(pya.PCellDeclarationHelper):
         # Connector geometry
         self.param("connector_wg", self.TypeList, "Dimension of coupler waveguides (w,s) [um]", 
                    default=[15.0, 7.5])
-        self.param("connector_extension", self.TypeDouble, "Extension length of coupler waveguides [um]", 
-                   default=10.0)
+        self.param("connector_extension", self.TypeList, "Extension length of coupler waveguides [um]", 
+                   default=[10.0])
         
         
         # # Junction parameters
@@ -202,7 +204,8 @@ class TransmonStar(pya.PCellDeclarationHelper):
         
         # Add ports at end of each connector
         for i in range(self.n_couplers):
-            ports = self._make_ports(self.coupler_angles[i])
+            ports = self._make_ports(angle_deg = self.coupler_angles[i], 
+                                     connector_length = self.connector_extension[i] if i < len(self.connector_extension) else self.connector_extension[-1])
             for port in ports:
                 self.cell.shapes(self.port_layer).insert(port)
         
@@ -364,12 +367,13 @@ class TransmonStar(pya.PCellDeclarationHelper):
                 angular_width=self.coupler_widths[i], 
                 depth=self.coupler_depths[i], 
                 gap=0,  # Gap handled in trapezoid cutout
-                trap_base=self.trap_bases[i]
+                trap_base=self.trap_bases[i],
+                connector_length = self.connector_extension[i] if i < len(self.connector_extension) else self.connector_extension[-1]
             )
             for i in range(self.n_couplers)
         ]
     
-    def _make_single_connector(self, angle_deg, angular_width, depth, gap, trap_base=0):
+    def _make_single_connector(self, angle_deg, angular_width, depth, gap, trap_base=0, connector_length=0):
         """
         Create a single coupler connector.
         
@@ -397,12 +401,12 @@ class TransmonStar(pya.PCellDeclarationHelper):
             connector_radius = max(0.1, self.corner_radius - gap)
             connector_region = self._round_corners(connector_region, connector_radius)
 
-        # Add rectangular pocket extending outward (fixed extension for all connectors)
-        pocket = self._make_connector_waveguide(angle_deg, self.ground_clearance + self.connector_extension, gap)
+        # Add rectangular pocket extending outward (variable extension for each connector)
+        pocket = self._make_connector_waveguide(angle_deg, connector_length, gap)
         pocket_region = pya.Region(pocket.to_itype(dbu))
-        
+
         connector_region += pocket_region
-        
+
         # Apply corner rounding to connector (radius reduced by gap)
         if self.corner_radius > 0:
             # Round again, only inner corners this time and can be corner radius
@@ -438,12 +442,12 @@ class TransmonStar(pya.PCellDeclarationHelper):
         else:
             return region.merged().round_corners(radius_dbu, radius_dbu, 32)
     
-    def _make_connector_waveguide(self, angle_deg, pocket_length, gap=0):
+    def _make_connector_waveguide(self, angle_deg, connector_length, gap=0):
         """Create rectangular waveguide extension for connector.
         
         Args:
             angle_deg: Rotation angle (degrees)
-            pocket_length: Extension length beyond outer_radius (um)
+            pocket_length: Extension length beyond outer_radius + gnd_clearance (um)
             gap: Additional spacing (unused, for API compatibility)
         
         Returns:
@@ -453,8 +457,13 @@ class TransmonStar(pya.PCellDeclarationHelper):
         pocket_width = self.connector_width
         
         # Create rectangle extending outward
-        rect = pya.DBox(-pocket_width/2, self.outer_radius + pocket_length, 
-                        pocket_width/2, self.outer_radius -10)
+        if connector_length > 0:
+            rect = pya.DBox(-pocket_width/2, self.outer_radius + connector_length + self.ground_clearance, 
+                            pocket_width/2, self.outer_radius - 5)
+        else: # negative pocket length
+            rect = pya.DBox(-pocket_width/2, self.outer_radius - 5,
+                            pocket_width/2, self.outer_radius + connector_length + self.ground_clearance)
+        
         rect_poly = pya.DPolygon(rect)
         
         # Rotate to angle
@@ -482,8 +491,8 @@ class TransmonStar(pya.PCellDeclarationHelper):
         
         for i in range(self.n_couplers):
             # Add a rectangle pocket for each coupler (to ensure a flat facet at the waveguide connector)
-            angle = self.coupler_angles[i]
-            pocket = self._make_ground_pocket(angle, 10.0)
+            pocket = self._make_ground_pocket(angle_deg = self.coupler_angles[i], 
+                                              connector_length=self.connector_extension[i] if i < len(self.connector_extension) else self.connector_extension[-1])
             pocket_region = pya.Region(pocket.to_itype(dbu))
             ground_region += pocket_region
 
@@ -492,7 +501,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
         
         return ground_region.merged()
     
-    def _make_ground_pocket(self, angle_deg, pocket_length):
+    def _make_ground_pocket(self, angle_deg, connector_length=0):
         """Create rectangular extension in ground plane at connector.
         
         Ensures flat waveguide interface at connector boundary.
@@ -508,15 +517,15 @@ class TransmonStar(pya.PCellDeclarationHelper):
         pocket_width = self.connector_width + 2*self.connector_gap
         
         # Create rectangle
-        rect = pya.DBox(-pocket_width/2, self.outer_radius + self.ground_clearance + self.connector_extension, 
-                        pocket_width/2, self.outer_radius + self.ground_clearance - pocket_length)
+        rect = pya.DBox(-pocket_width/2, self.outer_radius + self.ground_clearance + connector_length, 
+                        pocket_width/2, self.outer_radius + self.ground_clearance - 10)
         rect_poly = pya.DPolygon(rect)
         
         # Rotate to angle
         trans = pya.DCplxTrans(1.0, angle_deg, False, 0, 0)
         return trans * rect_poly
     
-    def _make_ports(self, angle_deg):
+    def _make_ports(self, angle_deg, connector_length=0):
         """Create port markers at the end of a connector waveguide.
         
         Creates two path objects:
@@ -530,7 +539,7 @@ class TransmonStar(pya.PCellDeclarationHelper):
             list[pya.DPath]: Two port path markers of length 1 um
         """
         # Port position at end of connector extension
-        port_y = self.outer_radius + self.ground_clearance + self.connector_extension
+        port_y = self.outer_radius + self.ground_clearance + connector_length
         
         # Create two paths of length 1 um
         port_start = pya.DPoint(0, port_y-0.5)
@@ -608,7 +617,7 @@ if __name__ == "__main__":
         "coupler_gaps": [20.0, 20.0, 20.0, 20.0, 20.0],     # Readout with smaller gap
         "coupler_widths": [48, 48, 48, 48, 48],
         "trap_bases": [20.0, 0.0, 0.0, 0.0, 0.0],
-        "corner_radius": 0.0,
+        "connector_extension": [10.0],
         "resolution": 30,
         "ground_clearance": 20.0,
         "connector_wg": [15.0, 7.5],
