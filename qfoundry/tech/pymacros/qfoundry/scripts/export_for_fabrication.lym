@@ -17,7 +17,7 @@
  <dsl-interpreter-name/>
  <text>import pya
 
-def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_flatten_cell_list = ['fill_8p'], final_layer_styles = None):
+def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_flatten_cell_list = ['fill_08p'], final_layer_styles = None):
     """
     This script prepares the currently active layout for fabrication by:
     1. Creating a new "static" layout with a flattened hierarchy.
@@ -227,19 +227,23 @@ if __name__ == "__main__":
     #   - value: is a list of tuples for the SOURCE layers to be moved to the target.
     layer_mapping = {
         (1, 0): [(130, 1), (1, 0)],
-        (2, 0): [(2, 0), (50, 0)],
+        (5, 0): [(2, 0), (50, 0)],
         (6, 0): [(146, 1), (6, 10)],
-        (7, 0): [(147, 1), (7, 10)]
+        (7, 0): [(147, 1), (7, 10)],
+        (50,10): [(50,10)],
+        (5,10): [(5,10)],
     }
     
     final_layer_styles = [
             ((1, 0), "Fab Layer 1/0", 0x6d75ff, 0x6D75ff,0), # Darkblue
-            ((2, 0), "Fab Layer 2/0", 0x990000, 0x990000,0), # Red
+            ((5, 0), "Fab Layer 5/0", 0x990000, 0x990000,0), # Red
             ((6, 0), "Fab Layer 6/0", 0xaaffaa, 0xaaffaa,0), # Greenish
             ((7, 0), "Fab Layer 7/0", 0x009900, 0x009900,2), # Green
+            ((5, 10), "QW MJunctions", 0x6d7522, 0x6D7522,0), # Darkblue
+            ((50, 1+++0), "QW Jucntion conn", 0xff75ff, 0xff75ff,0), # Darkblue
         ]
         
-    no_flatten_cell_list = ['fill_16p']
+    no_flatten_cell_list = ['fill_05p', 'fill_08p', 'fill_16p', 'QW_single_junction_24_2_nA']
     
     prepare_for_fabrication(layer_mapping, no_flatten_cell_list, final_layer_styles)</text>
 </klayout-macro>
