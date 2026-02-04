@@ -74,7 +74,7 @@ log("Layer definitions loaded successfully")
 
 # Aluminum superconducting layer rules
 min_al_width = 3.0.um           # Minimum aluminum feature width
-min_al_space = 2.0.um           # Minimum aluminum spacing
+min_al_space = 3.0.um           # Minimum aluminum spacing
 min_al_enclosure = 1.0.um       # Minimum enclosure of other features
 
 # Josephson junction rules  

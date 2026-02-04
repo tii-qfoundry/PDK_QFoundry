@@ -239,8 +239,8 @@ if __name__ == "__main__":
             ((5, 0), "Fab Layer 5/0", 0x990000, 0x990000,0), # Red
             ((6, 0), "Fab Layer 6/0", 0xaaffaa, 0xaaffaa,0), # Greenish
             ((7, 0), "Fab Layer 7/0", 0x009900, 0x009900,2), # Green
-            ((5, 10), "QW MJunctions", 0x6d7522, 0x6D7522,0), # Darkblue
-            ((50, 1+++0), "QW Jucntion conn", 0xff75ff, 0xff75ff,0), # Darkblue
+            ((5, 10), "QW Fab Layer 5/10", 0x6d7522, 0x6D7522,0), # Dark Yellow
+            ((50, 10), "QW Fab Layer 50/10", 0xff75ff, 0xff75ff,0), # Pink
         ]
         
     no_flatten_cell_list = ['fill_05p', 'fill_08p', 'fill_16p', 'QW_single_junction_24_2_nA']

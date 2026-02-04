@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Register Shortcuts</description>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut>Ctrl+Shift+R</shortcut>
+ <show-in-menu>true</show-in-menu>
+ <group-name/>
+ <menu-path>tools_menu.end</menu-path>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+# a convenience function to specify a shortcut for a given menu from Mattias K
+def set_shortcut(path, shortcut)
+  menu = RBA::Application.instance.main_window.menu
+  if menu.is_valid(path)
+    menu.action(path).shortcut = shortcut
+  end
+end
+
+# set the shortcut
+
+menu_shortcuts = [
+["zoom_menu.zoom_fit", "F"],
+["zoom_menu.zoom_in", "Ctrl++"],
+["zoom_menu.zoom_out", "Ctrl+-"],
+["zoom_menu.select_current_cell", "Shift+T"],
+["edit_menu.selection_menu.area_perimeter", "Shift+A"],
+["edit_menu.selection_menu.sel_flip_x", "Shift+H"],
+["edit_menu.selection_menu.sel_flip_y", "Shift+V"],
+["edit_menu.selection_menu.sel_rot_cw", "Shift+R"],
+["edit_menu.selection_menu.sel_move", "Shift+M"],
+["edit_menu.selection_menu.sel_move_to", "M"],
+["edit_menu.selection_menu.make_cell", "Ctrl+Shift+M"],
+["edit_menu.selection_menu.flatten_insts", "Ctrl+Shift+F"],
+["edit_menu.selection_menu.union", "Shift++"],
+["edit_menu.selection_menu.difference", "Shift+-"],
+["edit_menu.selection_menu.intersection", "Shift+*"],
+["file_menu.save", "Ctrl+S"],
+["file_menu.save_as", "Ctrl+Shift+S"],
+]
+
+menu_shortcuts.each do |menu_item, shortcut|
+  set_shortcut(menu_item, shortcut)
+end</text>
+</klayout-macro>
