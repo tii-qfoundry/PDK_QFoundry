@@ -227,6 +227,7 @@ if __name__ == "__main__":
     #   - value: is a list of tuples for the SOURCE layers to be moved to the target.
     layer_mapping = {
         (1, 0): [(130, 1), (1, 0)],
+        (11, 0): [(11, 0)],
         (5, 0): [(2, 0), (50, 0)],
         (6, 0): [(146, 1), (6, 10)],
         (7, 0): [(147, 1), (7, 10)],
@@ -236,6 +237,7 @@ if __name__ == "__main__":
     
     final_layer_styles = [
             ((1, 0), "Fab Layer 1/0", 0x6d75ff, 0x6D75ff,0), # Darkblue
+            ((11, 0), "Fab Layer 11/0", 0x6d75ff, 0x6D75ff,0), # Darkblue
             ((5, 0), "Fab Layer 5/0", 0x990000, 0x990000,0), # Red
             ((6, 0), "Fab Layer 6/0", 0xaaffaa, 0xaaffaa,0), # Greenish
             ((7, 0), "Fab Layer 7/0", 0x009900, 0x009900,2), # Green

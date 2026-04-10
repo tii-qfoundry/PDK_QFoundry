@@ -242,7 +242,7 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
                                                            'bot_dx': self.bot_dx,
                                                            'bot_dy': self.bot_dy})
             _add_shapes(self.cell, conn_shapes, jj_layer)
-
+        
         label_trans = pya.Trans(pya.Trans.R0, (-self.cap_w/2+10)/dbu, (self.cap_h-10)/dbu)     
         cell_label = self.layout.create_cell("TEXT", "Basic", {"text":self.label, "mag":20,"layer": pya.LayerInfo(1, 0) })
         cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),label_trans)
@@ -332,12 +332,14 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
             layer_add = self.layout.layer(pya.LayerInfo(131, 1))
             self.cell.shapes(layer_add).insert(region_pos) 
             self.cell.shapes(layerm).insert(region_neg)
-            self.cell.insert(cell_instance_lbl)    
+            if self.draw_cap:
+              self.cell.insert(cell_instance_lbl)    
         else:
             # Convert cell_instance_lbl to a region
-            self.cell.insert(cell_instance_lbl).flatten()
-            # Subtract the label region from region_pos if label_region
-            region_pos = region_pos - pya.Region(cell_instance_lbl.bbox())
+            if self.draw_cap:
+              self.cell.insert(cell_instance_lbl).flatten()
+              # Subtract the label region from region_pos if label_region
+              region_pos = region_pos - pya.Region(cell_instance_lbl.bbox())
             
             self.cell.shapes(layerm).insert(region_pos)
             #self.cell.shapes(layerm).insert(region_pos) 

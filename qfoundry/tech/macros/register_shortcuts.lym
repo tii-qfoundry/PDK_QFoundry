@@ -27,23 +27,25 @@ end
 # set the shortcut
 
 menu_shortcuts = [
-["zoom_menu.zoom_fit", "F"],
+["zoom_menu.zoom_fit", "f"],
 ["zoom_menu.zoom_in", "Ctrl++"],
 ["zoom_menu.zoom_out", "Ctrl+-"],
-["zoom_menu.select_current_cell", "Shift+T"],
-["edit_menu.selection_menu.area_perimeter", "Shift+A"],
-["edit_menu.selection_menu.sel_flip_x", "Shift+H"],
-["edit_menu.selection_menu.sel_flip_y", "Shift+V"],
-["edit_menu.selection_menu.sel_rot_cw", "Shift+R"],
-["edit_menu.selection_menu.sel_move", "Shift+M"],
-["edit_menu.selection_menu.sel_move_to", "M"],
-["edit_menu.selection_menu.make_cell", "Ctrl+Shift+M"],
-["edit_menu.selection_menu.flatten_insts", "Ctrl+Shift+F"],
+["zoom_menu.select_current_cell", "Shift+t"],
+["edit_menu.selection_menu.area_perimeter", "Shift+a"],
+["edit_menu.selection_menu.sel_flip_x", "Shift+h"],
+["edit_menu.selection_menu.sel_flip_y", "Shift+v"],
+["edit_menu.selection_menu.sel_rot_cw", "Shift+r"],
+["edit_menu.selection_menu.sel_move", "Shift+m"],
+["edit_menu.selection_menu.sel_move_to", "m"],
+["edit_menu.selection_menu.make_cell", "Ctrl+Shift+m"],
+["edit_menu.selection_menu.flatten_insts", "Shift+f"],
 ["edit_menu.selection_menu.union", "Shift++"],
 ["edit_menu.selection_menu.difference", "Shift+-"],
 ["edit_menu.selection_menu.intersection", "Shift+*"],
-["file_menu.save", "Ctrl+S"],
-["file_menu.save_as", "Ctrl+Shift+S"],
+["edit_menu.selection_menu.change_layer", "Shift+l"],
+["file_menu.save", "Ctrl+s"],
+["file_menu.save_as", "Ctrl+Shift+s"],
+["",""]
 ]
 
 menu_shortcuts.each do |menu_item, shortcut|
