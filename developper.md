@@ -511,13 +511,93 @@ def method_name(self, param1, param2):
 3. Test layer assignments with simple geometries
 4. Validate layer stack in final layouts
 
+## Versioning
+
+QFoundry PDK uses **automatic versioning from git tags** via [setuptools-scm](https://setuptools-scm.readthedocs.io/). No version number is ever hard-coded — it is always derived from the git history.
+
+### Version Format
+
+Tags must follow **semantic versioning** prefixed with `v`:
+
+```
+v<MAJOR>.<MINOR>.<PATCH>
+```
+
+| Example tag | Released version | Notes |
+|-------------|-----------------|-------|
+| `v1.0.0`    | `1.0.0`         | Exact release commit |
+| `v1.0.0` + 3 commits | `1.0.1.dev3+gabcdef` | Development snapshot after tag |
+| (no tag yet) | `0.0.0+unknown` | Fallback when git is unavailable |
+
+### Creating a Release
+
+```bash
+# 1. Make sure you are on main and your working tree is clean
+git checkout main
+git pull
+
+# 2. Create an annotated tag
+git tag -a v1.2.0 -m "Release v1.2.0: short description of changes"
+
+# 3. Push the tag to GitHub (triggers the version bump)
+git push origin v1.2.0
+```
+
+Use an **annotated** tag (`-a`) — `setuptools-scm` prefers annotated tags over lightweight ones.
+
+Follow [semantic versioning](https://semver.org/) rules when choosing the version number:
+- **MAJOR** — breaking changes to the public API or process compatibility
+- **MINOR** — new components or features, backward-compatible
+- **PATCH** — bug fixes and documentation updates
+
+### Checking the Current Version
+
+From the KLayout Python console or any Python script that has the PDK on its path:
+
+```python
+import qfoundry
+print(qfoundry.__version__)
+```
+
+Or from the command line inside the repository:
+
+```bash
+git describe --tags --always --dirty
+```
+
+### How It Works
+
+The version is resolved at import time in `qfoundry/tech/pymacros/qfoundry/_version.py` using the following priority:
+
+1. **Package metadata** (`importlib.metadata`) — used when the PDK is installed with `pip install -e .` or `pip install .`
+2. **`git describe`** — used when running directly from a git clone without a pip install
+3. **`"unknown"`** — final fallback when neither is available
+
+The `pyproject.toml` at the repository root configures `setuptools-scm` and is also used to `pip install` the package in editable mode for development:
+
+```bash
+# One-time setup for developers who want proper version metadata
+pip install -e .
+```
+
+### Editable Install (Recommended for Developers)
+
+Installing in editable mode makes `qfoundry` importable system-wide and ensures `qfoundry.__version__` reflects the current git tag:
+
+```bash
+cd PDK_Qfoundry
+pip install -e .
+```
+
+Re-run this command after creating a new release tag to refresh the cached metadata.
+
 ## Contributing
 
 1. **Fork and Branch**: Create feature branches for new components
 2. **Documentation**: Update this guide for new patterns or utilities
 3. **Testing**: Ensure all new components pass registration tests
 4. **Code Review**: Follow established patterns and conventions
-5. **Version Control**: Commit frequently with descriptive messages
+5. **Version Control**: Commit frequently with descriptive messages; tag releases with `git tag -a vX.Y.Z`
 
 ## References
 

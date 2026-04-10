@@ -1,6 +1,8 @@
 import pya
 from importlib import reload
 
+from ._version import __version__
+
 from .chips.FrameQF10 import FrameQF10
 from .chips.FrameQF5 import FrameQF5
 from .defaults import *

@@ -1,11 +1,11 @@
 :: for Windows
-:: GitHub repository installation of Starfish PDK files for KLayout
+:: GitHub repository installation of QFoundry PDK files for KLayout
 
 :: Assumes that 
-:: - Qfounbdry-* repositories are in the user's profile directory, under OneDrive/Documents/GitHub
+:: - QFoundry-* repositories are in the user's profile directory, under C:\Users\<username>\Documents\GitHub
 :: - KLAYOUT_HOME is in the user's profile directory, as KLayout
 
-Check if the github directory exists
+:: Check if the github directory exists
 if not exist "%userprofile%\Documents\Github" (
     echo GitHub directory not found in %userprofile%\Documents\Github
     echo Please clone the Qfoundry repositories from GitHub into this directory first.
