@@ -86,14 +86,13 @@ class ManhattanFatLead(pya.PCellDeclarationHelper):
         choices = [("Single Junction",0),("SQUID Pair",1), ("SQUID Reflected",2)]
         self.param("junction_type", self.TypeList, "Junction Type", choices=choices, default=0)
         self.param("squid_spacing", self.TypeDouble, "Spacing between SQUID junctions", default=20.0, unit="μm")
+        self.param("squid_asymmetry", self.TypeDouble, "Asymmetry of the SQUID junctions", default=1.0)
         
         self.param("angle", self.TypeDouble, "Junction angle", default = 0.0)
         self.param("inner_angle", self.TypeDouble, "Angle between junction pads", default = 90.0)
         self.param("junction_width_b", self.TypeDouble, "Bottom junction width", default = 0.3, unit="μm",hidden=False)
         self.param("junction_width_t", self.TypeDouble, "Additional width to the top electrode", default = 0.05, unit="μm",hidden=False)
 
-        self.param("squid_asymmetry", self.TypeDouble, "Asymmetry of the SQUID junctions", default=1.0)
-        
         self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=False)
         self.param("finger_size",self.TypeDouble, "Length of fingers (without overshoot).", default=5.0, unit="μm")
         

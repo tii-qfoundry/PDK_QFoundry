@@ -13,7 +13,7 @@ from kqcircuits.defaults import (
                                 
 from kqcircuits.elements.chip_frame import ChipFrame
 from kqcircuits.chips.launchers import Launchers
-from kqcircuits.elements.waveguide_coplanar_splitter import WaveguideCoplanarSplitter, t_cross_parameters
+from kqcircuits.elements.waveguide_coplanar_splitter import WaveguideCoplanarSplitter
 from kqcircuits.pya_resolver import pya
 from kqcircuits.elements.waveguide_composite import Node, WaveguideComposite
 from kqcircuits.elements.airbridges.airbridge import Airbridge

@@ -107,7 +107,7 @@ def _patch_scratches(gap, patch_width, conn_height, patch_clearance, size, angle
     ])
     return polygon
 
-def draw_patch(finger_size, cap_gap, conn_width, conn_height, angle, inner_angle, patch_scratch, patch_clearance=10.0, 
+def draw_patch(finger_size, cap_gap, conn_width, conn_height, angle, inner_angle, patch_scratch, patch_clearance=10.0, finger_overlap=1.0,
   center=pya.DPoint(0, 0), dbu=0.001) -> pya.DPolygon:
     size = finger_size
     gap = cap_gap
@@ -116,46 +116,51 @@ def draw_patch(finger_size, cap_gap, conn_width, conn_height, angle, inner_angle
     _angle = radians(angle)
     _inner_angle = radians(inner_angle)
     
-    def patch_points(heigth, size, angle,rot=0, round = False):
+    def patch_points(heigth, size, angle, direction=1, finger_overlap=1):
         end_x = size*cos(angle)
-        end_y = size*sin(angle)
-    
-        span_y = heigth+patch_clearance+(end_y)*sign(end_y)
-        
-        polygon = pya.DTrans(0,False, end_x, 0)*pya.DTrans(rot,False, 0, 0) * pya.DPolygon([
-            pya.DPoint(-patch_width/2, gap/2),
-            pya.DPoint(patch_width/2, gap/2),
-            pya.DPoint(patch_width/2, gap/2+span_y),
-            pya.DPoint(-patch_width/2, gap/2+span_y),
+        # Anchored at the capacitor gap edge (not the connector tip), since that
+        # edge - not the finger tip - is the fixed reference the lead crosses.
+        gap_edge_y = gap/2 if direction > 0 else -gap/2
+        y_size = heigth+patch_clearance if direction > 0 else -(heigth+patch_clearance)
+        # Matches the +1/-1 nudge that draw_connectors applies to the top/bottom
+        # connector lead respectively, so the patch stays aligned to the lead.
+        fudge = -finger_overlap if direction > 0 else finger_overlap
+
+        polygon = pya.DTrans(0,False, end_x, gap_edge_y+fudge) * pya.DPolygon([
+            pya.DPoint(-patch_width/2, 0),
+            pya.DPoint(patch_width/2, 0),
+            pya.DPoint(patch_width/2, y_size),
+            pya.DPoint(-patch_width/2, y_size),
         ])
         return polygon
-    
+
     patches = []
     if patch_scratch:
         dy_arr = linspace(0.0,10.0,5)
         for dy in dy_arr:
             patches.append((pya.DTrans(0,False,center.x,dy) * (_patch_scratches(gap, patch_width, conn_height, patch_clearance, size=size,  angle=_angle))).to_itype(dbu))
         for dy in dy_arr:
-            patches.append((pya.DTrans(0,False,center.x, -dy) * (_patch_scratches(gap, patch_width, conn_height, patch_clearance, size=size,  angle=_angle-(_inner_angle),rot=2))).to_itype(dbu))  
-    else:    
-        patches = [pya.DTrans(0,False,center.x, 0) * (
-                    patch_points( heigth=conn_height-cap_gap/2.0*sin(_angle)+patch_clearance,
-                                    size=size,  
-                                    angle=_angle)
+            patches.append((pya.DTrans(0,False,center.x, -dy) * (_patch_scratches(gap, patch_width, conn_height, patch_clearance, size=size,  angle=_angle-(_inner_angle),rot=2))).to_itype(dbu))
+    else:
+        bottom_angle = _angle - _inner_angle
+        # Both anchor at the gap edge now, so the span is simply conn_height -
+        # no more sin/cos cancellation needed to offset the connector tip's angle.
+        top_height = conn_height
+        bot_height = conn_height
+        patches = [pya.DTrans(0,False,center.x, center.y) * (
+                    patch_points(heigth=top_height, size=size, angle=_angle, direction=1, finger_overlap=finger_overlap)
                     ).to_itype(dbu),
-                    pya.DTrans(0,False,center.x, 0) * (
-                    patch_points( heigth=conn_height-cap_gap/2.0*cos(_angle)+patch_clearance,
-                                    size=size,  
-                                    angle=_angle-(_inner_angle),rot=2)
+                    pya.DTrans(0,False,center.x, center.y) * (
+                    patch_points(heigth=bot_height, size=size, angle=bottom_angle, direction=-1, finger_overlap=finger_overlap)
                     ).to_itype(dbu)]
 
     return patches
 
-def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap=2, direction = +1) -> pya.DPolygon:
+def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap=2, direction = +1, finger_overlap=1, round_radius=0) -> pya.DPolygon:
     size = finger_size
     _angle = radians(angle)
     _inner_angle = radians(inner_angle)
-    
+
     def patch_points(heigth, size, angle,rot=0, round = True):
         end_x = size*cos(angle)
         end_y = size*sin(angle)
@@ -167,9 +172,11 @@ def draw_patch_openning(finger_size, conn_width, heigth, angle, inner_angle, gap
             pya.DPoint(conn_width/2+gap, 0),
         ])
         if True:
-            polygon = polygon.round_corners(0, 0, 32)
+            polygon = polygon.round_corners(round_radius, round_radius, 32)
         return polygon
-        
-    patch = pya.DTrans(0,False,0, -1) * (patch_points(heigth=heigth, size=size,angle=_angle))
-    
+
+    # Fix the patch position to account for the finger overlap, so that the patch is aligned with the lead.
+    fudge = -finger_overlap if direction > 0 else finger_overlap
+    patch = pya.DTrans(0,False,0, fudge) * (patch_points(heigth=heigth, size=size,angle=_angle))
+
     return patch

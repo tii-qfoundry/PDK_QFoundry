@@ -16,7 +16,6 @@ NEGATIVE_LAYERS = [
 ]
 
 
-    
 class Manhattan(pya.PCellDeclarationHelper):
 
     def __init__(self):
@@ -44,30 +43,30 @@ class Manhattan(pya.PCellDeclarationHelper):
         self.param("junction_width_b", self.TypeDouble, "Bottom junction width", default = 0.3, unit="μm",hidden=False)
         self.param("junction_y_offset", self.TypeDouble, "Vertical Offset of the junction position", default = 0.0, unit="μm",hidden=False)    
         self.param("finger_overshoot",self.TypeDouble, "Length of fingers after the junction.", default=2.0, unit="μm", hidden=False)
-        self.param("finger_overlap",self.TypeDouble, "Length of fingers inside the pads.", default=1.0, unit="μm",hidden=True)
+        self.param("finger_overlap",self.TypeDouble, "Length of fingers inside the arms.", default=1.0, unit="μm",hidden=True)
         self.param("finger_size",self.TypeDouble, "Length of fingers (without overshoot).", default=10.0, unit="μm")
         
-        self.param("round_pad", self.TypeBoolean, "Pad has round edges", default=True, hidden=True)
-        self.param("pad_radius", self.TypeDouble, "Pad edge radius", default=2.0, hidden=True)
-        self.param("conn_width", self.TypeDouble, "Connector pad width", default=5.0, hidden=False)
-        self.param("conn_height", self.TypeDouble, "Connector pad height", default=20.0, hidden=False)
+        self.param("round_pad", self.TypeBoolean, "Arm has round edges", default=True, hidden=True)
+        self.param("pad_radius", self.TypeDouble, "Arm edge radius", default=2.0, hidden=True)
+        self.param("conn_width", self.TypeDouble, "Connector arm width", default=5.0, hidden=False)
+        self.param("conn_height", self.TypeDouble, "Connector arm height", default=20.0, hidden=False)
 
         # add separator
-        self.param("draw_cap", self.TypeBoolean, "Include test pad", default=True)
-        self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=20.0)
+        self.param("draw_cap", self.TypeBoolean, "Include test pad", default=False)
+        self.param("cap_gap", self.TypeDouble, "Capacitor gap", default=40.0)
         self.param("cap_w", self.TypeDouble, "Capacitor width", default=200.0,hidden=False)
         self.param("cap_h", self.TypeDouble, "Capacitor height", default=200.0,hidden=False)
         self.param("draw_patch", self.TypeBoolean, "Include patches", default=True)
         self.param("patch_scratch", self.TypeBoolean, "Draw 45 deg scratches as patch", default=False)
         self.param("patch_layer", self.TypeLayer, "Patch Layer", default = pya.LayerInfo(4, 0))
-        self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0, hidden = True)
+        self.param("patch_gap", self.TypeDouble, "Patch gap", default=2.0, hidden = False)
         self.param("patch_clearance", self.TypeDouble, "Patch clearance", default=5.0)
 
         
         self.param("cap_layer", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))
         self.param("offset_compensation",self.TypeDouble, "Compensation for top junction.", default=0.0, unit="μm",hidden=True)
         self.param("mirror_offset",self.TypeDouble, "Length of fingers (without overshoot).", default=False, unit="μm",hidden=True)
-        self.param("label",self.TypeString, "Label", default="QFOUNDRY",hidden=True)
+        self.param("label",self.TypeString, "Label", default="qfoundry_manhattan",hidden=True)
 
     def produceManhattan(self): 
             """Draws the Manhattan junction"""
@@ -92,7 +91,6 @@ class Manhattan(pya.PCellDeclarationHelper):
             # Capacitor
             if self.draw_cap:
                 cap_shape = draw_pad(self.cap_w, self.cap_h, self.cap_gap, dbu = dbu)
-                _angle = radians(self.angle)
                 patch_open_shape = []
                 patch_shape = []
                 
@@ -106,79 +104,88 @@ class Manhattan(pya.PCellDeclarationHelper):
                 region_pos = pya.Region()
                 region_neg = pya.Region()
                 
-            # Patches
-            if self.draw_patch:
-                # Use the updated draw_patch function
-                patch_shape = draw_patch(
-                    self.finger_size, 
-                    self.cap_gap, 
-                    self.conn_width, 
-                    self.conn_height, 
-                    self.angle, 
-                    self.inner_angle, 
-                    self.patch_scratch, 
-                    self.patch_clearance,
-                    center=pya.DPoint(0, 0), 
-                    dbu=dbu
-                )
-                
-                # Patch opening in base metal layer
-                center = pya.DPoint(0, 0)
-                top_height = self.conn_height+self.cap_gap/2-self.finger_size*sin(_angle)
-                patch_top = draw_patch_openning(
-                    self.finger_size, 
-                    self.conn_width, 
-                    top_height, 
-                    self.angle, 
-                    self.inner_angle, 
-                    gap = self.patch_gap
-                )
-                
-                bot_height = self.conn_height+self.cap_gap/2-self.finger_size*cos(_angle)
-                patch_bot = draw_patch_openning(
-                    self.finger_size, 
-                    self.conn_width, 
-                    bot_height, 
-                    self.angle-90, 
-                    self.inner_angle,   
-                    gap = self.patch_gap
-                )
-
-                patch_open_shape = [
-                    (pya.DTrans(0, False, center.x,center.y) * patch_top).to_itype(dbu),
-                    (pya.DTrans(0, False, center.x,center.y-bot_height) * patch_bot).to_itype(dbu)
-                ]
-                region_pos = region_pos - pya.Region(patch_open_shape).merged()
-                region_neg = region_neg + pya.Region(patch_open_shape).merged()
+            # Patches (maybe not drawn, but always calculated so it can be used for the region logic)
+            patch_shape = draw_patch(
+                self.finger_size, 
+                self.cap_gap, 
+                self.conn_width, 
+                self.conn_height, 
+                self.angle, 
+                self.inner_angle, 
+                self.patch_scratch, 
+                self.patch_clearance,
+                finger_overlap = self.finger_overlap,
+                center=pya.DPoint(0, 0), 
+                dbu=dbu
+            )
             
-            # Label handling
+            # Patch opening in base metal layer
+            center = pya.DPoint(0, 0)
+            _angle = radians(self.angle)
+            top_height = self.conn_height+self.cap_gap/2-self.finger_size*sin(_angle)
+            patch_top = draw_patch_openning(
+                self.finger_size,
+                self.conn_width,
+                top_height,
+                self.angle,
+                self.inner_angle,
+                gap = self.patch_gap,
+                finger_overlap = self.finger_overlap,
+                round_radius = self.pad_radius + self.patch_clearance - self.patch_gap,
+            )
+
+            bottom_angle = self.angle - self.inner_angle
+            bot_height = self.conn_height+self.cap_gap/2+self.finger_size*sin(radians(bottom_angle))
+            patch_bot = draw_patch_openning(
+                self.finger_size,
+                self.conn_width,
+                bot_height,
+                angle = bottom_angle,
+                inner_angle = self.inner_angle,
+                gap = self.patch_gap,
+                finger_overlap = self.finger_overlap,
+                round_radius = self.pad_radius + self.patch_clearance - self.patch_gap,
+                direction = -1,
+            )
+
+            patch_open_shape = [
+                (pya.DTrans(0, False, center.x,center.y) * patch_top ).to_itype(dbu),
+                (pya.DTrans(0, False, center.x,center.y) * patch_bot).to_itype(dbu)
+            ]
+            region_pos = region_pos - pya.Region(patch_open_shape).merged()
+            region_neg = region_neg + pya.Region(patch_open_shape).merged()
+
+            if self.draw_patch:
+              layer_patch = self.layout.layer(self.patch_layer)
+              _add_shapes(self.cell, patch_shape, layer_patch)
+                  
+            # Drwaing and label handling
+            layer_cap = self.layout.layer(self.cap_layer)
+            layer_add = self.layout.layer(pya.LayerInfo(131, 1))
+            
             if self.draw_cap:
                 trans = pya.Trans(pya.Trans.R0, (-self.cap_w/2+10)/dbu, (self.cap_h-10)/dbu)     
-                cell_label = self.layout.create_cell("TEXT", "Basic", {"text":self.label, "mag":20,"layer": pya.LayerInfo(1, 0) })
-                cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),trans)
-            else:
-                cell_instance_lbl = pya.CellInstArray(pya.CellIndex(0), trans)
             
-            # Add shapes to the layout
-            layer_cap = self.layout.layer(self.cap_layer)
-
-            # Apply layer logic based on lithography type
-            if layer_cap in [self.layout.layer(layer) for layer in NEGATIVE_LAYERS]: 
-                # Negative lithography: use separate layers for positive and negative regions
-                layer_add = self.layout.layer(pya.LayerInfo(131, 1))
-                self.cell.shapes(layer_add).insert(region_pos) 
-                self.cell.shapes(layer_cap).insert(region_neg)
-                self.cell.insert(cell_instance_lbl)    
+                # Apply layer logic based on lithography type
+                if layer_cap in [self.layout.layer(layer) for layer in NEGATIVE_LAYERS]: 
+                    # Negative lithography: use separate layers for positive and negative regions
+                    cell_label = self.layout.create_cell("TEXT", "Basic", {"text":self.label, "mag":20,"layer": layer_cap})
+                    cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),trans)
+                    self.cell.insert(cell_instance_lbl)    
+                else:
+                    # Positive lithography: insert label and subtract from positive region
+                    cell_label = self.layout.create_cell("TEXT", "Basic", {"text":self.label, "mag":20,"layer": layer_add})
+                    cell_instance_lbl = pya.CellInstArray(cell_label.cell_index(),trans)
+                    self.cell.insert(cell_instance_lbl)
+                    # Flatten and subtract the label region from region_pos if needed
+                    region_pos = region_pos - pya.Region(cell_label.shapes(layer_label)).merged()
             else:
-                # Positive lithography: insert label and subtract from positive region
-                self.cell.insert(cell_instance_lbl)
-                # Flatten and subtract the label region from region_pos if needed
-                self.cell.shapes(layer_cap).insert(region_pos)
-
-            # Add patch shapes to patch layer
-            layer_patch = self.layout.layer(self.patch_layer)
-            _add_shapes(self.cell, patch_shape, layer_patch)
-
+                cell_label = pya.DText(self.label, 0.0, 0.0)
+                layer_label = self.layout.layer(pya.LayerInfo(68, 2))
+                # self.cell.shapes(layer_label).insert(cell_label)
+                
+            self.cell.shapes(layer_add).insert(region_pos) 
+            self.cell.shapes(layer_cap).insert(region_neg)
 
     def draw_connectors(self, center=pya.DPoint(0, 0)):
         dbu = self.layout.dbu
@@ -234,8 +241,8 @@ if __name__ == "__main__":
               "junction_width_t":0.1, 
               "junction_width_b":0.2, 
               "angle": 0.,
-              "draw_cap":True,
-              "patch_scratch":True,}
+              "draw_cap":False,
+              "patch_scratch":False,}
     pcell_trans = pya.Trans(pya.Trans.R0, 0.0, 0.0)
 
     test_pcell(pcell_decl, pcell_params, pcell_trans)
