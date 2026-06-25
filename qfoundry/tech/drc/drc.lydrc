@@ -56,7 +56,6 @@ writeField = input(98).flatten         # EBL writefield definitions
 # Airbridge layers
 airbridge_pads    = input(146,1).flatten - excpt    # Airbridge landing pads
 airbridge_flyover = input(147,1).flatten - excpt    # Airbridge flyover region
-qw_airbridge_pad  = input(6,10).flatten             # Quarter-wave airbridge pads
 
 # Additional layers for comprehensive checking
 etch_layer        = input(120,0).flatten - excpt    # Etch definition layer
@@ -209,12 +208,14 @@ ab_pad_not_covered = airbridge_pads.select_not_inside(airbridge_flyover)
 ab_pad_not_covered.output("Airbridge Pad Coverage","Airbridge pads must be fully covered by flyover region")
 
 # 2. Airbridge pad interference with aluminum
-ab_pad_interference = qw_airbridge_pad.and(poly_al_sc)
-ab_pad_interference.output("Airbridge Aluminum Interference","Airbridge pads cannot overlap with aluminum waveguides")
+ab_pad_interference = airbridge_pads.and(poly_al_sc)
+ab_pad_interference.output("Airbridge Aluminum Interference","Airbridge pads cannot overlap with aluminum waveguide clearance")
 
 # 3. Airbridge minimum clearance
 ab_clearance_violations = airbridge_pads.separation(poly_al_sc, min_ab_clearance - al_tol)
 ab_clearance_violations.output("Airbridge Clearance Violation","Minimum clearance around airbridges: #{min_ab_clearance}")
+
+
 
 # 4. Airbridge pad size check
 ab_pad_too_small = airbridge_pads.with_bbox_width(0, min_ab_pad_size) + airbridge_pads.with_bbox_height(0, min_ab_pad_size)

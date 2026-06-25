@@ -60,8 +60,7 @@ outside.output("Junctions outside WF","Junctions must be defined within a writef
 wf_overlap = writeField.merged(2)
 wf_overlap.output("WF Instance ill defined","It appears that more than one type of writefield is being defined or WF cells are overlapping.")
 
-
-al_tol = 0.05
+al_tol = 0.05r
 jj_tol = 0.005
 
 # Dimensions of aluminum superconductive layer
