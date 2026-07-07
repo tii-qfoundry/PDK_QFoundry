@@ -5,8 +5,8 @@ Layers:
     1/0 -> keepout (circle + CPW gaps - metal)
 
 Extras:
-    - Readout selector: top, bottom, both
-    - Flux cutout selector: left, right, both
+    - Readout selector: none, top, bottom, both
+    - Flux cutout selector: none, left, right, both
 """
 
 import pya
@@ -38,6 +38,7 @@ class Transmon(pya.PCellDeclarationHelper):
                               self.transmon_span - 1.0))
         self.flux_cutout_base = max(1.0, float(self.flux_cutout_base))
         self.flux_cutout_angle = max(-30.0, min(float(self.flux_cutout_angle), 30.0))
+        self.flux_cutout_radius = max(0.0, float(self.flux_cutout_radius))
 
         # Normalize readout selector.
         ro = self.readout_islands
@@ -102,9 +103,11 @@ class Transmon(pya.PCellDeclarationHelper):
         self.param("depth_flux_cutout", self.TypeDouble,
                "Flux cutout depth into keepout [um]", default=88.0)
         self.param("flux_cutout_base", self.TypeDouble,
-                   "Flux cutout base width at inner (deep) edge [um]", default=92.0)
+                   "Flux cutout base width at inner (deep) edge [um]", default=94.0)
         self.param("flux_cutout_angle", self.TypeDouble,
                    "Flux cutout wall angle [deg, -30..30] (signed)", default=12.0)
+        self.param("flux_cutout_radius", self.TypeDouble,
+               "Flux cutout C-termination radius [um] (0 = flat)", default=0.0)
 
         # Main couplers
         self.param("coupler_angle", self.TypeDouble,
@@ -194,7 +197,7 @@ class Transmon(pya.PCellDeclarationHelper):
         # Round island and slot corners.
         if self.corner_radius > 0.0:
             cr = int(self.corner_radius / dbu)
-            island_region = raw_islands.round_corners(cr, cr, 32)
+            island_region = raw_islands.round_corners(cr, cr, 64)
         else:
             island_region = raw_islands
 
@@ -235,7 +238,7 @@ class Transmon(pya.PCellDeclarationHelper):
         # Round opening corners before adding extensions.
         if self.keepout_corner_radius > 0.0:
             kr = int(self.keepout_corner_radius / dbu)
-            keepout_core = keepout_core.round_corners(kr, kr, 32)
+            keepout_core = keepout_core.round_corners(kr, kr, 64)
 
         # Add CPW gap strips.
         cpw_gaps = pya.Region()
@@ -252,7 +255,7 @@ class Transmon(pya.PCellDeclarationHelper):
         # Round keepout concave corners.
         if self.keepout_corner_radius > 0.0:
             kr = int(self.keepout_corner_radius / dbu)
-            keepout_base = keepout_base.round_corners(kr, 0, 32)
+            keepout_base = keepout_base.round_corners(kr, 0, 64)
 
         # Subtract metal from keepout.
         ground_neg = (keepout_base - metal).merged()
@@ -307,7 +310,7 @@ class Transmon(pya.PCellDeclarationHelper):
         ipoly = self._rot(pya.DPolygon(box), angle_deg).to_itype(dbu)
         if width > 0:
             rr = int((width / 2.0) / dbu)
-            ipoly = ipoly.round_corners(0, rr, 16)
+            ipoly = ipoly.round_corners(0, rr, 32)
         return pya.Region(ipoly)
 
     def _cpw_center(self, angle_deg, extension, width, dbu):
@@ -339,6 +342,7 @@ class Transmon(pya.PCellDeclarationHelper):
         depth = float(self.depth_flux_cutout)
         base = float(self.flux_cutout_base)
         ang = math.radians(float(self.flux_cutout_angle))
+        r_cap = float(self.flux_cutout_radius)
 
         # Inner width uses flux_cutout_base.
         w_inner = max(1.0, base)
@@ -364,7 +368,24 @@ class Transmon(pya.PCellDeclarationHelper):
                 pya.DPoint(x_in, w_inner_2),
                 pya.DPoint(x_in, -w_inner_2),
             ])
-        return pya.Region(poly.to_itype(dbu))
+        cutout = pya.Region(poly.to_itype(dbu))
+
+        # Optional C-shaped termination at the deep edge.
+        if r_cap > 0.0:
+            inward_sign = 1.0 if side == "left" else -1.0
+            # Set center so the chord at x = x_in has length flux_cutout_base.
+            # Chord formula: L = 2*sqrt(r^2 - d^2) -> d = sqrt(r^2 - (L/2)^2)
+            d_join = math.sqrt(max(0.0, r_cap * r_cap - w_inner_2 * w_inner_2))
+            cx = x_in + inward_sign * d_join
+
+            outer = pya.Region(
+                (pya.DCplxTrans(1.0, 0.0, False, cx, 0.0) * self._circle_poly(r_cap)).to_itype(dbu)
+            )
+
+            ring = outer
+            cutout = (cutout - ring).merged()
+
+        return cutout
 
     def _readout_t_coupler(self, angle_deg, target_island, dbu):
         """Return a rounded T-shaped readout coupler."""
@@ -439,5 +460,6 @@ if __name__ == "__main__":
 
     params = {
         "flux_input_side": "right",
+        "flux_cutout_radius": 40.0
     }
     test_pcell(Transmon, params, pya.Trans(pya.Trans.R0, 0, 0))
