@@ -17,7 +17,7 @@
  <dsl-interpreter-name/>
  <text>import pya
 
-def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_flatten_cell_list = ['fill_08p'], final_layer_styles = None):
+def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_flatten_cell_list = ['fill_08p'], final_layer_styles = None, layer_subtraction = None):
     """
     This script prepares the currently active layout for fabrication by:
     1. Creating a new "static" layout with a flattened hierarchy.
@@ -25,7 +25,9 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
        while preserving a list of specified cells (e.g., fill cells).
     3. Moving and merging specified layers to their final fabrication layers
        based on a configurable dictionary.
-    4. Deleting all shapes on non-fabrication layers.
+    4. Optionally subtracting specified layers from target fabrication layers
+       (boolean NOT), based on a configurable dictionary.
+    5. Deleting all shapes on non-fabrication layers.
     """
     print("--- Starting Fabrication Preparation Script ---")
 
@@ -157,8 +159,35 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
         
         print("Layer mapping complete.")
 
-        # --- 4. Delete all non-fabrication layers ---
-        print("\nStep 4: Deleting all layers except for fabrication layers...")
+        # --- 4. Process Layer Subtraction ---
+        if layer_subtraction:
+            print("\nStep 4: Processing layer subtractions...")
+
+            for target_spec, subtract_specs in layer_subtraction.items():
+                target_layer_idx = fab_layout.layer(*target_spec)
+
+                for subtract_spec in subtract_specs:
+                    print(f"  - Subtracting layer {subtract_spec} from {target_spec} (full hierarchy)")
+                    subtract_layer_idx = fab_layout.layer(*subtract_spec)
+
+                    # Gather shapes recursively (in top-cell coordinates) since the
+                    # target and subtract shapes may live in different cells after
+                    # selective flattening (e.g. a PCell's local shapes vs. a
+                    # top-level ground plane).
+                    target_region = pya.Region(fab_top_cell.begin_shapes_rec(target_layer_idx))
+                    subtract_region = pya.Region(fab_top_cell.begin_shapes_rec(subtract_layer_idx))
+                    result_region = (target_region - subtract_region).merged()
+
+                    # Clear the target layer everywhere in the hierarchy and write
+                    # the flattened result back into the top cell.
+                    for cell in fab_layout.each_cell():
+                        cell.clear(target_layer_idx)
+                    fab_top_cell.shapes(target_layer_idx).insert(result_region)
+
+            print("Layer subtraction complete.")
+
+        # --- 5. Delete all non-fabrication layers ---
+        print("\nStep 5: Deleting all layers except for fabrication layers...")
         
         fab_layer_indices = {fab_layout.layer(*spec) for spec in layer_mapping.keys()}
         all_layer_indices = fab_layout.layer_indexes()
@@ -175,12 +204,12 @@ def prepare_for_fabrication(layer_mapping = {(1, 0): [(130, 1), (1, 0)]}, no_fla
 
         print("Layer cleanup complete.")
     
-         # --- 5. Cleanup Unused Cell Definitions ---
-        print("\nStep 5: Cleaning up unused cell definitions...")
+         # --- 6. Cleanup Unused Cell Definitions ---
+        print("\nStep 6: Cleaning up unused cell definitions...")
         fab_layout.cleanup(True)
         print("Unused cells have been removed.")
 
-        # --- 6. Finalization ---
+        # --- 7. Finalization ---
         # The layout is already created and visible. We just need to
         # set the view to our new top cell and zoom to fit.
         fab_view = fab_cellview.view()
@@ -232,10 +261,18 @@ if __name__ == "__main__":
         (5, 0): [(2, 0), (50, 0)],
         (6, 0): [(146, 1), (6, 10)],
         (7, 0): [(147, 1), (7, 10)],
-        (50,10): [(50,10)],
-        (5,10): [(5,10)],
+        (6,10): [(6,10)],
     }
-    
+
+    # --- Layer Subtraction Configuration (optional) ---
+    # Dictionary where:
+    #   - key:   is a tuple for the TARGET fab layer (layer, datatype) to subtract from.
+    #   - value: is a list of tuples for the layers whose shapes will be removed
+    #            from the target layer (boolean NOT), applied after layer_mapping.
+    layer_subtraction = {
+        (1, 0): [(30, 0)],
+    }
+
     final_layer_styles = [
             ((1, 0), "Fab Layer 1/0", 0x6d75ff, 0x6D75ff,0), # Darkblue
             ((4, 0), "Fab Layer 4/0", 0x6d75ff, 0x6D75ff,0), # Darkblue
@@ -243,11 +280,10 @@ if __name__ == "__main__":
             ((5, 0), "Fab Layer 5/0", 0x990000, 0x990000,0), # Red++++
             ((6, 0), "Fab Layer 6/0", 0xaaffaa, 0xaaffaa,0), # Greenish
             ((7, 0), "Fab Layer 7/0", 0x009900, 0x009900,2), # Green
-            ((5, 10), "QW Fab Layer 5/10", 0x6d7522, 0x6D7522,0), # Dark Yellow
-            ((50, 10), "QW Fab Layer 50/10", 0xff75ff, 0xff75ff,0), # Pink
+            ((6, 10), "Extra Regions", 0x6d7522, 0x6D7522,0), # Dark Yellow
         ]
         
     no_flatten_cell_list = ['fill_05p', 'fill_08p', 'fill_16p', 'QW_single_junction_24_2_nA']
     
-    prepare_for_fabrication(layer_mapping, no_flatten_cell_list, final_layer_styles)</text>
+    prepare_for_fabrication(layer_mapping, no_flatten_cell_list, final_layer_styles, layer_subtraction)</text>
 </klayout-macro>
