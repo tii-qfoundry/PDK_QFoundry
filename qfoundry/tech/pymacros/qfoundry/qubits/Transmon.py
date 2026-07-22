@@ -19,7 +19,7 @@ _CPW_OVERLAP = 5.0
 _READOUT_ANGLE = {"top": 90.0, "bottom": 270.0}
 
 
-class TransmonFloatingCircle(pya.PCellDeclarationHelper):
+class Transmon(pya.PCellDeclarationHelper):
 
     def __init__(self):
         super().__init__()
@@ -462,4 +462,4 @@ if __name__ == "__main__":
         "flux_input_side": "right",
         "flux_cutout_radius": 40.0
     }
-    test_pcell(TransmonFloatingCircle, params, pya.Trans(pya.Trans.R0, 0, 0))
+    test_pcell(Transmon, params, pya.Trans(pya.Trans.R0, 0, 0))
