@@ -7,6 +7,8 @@ Layers:
 Extras:
     - Readout selector: none, top, bottom, both
     - Flux cutout selector: none, left, right, both
+    - Junction leads: axis-aligned or angle-matched stubs marking where a
+      future Manhattan junction (see junctions/Manhattan.py) will be placed
 """
 
 import pya
@@ -39,6 +41,12 @@ class Transmon(pya.PCellDeclarationHelper):
         self.flux_cutout_base = max(1.0, float(self.flux_cutout_base))
         self.flux_cutout_angle = max(-30.0, min(float(self.flux_cutout_angle), 30.0))
         self.flux_cutout_radius = max(0.0, float(self.flux_cutout_radius))
+
+        self.arm_width = max(0.0, float(self.arm_width))
+        self.arm_gap = max(0.0, float(self.arm_gap))
+        self.arm_radius = max(0.0, float(self.arm_radius))
+        self.junction_angle = max(0.0, min(90.0, float(self.junction_angle)))
+        self.squid_spacing = max(0.0, float(self.squid_spacing))
 
         # Normalize readout selector.
         ro = self.readout_islands
@@ -77,37 +85,62 @@ class Transmon(pya.PCellDeclarationHelper):
                    default=pya.LayerInfo(133, 1), hidden=True)
 
         # Islands
-        self.param("island_width", self.TypeDouble, "Island width [um]", default=400.0)
-        self.param("island_height", self.TypeDouble, "Island height [um]", default=180.0)
+        self.param("island_width", self.TypeDouble, "Island width [um]", default=420.0)
+        self.param("island_height", self.TypeDouble, "Island height [um]", default=200.0)
         self.param("island_gap", self.TypeDouble,
                    "Vertical gap between islands [um]", default=40.0)
         self.param("corner_radius", self.TypeDouble,
                    "Island corner rounding radius (outer + inner slot corners) [um]",
-                   default=25.0)
+                   default=20.0)
+
+        # Junction leads
+        self.param("add_junction_leads", self.TypeBoolean,
+                   "Add leads from the islands toward the future junction position",
+                   default=True)
+        self.param("junction_pos_x", self.TypeDouble,
+                   "X position of the junction center [um]", default=0.0)
+        self.param("junction_y_offset", self.TypeDouble,
+                   "Vertical offset of the junction from the island-gap center [um]",
+                   default=0.0)
+        self.param("arm_width", self.TypeDouble,
+                   "Junction lead width [um]", default=8.0)
+        self.param("arm_gap", self.TypeDouble,
+                   "Gap left between a lead tip and the junction position [um]", default=8.0)
+        self.param("arm_radius", self.TypeDouble,
+                   "Lead corner rounding radius [um]", default=3.0)
+        self.param("lead_angled", self.TypeBoolean,
+                   "Align leads to the junction fingers (angled Manhattan junction)",
+                   default=False)
+        self.param("junction_angle", self.TypeDouble,
+                   "Junction finger angle [deg, 0-90], used when lead_angled is set",
+                   default=0.0)
+        self.param("squid_spacing", self.TypeDouble,
+                   "SQUID loop: spacing to a second junction lead set, placed at "
+                   "junction_pos_x - squid_spacing [um]; 0 disables it", default=0.0)
 
         # Keepout
         self.param("transmon_span", self.TypeDouble,
-                   "Radius of keepout circle around transmon [um]", default=300.0)
+                   "Radius of keepout circle around transmon [um]", default=360.0)
         self.param("keepout_corner_radius", self.TypeDouble,
                    "Rounding of keepout inner corners at CPW-circle junctions [um]",
-                   default=13.0)
+                   default=50.0)
         
         # Flux cutout
         p_flux_side = self.param("flux_input_side", self.TypeString,
                      "Flux cutout side: left, right, or both",
-                     default="both")
+                     default="right")
         p_flux_side.add_choice("None", "none")
         p_flux_side.add_choice("Left", "left")
         p_flux_side.add_choice("Right", "right")
         p_flux_side.add_choice("Both", "both")
         self.param("depth_flux_cutout", self.TypeDouble,
-               "Flux cutout depth into keepout [um]", default=88.0)
+               "Flux cutout depth into keepout [um]", default=135.0)
         self.param("flux_cutout_base", self.TypeDouble,
-                   "Flux cutout base width at inner (deep) edge [um]", default=94.0)
+                   "Flux cutout base width at inner (deep) edge [um]", default=80.0)
         self.param("flux_cutout_angle", self.TypeDouble,
-                   "Flux cutout wall angle [deg, -30..30] (signed)", default=12.0)
+                   "Flux cutout wall angle [deg, -30..30] (signed)", default=30.0)
         self.param("flux_cutout_radius", self.TypeDouble,
-               "Flux cutout C-termination radius [um] (0 = flat)", default=0.0)
+               "Flux cutout C-termination radius [um] (0 = flat)", default=80.0)
 
         # Main couplers
         self.param("coupler_angle", self.TypeDouble,
@@ -122,8 +155,8 @@ class Transmon(pya.PCellDeclarationHelper):
         self.param("coupler_gap", self.TypeDouble,
                    "Capacitive gap between finger tip and island edge [um]", default=10.0)
         self.param("coupler_extensions", self.TypeList,
-                   "Waveguide extension beyond circle [um] (1 value or 4 per coupler)",
-                   default=[50.0])
+                   "Waveguide extension beyond circle [um] - 1 value or 4 (1 per coupler)",
+                   default=[30.0])
 
         # Readout couplers
         p_readout = self.param("readout_islands", self.TypeString,
@@ -140,11 +173,11 @@ class Transmon(pya.PCellDeclarationHelper):
         self.param("readout_gap", self.TypeDouble,
                    "Capacitive gap from T-bar inner edge to island face [um]", default=30.0)
         self.param("readout_width", self.TypeDouble,
-                   "T-bar thickness along radial direction [um]", default=30.0)
+                   "T-bar thickness along radial direction [um]", default=20.0)
         self.param("readout_span", self.TypeDouble,
-                   "T-bar total transverse length [um]", default=180.0)
+                   "T-bar total transverse length [um]", default=120.0)
         self.param("readout_extension", self.TypeDouble,
-                   "Readout waveguide extension beyond circle [um]", default=100.0)
+                   "Readout waveguide extension beyond circle [um]", default=30.0)
 
         # Auxiliary
         self.param("margin", self.TypeDouble,
@@ -188,9 +221,11 @@ class Transmon(pya.PCellDeclarationHelper):
             fingers += f
             finger_list.append(f)
 
-        # Raw islands with coupler slots.
+        # Raw islands, plus junction leads (individually rounded before merging).
         raw_islands = (self._raw_island("top", dbu) +
                        self._raw_island("bottom", dbu)).merged()
+        if self.add_junction_leads:
+            raw_islands = (raw_islands + self._junction_leads(dbu)).merged()
         for f in finger_list:
             raw_islands -= f.sized(coupler_gap_dbu)
 
@@ -301,6 +336,127 @@ class Transmon(pya.PCellDeclarationHelper):
         else:
             box = pya.DBox(-w / 2, -g - h, w / 2, -g)
         return pya.Region(pya.DPolygon(box).to_itype(dbu))
+
+    def _junction_leads(self, dbu):
+        """Return leads for the junction position, plus a second set offset by
+        squid_spacing (to the left) when set, forming a SQUID loop."""
+        jx = float(self.junction_pos_x)
+        leads = self._junction_lead_pair(jx, dbu)
+        squid_spacing = float(self.squid_spacing)
+        if squid_spacing > 0.0:
+            leads += self._junction_lead_pair(jx - squid_spacing, dbu)
+        return leads
+
+    def _junction_lead_pair(self, jx, dbu):
+        """Return the (individually rounded) leads reaching from the top/bottom
+        islands toward junction position jx, stopping arm_gap short of it."""
+        aw = float(self.arm_width)
+        ag = float(self.arm_gap)
+        ar = float(self.arm_radius)
+        jy = float(self.junction_y_offset)
+        g = self.island_gap / 2.0
+        overlap = ar
+        rr = int(ar / dbu)
+
+        leads = pya.Region()
+        angled = bool(self.lead_angled) and 30.0 <= float(self.junction_angle) <= 150.0
+
+        if angled:
+            theta = float(self.junction_angle)
+            half = aw / 2.0
+            extra = half - ag
+            s0_bot = ag + extra * (theta / 90.0)
+            s0_top = ag + extra * (1.0 - theta / 90.0)
+            min_len = g
+
+            x_half = self.island_width / 2.0
+
+            # A tilted far edge trails the centerline by (arm_width/2)*|cos(dir)|;
+            # pad the penetration by that plus arm_radius so it still clears.
+            dir_bot = theta
+            pen_bot = ar + half * abs(math.cos(math.radians(dir_bot)))
+            s_far_bot = self._lead_far_s(jx, jy, dir_bot, -(g + pen_bot), x_half,
+                                          s0_bot + min_len, x_overlap=ar)
+            leads += self._angled_lead(jx, jy, dir_bot, s0_bot, s_far_bot, aw, rr, dbu)
+            leads += self._island_bridge(jx, jy, dir_bot, s_far_bot, -(g + pen_bot),
+                                          x_half, aw, rr, dbu)
+
+            dir_top = theta - 90.0
+            pen_top = ar + half * abs(math.cos(math.radians(dir_top)))
+            s_far_top = self._lead_far_s(jx, jy, dir_top, g + pen_top, x_half,
+                                          s0_top + min_len, x_overlap=ar)
+            leads += self._angled_lead(jx, jy, dir_top, s0_top, s_far_top, aw, rr, dbu)
+            leads += self._island_bridge(jx, jy, dir_top, s_far_top, g + pen_top,
+                                          x_half, aw, rr, dbu)
+        else:
+            # Leads stay axis-aligned; only their near-edge anchor moves with
+            # junction_angle. (arm_gap - arm_width/2)*(sin+cos) never changes
+            # sign on [0, 90], so top_tip_y and bot_tip_y can never cross.
+            theta_rad = math.radians(float(self.junction_angle))
+            cos_t, sin_t = math.cos(theta_rad), math.sin(theta_rad)
+            half = aw / 2.0
+
+            bot_cx = jx - ag * sin_t
+            bot_tip_y = jy - ag * cos_t + half * sin_t
+
+            top_cx = jx - ag * cos_t
+            top_tip_y = jy + ag * sin_t - half * cos_t
+
+            bot = pya.DBox(bot_cx - half, -g - overlap, bot_cx + half, bot_tip_y)
+            leads += self._rounded_box_region(bot, rr, dbu)
+
+            top = pya.DBox(top_cx - half, top_tip_y, top_cx + half, g + overlap)
+            leads += self._rounded_box_region(top, rr, dbu)
+
+        return leads
+
+    def _lead_far_s(self, jx, jy, dir_deg, target_y, x_half, min_len, x_overlap=0.0):
+        """Distance (along -dir_deg from the junction position) needed to reach
+        target_y, additionally clamped into the island's x-span only when that
+        span is actually reachable at positive s (never lets s_far go negative)."""
+        rad = math.radians(dir_deg)
+        sin_d, cos_d = math.sin(rad), math.cos(rad)
+        s_y = (jy - target_y) / sin_d if abs(sin_d) > 1e-9 else 0.0
+        s_far = max(s_y, min_len)
+        if abs(cos_d) > 1e-9:
+            inner = max(0.0, x_half - x_overlap)
+            s_a, s_b = (jx - inner) / cos_d, (jx + inner) / cos_d
+            s_enter, s_exit = min(s_a, s_b), max(s_a, s_b)
+            if s_exit > 0.0:
+                s_far = min(max(s_far, s_enter), s_exit)
+        return max(s_far, 0.0)
+
+    def _island_bridge(self, cx, cy, dir_deg, s_far, target_y, x_half, width, rr, dbu):
+        """Bridge an angled lead's far end into the island whenever it lands
+        short in y and/or outside the island's x-span at that y."""
+        rad = math.radians(dir_deg)
+        far_x = cx - s_far * math.cos(rad)
+        far_y = cy - s_far * math.sin(rad)
+        inner = max(0.0, x_half - width / 2.0)
+        inside_x = min(max(far_x, -inner), inner)
+        # Skip drawing anything shorter than the rounding radius: it would
+        # be a degenerate sliver once rounded, not a meaningful correction.
+        eps = max(rr * dbu, 1e-3)
+        if abs(far_y - target_y) < eps and abs(inside_x - far_x) < eps:
+            return pya.Region()
+        box = pya.DBox(min(far_x, inside_x) - width / 2.0, min(far_y, target_y),
+                        max(far_x, inside_x) + width / 2.0, max(far_y, target_y))
+        return self._rounded_box_region(box, rr, dbu)
+
+    def _angled_lead(self, cx, cy, dir_deg, s0, s_far, width, rr, dbu):
+        """Rectangle spanning [s0, s_far] measured backward (i.e. along
+        dir_deg + 180) from the junction position (cx, cy)."""
+        box = pya.DBox(s0, -width / 2.0, s_far, width / 2.0)
+        poly = pya.DCplxTrans(1.0, dir_deg + 180.0, False, cx, cy) * pya.DPolygon(box)
+        return self._rounded_box_region(poly, rr, dbu)
+
+    def _rounded_box_region(self, dshape, rr, dbu):
+        """Return dshape (a DBox or DPolygon) as a Region, corners rounded by rr."""
+        dpoly = dshape if isinstance(dshape, pya.DPolygon) else pya.DPolygon(dshape)
+        ipoly = dpoly.to_itype(dbu)
+        if rr > 0:
+            ipoly = ipoly.round_corners(rr, rr, 32)
+        return pya.Region(ipoly)
 
     def _radial_finger(self, angle_deg, width, dbu):
         """Return one rounded-tip radial finger on metal layer."""
@@ -459,7 +615,9 @@ if __name__ == "__main__":
     reload_library()
 
     params = {
-        "flux_input_side": "right",
-        "flux_cutout_radius": 40.0
+        "lead_angled": True,
+        "junction_angle": 45.0,
+        "junction_pos_x": 225.0,
+        "squid_spacing":40,
     }
     test_pcell(Transmon, params, pya.Trans(pya.Trans.R0, 0, 0))
