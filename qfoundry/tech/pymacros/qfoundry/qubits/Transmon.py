@@ -396,10 +396,10 @@ class Transmon(pya.PCellDeclarationHelper):
             cos_t, sin_t = math.cos(theta_rad), math.sin(theta_rad)
             half = aw / 2.0
 
-            bot_cx = jx - ag * sin_t
+            bot_cx = jx - ag * sin_t - half * sin_t
             bot_tip_y = jy - ag * cos_t + half * sin_t
 
-            top_cx = jx - ag * cos_t
+            top_cx = jx - ag * cos_t - half * cos_t
             top_tip_y = jy + ag * sin_t - half * cos_t
 
             bot = pya.DBox(bot_cx - half, -g - overlap, bot_cx + half, bot_tip_y)
