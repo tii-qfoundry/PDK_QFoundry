@@ -300,14 +300,12 @@ class Transmon(pya.PCellDeclarationHelper):
         self.cell.shapes(self.metal_n_layer).insert(ground_neg)
 
         for i, angle in enumerate(coupler_angles):
-            self.cell.shapes(self.port_layer).insert(
-                self._port(angle, self.transmon_span + ext_list[i],
-                           self.coupler_wg_width + 2.0 * self.coupler_wg_gap))
+            self._port_instance(angle, self.transmon_span + ext_list[i],
+                                self.coupler_wg_width, self.coupler_wg_gap)
         for i in range(n_ro):
-            self.cell.shapes(self.port_layer).insert(
-                self._port(ro_angles[i],
-                           self.transmon_span + float(self.readout_extension),
-                           self.readout_wg_width + 2.0 * self.readout_wg_gap))
+            self._port_instance(ro_angles[i],
+                                self.transmon_span + float(self.readout_extension),
+                                self.readout_wg_width, self.readout_wg_gap)
 
         full = (metal + ground_neg).merged()
         self.cell.shapes(self.devrec_layer).insert(full)
@@ -598,13 +596,22 @@ class Transmon(pya.PCellDeclarationHelper):
                     hits.append(t)
         return max(hits) if hits else None
 
-    def _port(self, angle_deg, port_r, total_width):
-        """1 µm DPath port marker at the waveguide end."""
+    def _port_instance(self, angle_deg, port_r, wg_width, wg_gap):
+        """Place a Port PCell instance at (port_r, angle_deg), oriented so its
+        propagation axis points radially outward from the transmon center."""
+        dbu = self.layout.dbu
+        port_cell = self.layout.create_cell(pcell_name="Port", params={
+            "port_layer": self.port_layer,
+            "wg_width": wg_width,
+            "wg_gap": wg_gap,
+        })
+        if port_cell is None:
+            raise RuntimeError("Port PCell not found - cannot place port")
         angle_rad = math.radians(angle_deg)
-        ca, sa = math.cos(angle_rad), math.sin(angle_rad)
-        p0 = pya.DPoint((port_r - 0.5) * ca, (port_r - 0.5) * sa)
-        p1 = pya.DPoint((port_r + 0.5) * ca, (port_r + 0.5) * sa)
-        return pya.DPath([p0, p1], total_width)
+        x = port_r * math.cos(angle_rad)
+        y = port_r * math.sin(angle_rad)
+        trans = pya.DCplxTrans(1.0, angle_deg, False, x, y).to_itrans(dbu)
+        self.cell.insert(pya.CellInstArray(port_cell.cell_index(), trans))
 
 
 # Local test block.
