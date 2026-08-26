@@ -74,15 +74,13 @@ class Transmon(pya.PCellDeclarationHelper):
     def set_parameters(self):
         # Layers
         self.param("metal_layer", self.TypeLayer, "Metal layer (positive)",
-                   default=pya.LayerInfo(30, 0))
+                   default=pya.LayerInfo(1, 1))
         self.param("metal_n_layer", self.TypeLayer, "Ground plane negative layer",
                    default=pya.LayerInfo(1, 0))
-        self.param("port_layer", self.TypeLayer, "Port layer",
-                   default=pya.LayerInfo(997, 0), hidden=True)
         self.param("devrec_layer", self.TypeLayer, "Device recognition layer",
-                   default=pya.LayerInfo(68, 0), hidden=True)
+                   default=pya.LayerInfo(100, 2), hidden=True)
         self.param("ground_exclude_layer", self.TypeLayer, "Ground exclusion layer",
-                   default=pya.LayerInfo(133, 1), hidden=True)
+                   default=pya.LayerInfo(1, 5), hidden=True)
 
         # Islands
         self.param("island_width", self.TypeDouble, "Island width [um]", default=420.0)
@@ -236,7 +234,7 @@ class Transmon(pya.PCellDeclarationHelper):
         else:
             island_region = raw_islands
 
-        # Readout metal and CPW centers.
+        # Readout metal and CPW cores.
 
         readout_inner = pya.Region()
         for i in range(n_ro):
@@ -245,11 +243,13 @@ class Transmon(pya.PCellDeclarationHelper):
         cpw_centers = pya.Region()
         for i, angle in enumerate(coupler_angles):
             cpw_centers += self._cpw_center(angle, ext_list[i],
-                                            self.coupler_wg_width, dbu)
+                                            self.coupler_wg_width, 
+                                            x0 = self._cpw_inward_start(), dbu = dbu)
         for i in range(n_ro):
             cpw_centers += self._cpw_center(ro_angles[i],
                                             float(self.readout_extension),
-                                            self.readout_wg_width, dbu)
+                                            self.readout_wg_width, 
+                                            x0 = self.island_height + self.island_gap/2.0 + self.readout_gap, dbu = dbu)
 
         # Final metal region.
         metal = (island_region + fingers + readout_inner + cpw_centers).merged()
@@ -300,10 +300,10 @@ class Transmon(pya.PCellDeclarationHelper):
         self.cell.shapes(self.metal_n_layer).insert(ground_neg)
 
         for i, angle in enumerate(coupler_angles):
-            self._port_instance(angle, self.transmon_span + ext_list[i],
+            self._port_instance(f"C{i + 1}", angle, self.transmon_span + ext_list[i],
                                 self.coupler_wg_width, self.coupler_wg_gap)
         for i in range(n_ro):
-            self._port_instance(ro_angles[i],
+            self._port_instance(f"RO_{ro_isl[i]}", ro_angles[i],
                                 self.transmon_span + float(self.readout_extension),
                                 self.readout_wg_width, self.readout_wg_gap)
 
@@ -467,9 +467,9 @@ class Transmon(pya.PCellDeclarationHelper):
             ipoly = ipoly.round_corners(0, rr, 32)
         return pya.Region(ipoly)
 
-    def _cpw_center(self, angle_deg, extension, width, dbu):
+    def _cpw_center(self, angle_deg, extension, width, x0, dbu):
         """Return CPW center strip on metal layer."""
-        x0 = self._cpw_inward_start()
+        #x0 = self._cpw_inward_start()
         x1 = self.transmon_span + extension
         box = pya.DBox(x0, -width / 2.0, x1, width / 2.0)
         return pya.Region(self._rot(pya.DPolygon(box), angle_deg).to_itype(dbu))
@@ -567,7 +567,8 @@ class Transmon(pya.PCellDeclarationHelper):
         tbar_x_inner = entry_r + rg
         tbar_x_outer = min(tbar_x_inner + rw, self.transmon_span - 1.0)
         tbar_x_inner = tbar_x_outer - rw
-
+        tbar_x_center = tbar_x_outer + rw / 2.0
+        
         # Stem overlaps T-bar to avoid seams.
         tbar_box = pya.DBox(tbar_x_inner, -rs / 2.0, tbar_x_outer, rs / 2.0)
         stem_box = pya.DBox(tbar_x_inner, -rww / 2.0, self.transmon_span, rww / 2.0)
@@ -596,14 +597,15 @@ class Transmon(pya.PCellDeclarationHelper):
                     hits.append(t)
         return max(hits) if hits else None
 
-    def _port_instance(self, angle_deg, port_r, wg_width, wg_gap):
+    def _port_instance(self, name, angle_deg, port_r, wg_width, wg_gap):
         """Place a Port PCell instance at (port_r, angle_deg), oriented so its
         propagation axis points radially outward from the transmon center."""
         dbu = self.layout.dbu
         port_cell = self.layout.create_cell(pcell_name="Port", params={
-            "port_layer": self.port_layer,
+            "pin_name": name,
             "wg_width": wg_width,
             "wg_gap": wg_gap,
+            "layer": self.metal_layer,
         })
         if port_cell is None:
             raise RuntimeError("Port PCell not found - cannot place port")
@@ -627,4 +629,4 @@ if __name__ == "__main__":
         "junction_pos_x": 225.0,
         "squid_spacing":40,
     }
-    test_pcell(Transmon, params, pya.Trans(pya.Trans.R0, 0, 0))
+    #test_pcell(Transmon, params, pya.Trans(pya.Trans.R0, 0, 0))

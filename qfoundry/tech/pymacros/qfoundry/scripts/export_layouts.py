@@ -26,9 +26,9 @@ def export_layouts(layout, output_dir):
         cell_name = cell.name
         file_path = os.path.join(output_dir, f"{cell_name}.gds")
         
-        # Remove anything in layers 133/1
-        # Remove all shapes from layer 133/1
-        layer_info = pya.LayerInfo(133, 1)
+        # Remove anything in layers 1/5
+        # Remove all shapes from layer 1/5
+        layer_info = pya.LayerInfo(1, 5)
         if layout.layer(layer_info) is not None:
             layer_index = layout.layer(layer_info)
             cell.shapes(layer_index).clear()
