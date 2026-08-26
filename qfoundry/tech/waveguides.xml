@@ -63,6 +63,14 @@
       <taper length="50.0"/>
       <routing style="manhattan"/>
     </cpw>
+    <cpw name="couplers" layer="1/1" gap_layer="1/0" clearance_layer="1/5">
+      <trace_width value="15.0"/>
+      <gap_width value="30.0"/>
+      <ground_clearance value="20.0"/>
+      <bend_radius min="100.0" default="75.0" style="euler"/>
+      <taper length="100.0"/>
+      <routing style="manhattan"/>
+    </cpw>
     <launcher_pitch>
       <pitch value="1000.0"/>
       <pitch value="2540.0"/>
