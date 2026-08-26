@@ -157,8 +157,9 @@
  </writer-options>
  <connectivity>
   <stack>
-   <name/>
-   <description/>
+   <name>L1</name>
+   <description>Quantum Circuit Layer</description>
+   <symbols>L1='1/0+1/1+1/4+2/0+2/4+3/0+3/4+4/0+4/4+6/0+6/4+7/0+7/4'</symbols>
   </stack>
  </connectivity>
 </technology>

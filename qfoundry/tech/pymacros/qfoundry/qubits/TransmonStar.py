@@ -18,6 +18,8 @@ Date: 2026
 import pya
 import math
 
+from kcq.geometry import pins
+
 
 class TransmonStar(pya.PCellDeclarationHelper):
     """Parametric cell for a star-shaped transmon qubit.
@@ -114,18 +116,16 @@ class TransmonStar(pya.PCellDeclarationHelper):
         """Define all parameters for the PCell."""
         
         # Layer parameters
-        self.param("metal_layer", self.TypeLayer, "Metal layer for qubit", 
-                   default=pya.LayerInfo(30, 0))
-        self.param("junction_layer", self.TypeLayer, "Junction layer", 
+        self.param("metal_layer", self.TypeLayer, "Metal layer for qubit",
+                   default=pya.LayerInfo(1, 1))
+        self.param("junction_layer", self.TypeLayer, "Junction layer",
                    default=pya.LayerInfo(2, 0))
-        self.param("metal_n_layer", self.TypeLayer, "Metalization negative layer", 
+        self.param("metal_n_layer", self.TypeLayer, "Metalization negative layer",
                    default=pya.LayerInfo(1, 0))
-        self.param("port_layer", self.TypeLayer, "Port layer for waveguide connections", 
-                   default=pya.LayerInfo(997, 0), hidden=True)
-        self.param("devrec_layer", self.TypeLayer, "Device recognition layer", 
-                   default=pya.LayerInfo(68, 0), hidden=True)
-        self.param("ground_exclude_layer", self.TypeLayer, "Ground exclusion layer", 
-                   default=pya.LayerInfo(133, 1), hidden=True)
+        self.param("devrec_layer", self.TypeLayer, "Device recognition layer",
+                   default=pya.LayerInfo(100, 2), hidden=True)
+        self.param("ground_exclude_layer", self.TypeLayer, "Ground exclusion layer",
+                   default=pya.LayerInfo(1, 5), hidden=True)
         
         # Geometric parameters for the central island
         self.param("outer_radius", self.TypeDouble, "Outer radius of qubit island [um]", 
@@ -203,11 +203,14 @@ class TransmonStar(pya.PCellDeclarationHelper):
             self.cell.shapes(self.metal_layer).insert(region)
         
         # Add ports at end of each connector
+        waveguide_width = self.connector_width + 2.0 * self.connector_gap
         for i in range(self.n_couplers):
-            ports = self._make_ports(angle_deg = self.coupler_angles[i], 
-                                     connector_length = self.connector_extension[i] if i < len(self.connector_extension) else self.connector_extension[-1])
-            for port in ports:
-                self.cell.shapes(self.port_layer).insert(port)
+            connector_length = (self.connector_extension[i] if i < len(self.connector_extension)
+                                 else self.connector_extension[-1])
+            position, pin_angle_deg = self._port_position_and_angle(
+                angle_deg=self.coupler_angles[i], connector_length=connector_length)
+            pins.add_pin(self.cell, self.layout, f"P{i + 1}", position, pin_angle_deg, waveguide_width,
+                         self.metal_layer.layer)
         
         # Add device recognition layer (outer boundary excluding ports)
         devrec = self._make_device_recognition(ground_cutout, inner_region)
@@ -525,35 +528,19 @@ class TransmonStar(pya.PCellDeclarationHelper):
         trans = pya.DCplxTrans(1.0, angle_deg, False, 0, 0)
         return trans * rect_poly
     
-    def _make_ports(self, angle_deg, connector_length=0):
-        """Create port markers at the end of a connector waveguide.
-        
-        Creates two path objects:
-        1. Inner path with width = connector_width (signal)
-        2. Outer path with width = connector_width + 2*connector_gap (signal + gap)
-        
-        Args:
-            angle_deg: Rotation angle for the port (degrees)
-        
+    def _port_position_and_angle(self, angle_deg, connector_length=0):
+        """Position and outward angle for the kcq pin at the end of a
+        connector waveguide: local (0, port_y) facing +y, rotated by
+        angle_deg to the connector's own direction.
+
         Returns:
-            list[pya.DPath]: Two port path markers of length 1 um
+            (pya.DPoint, float): pin position, pin outward angle [deg]
         """
-        # Port position at end of connector extension
         port_y = self.outer_radius + self.ground_clearance + connector_length
-        
-        # Create two paths of length 1 um
-        port_start = pya.DPoint(0, port_y-0.5)
-        port_end = pya.DPoint(0, port_y + 0.5)
-        
-        # Port (waveguide width)
-        waveguide_width = self.connector_width + 2 * self.connector_gap
-        port = pya.DPath([port_start, port_end], waveguide_width )
-        
-        # Rotate both ports to the connector angle
         trans = pya.DCplxTrans(1.0, angle_deg, False, 0, 0)
-        port_rotated = trans * port
-        
-        return [port_rotated]
+        position = trans * pya.DPoint(0.0, port_y)
+        pin_angle_deg = (90.0 + angle_deg) % 360.0
+        return position, pin_angle_deg
     
     def _make_device_recognition(self, ground_cutout, inner_region):
         """Create device recognition layer showing device boundary.

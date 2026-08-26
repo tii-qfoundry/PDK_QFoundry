@@ -21,7 +21,7 @@ def array_junctions():
   
     #Define the layers that willl be used in the layout
     met_layer = top_cell.layout().layer(pya.LayerInfo(1, 0))
-    fp_layer = top_cell.layout().layer(pya.LayerInfo(68, 0))
+    fp_layer = top_cell.layout().layer(pya.LayerInfo(100, 2))
     
     #Draw a floor plan
     top_cell.shapes(fp_layer).insert(Box(-2700/dbu,-2700/dbu, 2700/dbu, 2700/dbu))
