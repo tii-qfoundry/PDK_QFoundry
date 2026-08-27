@@ -159,7 +159,23 @@
   <stack>
    <name>L1</name>
    <description>Quantum Circuit Layer</description>
+  </stack>
+  <stack>
+   <name>L1.5</name>
+   <description>Airbridge Span Layer</description>
+   <connection>L1,AirbridgeLanding,L1.5</connection>
+   <connection>L1.5,,L1.5</connection>
+   <symbols>AirbridgeLanding='8/0+8/4'</symbols>
+   <symbols>L1.5='9/0+9/4'</symbols>
+  </stack>
+  <stack>
+   <name>L2</name>
+   <description>Routing Layer Flip Chip</description>
+   <connection>L1,,L1</connection>
+   <connection>L1,via12,L2</connection>
+   <connection>L2,,L2</connection>
    <symbols>L1='1/0+1/1+1/4+2/0+2/4+3/0+3/4+4/0+4/4+6/0+6/4+7/0+7/4'</symbols>
+   <symbols>L2='10/0'</symbols>
   </stack>
  </connectivity>
 </technology>
