@@ -1,5 +1,3 @@
-# $autorun
-
 import os
 import pya
 import qfoundry as pdk
