@@ -1,10 +1,22 @@
 import os
+import warnings
+
 import pya
 import qfoundry as pdk
 from kqcircuits.util.library_helper import load_libraries
-from kcq.pcells.Pin import Pin
-from kcq.pcells.Waveguide import Waveguide
-from kcq.utils import pcell_loader
+
+# kcq is a soft dependency: Waveguide, Pin, and fixed-cell registration
+# below need it, but every other PCell (chips/elements/junctions/qubits)
+# does not, so a missing kcq install degrades functionality instead of
+# blocking the whole PDK from loading.
+try:
+    from kcq.pcells.Pin import Pin
+    from kcq.pcells.Waveguide import Waveguide
+    from kcq.utils import pcell_loader
+    _KCQ_AVAILABLE = True
+except ImportError:
+    Pin = Waveguide = pcell_loader = None
+    _KCQ_AVAILABLE = False
 
 def reload_library():
   return __PDK_Lib__()
@@ -16,6 +28,15 @@ class __PDK_Lib__(pya.Library):
     self.description = "QFoundry Library"
     self.technology = "qfoundry"
     tech = pya.Technology.technology_by_name(technology)
+
+    if not _KCQ_AVAILABLE:
+      warnings.warn(
+        "kcq package not found -- qfoundry without kcq is deprecated and only partially "
+        "functional. Waveguide, Pin, and fixed-cell registration are skipped, and any PCell "
+        "that places ports via kcq (e.g. Port, Transmon, TransmonStar) will fail to load too. "
+        "Install kcq for full functionality.",
+        DeprecationWarning,
+      )
 
     library_folders = [
       "chips",
@@ -36,9 +57,12 @@ class __PDK_Lib__(pya.Library):
           print("Importing file: " + file_name)
           #exec(open(os.path.join(root, file)).read())
           cell_name = file_name[:-3]
-          cell_module= import_module_from_path(cell_name, os.path.join(root, file_name))
-          
-          
+          try:
+            cell_module = import_module_from_path(cell_name, os.path.join(root, file_name))
+          except Exception as e:
+            print(f"Skipping {file_name}: {e}")
+            continue
+
           try:
             obj = getattr(cell_module, cell_name)
             if issubclass(obj,pya.PCellDeclarationHelper) or issubclass(obj, pya._PCellDeclarationHelperMixin): #Check if the type of the cell is a Klayout PCellDeclaration
@@ -48,19 +72,20 @@ class __PDK_Lib__(pya.Library):
           except Exception as e:
             print(f"Error importing {cell_name} from {file_name}: {e}")
 
-    # kcq's own core PCells, not under library_folders since they ship
-    # with the kcq package itself. Pass tech_name="qfoundry" when
-    # placing one, to size it from this PDK's waveguides.xml.
-    self.layout().register_pcell("Waveguide", Waveguide())
-    self.layout().register_pcell("Pin", Pin())
+    if _KCQ_AVAILABLE:
+      # kcq's own core PCells, not under library_folders since they ship
+      # with the kcq package itself. Pass tech_name="qfoundry" when
+      # placing one, to size it from this PDK's waveguides.xml.
+      self.layout().register_pcell("Waveguide", Waveguide())
+      self.layout().register_pcell("Pin", Pin())
 
-    # Static fixed cells (qfoundry/tech/fixed_cells/*.oas + .json pin
-    # sidecars), registered into their own library
-    # (pcell_loader.fixed_cell_library_name("qfoundry") ==
-    # "qfoundry_fixed_cells") the same way kcq's own register_library
-    # keeps fixed cells separate from PCells. Reuses kcq's generic
-    # loader rather than a second, hand-rolled import routine.
-    pcell_loader.register_fixed_cell_library("qfoundry")
+      # Static fixed cells (qfoundry/tech/fixed_cells/*.oas + .json pin
+      # sidecars), registered into their own library
+      # (pcell_loader.fixed_cell_library_name("qfoundry") ==
+      # "qfoundry_fixed_cells") the same way kcq's own register_library
+      # keeps fixed cells separate from PCells. Reuses kcq's generic
+      # loader rather than a second, hand-rolled import routine.
+      pcell_loader.register_fixed_cell_library("qfoundry")
 
     # TODO: The different cells need to be registered in accordance to their respective library fodlers to match KQCircuits Specification
     load_libraries(flush = True)
