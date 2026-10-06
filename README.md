@@ -11,6 +11,16 @@ TII QFoundry standard PDK for superconducting qubit fabrication. The KLayout PDK
 3. **Import technology** in KLayout: Tools → Manage Technologies → Import → Select `qfoundry.lyt`
 4. **Start designing** with parametric quantum components
 
+## Contents
+
+- [Quick Start](#quick-start)
+- [Design Guide](#design-guide): process, parameters, [qubit model](#qubit-design), [junction resistance](#junction-resistance), [airbridges](#airbridges)
+- [Layout Specification](#layout-specification): layers, [components](#standard-components), [waveguides](#waveguide-standards), [PCB launchers](#standard-pcb-design)
+- [KLayout PDK Installation](#klayout-pdk-installation)
+- [Design a basic layout](#design-a-basic-layout)
+- [Checking your design](#checking-your-design) and [Exporting](#exporting-your-design)
+- [Creating your own components](#creating-your-own-components)
+
 ## Design Guide
 
 The QFoundry microfabrication process is a single-layer superconducting aluminum manufacturing process with medium and high-resolution lithography steps. The high-resolution lithography is used **exclusively** for Josephson junction micro-fabrication, while standard resolution is suitable for resonators, transmission lines, and capacitive elements.
@@ -24,6 +34,8 @@ The superconducting layer consists of low kinetic inductance Aluminum (Al) depos
 ### Process Parameters
 
 Current fabrication process parameters derived from device characterization and modeling:
+
+These feed the [qubit frequency model](#transmons) $f_{01}(R_N, T)$.
 
 Parameter | Value | Comment
 --- | --- | --- | 
@@ -39,29 +51,58 @@ $\varepsilon_{r,Si}$ | $11.6883$ | Cold relative permittivity of Silicon, based 
 Standard coplanar waveguides used by the foundry are 15 $\mu m$ wide with 7.5 $\mu m$ spacing to the ground plane. This creates a waveguide with characteristic impedance of $Z_0 = 49.24 \Omega$ and effective permittivity of $\epsilon_{eff}=6.345$.
 
 ### Qubit design
-In general, the josephson junction energy can be estimated using the Ambegaokar–Baratoff relation given by
+
+#### Josephson junction model
+The junction critical current follows the Ambegaokar–Baratoff (AB) relation. The QFoundry model extends it with two fitted corrections: a series/leakage resistance offset $R^\ast$ and a dimensionless gap-scaling factor $k_\Delta$ that absorbs the deviation of the measured $I_c R_N$ product from the ideal BCS value.
+
+For reference, the ideal AB relation is
 
 $$
-\frac{E_J}{\hbar} = \frac{Ic}{2e}= \frac{1}{4e^2} \frac{\pi \Delta_{SC}(T)}{R_n+R^{\ast}} tanh{\frac{\Delta_{SC}(T)}{2k_BT}}
+I_c R = \frac{\pi \Delta(T)}{2 e_0}\tanh\left(\frac{\Delta(T)}{2 k_B T}\right), \qquad \frac{E_J}{\hbar} = \frac{I_c}{2e_0}
 $$
 
-Where $R^{\ast}= \rho^{\ast}/A_{JJ}+R_0^{\ast}$ is the fabrication resistance correction factor, related to leakage currents not contributing to the superconductive critical current. Using $E_C = \frac12 \frac{e^2}{C_{\sum}+C_{J}}$, where the fabricated $C_{J}$ is the junction capacitance approximated from $C_{J} = \gamma \cdot A_{JJ}$, with $\gamma$ the capacitance per unit area of the junction (ideally $\gamma = \frac{\varepsilon_0\varepsilon_{r,ox}}{d}$, where d is the oxide thickness and $\varepsilon_{r,ox}$ is the relative permittivity of the oxide layer). 
+The QFoundry model parametrizes the measured room-temperature junction resistance $R_N$ as follows:
 
+- $R^\ast = \rho^\ast / A_{JJ} + R_0^\ast$ is the fabrication resistance correction, accounting for leakage currents that do not contribute to the superconducting critical current ($A_{JJ}$ is the junction area).
+- $\Delta(T)$ is the superconducting gap at temperature $T$, and $\Delta_{\text{eff}}$ the effective gap fitted to the measured devices.
+- $k_\Delta = \dfrac{2 e_0 \, I_c (R_N + R^\ast)}{\pi \Delta_{\text{eff}}}$ is the ratio between the measured $I_c (R_N+R^\ast)$ product and the ideal zero-temperature AB value ($k_\Delta = 1$ recovers the ideal AB relation).
+- $E_C = \dfrac{e_0^2}{2\left(C_\Sigma + C_J\right)}$ is the charging energy, where $C_\Sigma$ is the shunt capacitance and $C_J = \gamma \cdot A_{JJ}$ is the junction capacitance. $\gamma$ is the capacitance per unit area of the junction (ideally $\gamma = \varepsilon_0\varepsilon_{r,ox}/d$, with $d$ the oxide thickness and $\varepsilon_{r,ox}$ the relative permittivity of the oxide).
 
 #### Transmons
-The excitation frequency of transmon qubits can be approximated by
+Combining the AB relation with the transmon approximation $E_{01} \approx \sqrt{8 E_J E_C} - E_C$, the qubit frequency as a function of the room-temperature junction resistance and the operating temperature is
 
 $$
-  \frac{E_{q,01}}{h}= \sqrt{8E_J E_C}-E_C
+f_{01}(R_N, T) = \sqrt{\frac{A(T)\, E_C}{R_N + R^\ast}} - E_C
 $$
 
-The qubit frequency, for a transmon with shunt capacitance of $74 fF$ (typical transmon used by the qfoundry) can be roughly estimated from
+with
 
 $$
-  \omega_{01}/2\pi = 7.2012 - 0.1473 \times R_n [GHz]
+\begin{cases}
+A(T) = k_\Delta \cdot \dfrac{\Delta(T)}{e_0^2} \tanh\left(\dfrac{\Delta(T)}{2 k_B T}\right) \\[10pt]
+k_\Delta = \dfrac{2 e_0 \, I_c (R_N + R^\ast)}{\pi \Delta_{\text{eff}}}
+\end{cases}
 $$
 
-With $R_n$ the measured junction resistance in $k\Omega$. 
+##### $I_c R$ product
+Inverting the definition of $k_\Delta$ gives the critical current–resistance product, which is the figure usually reported for a junction:
+
+$$
+I_c \left(R_N + R^\ast\right) = k_\Delta \cdot \frac{\pi \Delta_{\text{eff}}}{2 e_0}
+$$
+
+With $\Delta_{\text{eff}}$ in joules and $e_0$ in coulombs, the result is in volts. The ideal AB value ($k_\Delta = 1$) with $\Delta_{sc} = 2.78\times10^{-23}\,J$ from the [process parameters](#process-parameters) is $\pi\Delta_{sc}/2e_0 \approx 273\,\mu V$, so a fitted $k_\Delta$ scales this directly: e.g. $k_\Delta = 0.8$ corresponds to $I_c R \approx 218\,\mu V$. Conversely, a measured $I_c R$ gives $k_\Delta = 2 e_0\, I_c R / (\pi \Delta_{\text{eff}})$. The critical current of a given junction follows from $I_c = I_c R / (R_N + R^\ast)$.
+
+Here $E_C$ is expressed in frequency units, so $f_{01}$ is obtained directly in Hz (the Planck constant is absorbed in $A(T)$). $R_N$ is the measured junction resistance, $R^\ast$ is the fitted correction from the [process parameters](#process-parameters) table, and $\Delta(T)$ follows the BCS temperature dependence with $T_c$ from the same table. $k_\Delta$ and $R^\ast$ are fitted jointly against measured qubit frequencies; refit them when the process changes.
+
+To use the model for design:
+
+1. Choose the shunt capacitance $C_\Sigma$ (and thus $E_C$) from the qubit layout.
+2. Pick the target $f_{01}$ and invert the equation above for $R_N + R^\ast$.
+3. Convert the required $R_N$ into a junction area with the [Junction Resistance](#junction-resistance) models, using the patched or full-EBL parameters as appropriate.
+
+> ``📝``
+> The earlier linear approximation $\omega_{01}/2\pi = 7.2012 - 0.1473\, R_n$ [GHz] ($R_n$ in $k\Omega$, $C_\Sigma = 74\,fF$) is **superseded** by the model above. It is only valid close to that specific shunt capacitance and resistance range, and should not be used for new designs.
 
 #### Junction Resistance
 We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, here used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Both following the form:
