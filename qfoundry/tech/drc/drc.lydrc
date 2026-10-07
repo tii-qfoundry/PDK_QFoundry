@@ -50,8 +50,8 @@ poly_al_jj = input("2/0").flatten - excpt                 # Josephson junction l
 
 # Device and boundary layers
 devRec    = input(68,0).flatten        # Device recognition layer
-floorPlan = input(99).flatten          # Design boundary/floorplan
-writeField = input(98).flatten         # EBL writefield definitions
+floorPlan = input(100,4).flatten          # Design boundary/floorplan
+writeField = input(100,6).flatten         # EBL writefield definitions
 
 # Airbridge layers
 airbridge_pads    = input(146,1).flatten - excpt    # Airbridge landing pads
