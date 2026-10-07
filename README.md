@@ -53,7 +53,7 @@ Standard coplanar waveguides used by the foundry are 15 $\mu m$ wide with 7.5 $\
 ### Qubit design
 
 #### Josephson junction model
-The junction critical current follows the Ambegaokar–Baratoff (AB) relation. The QFoundry model extends it with two fitted corrections: a series/leakage resistance offset $R^\ast$ and a dimensionless gap-scaling factor $k_\Delta$ that absorbs the deviation of the measured $I_c R_N$ product from the ideal BCS value.
+The junction critical current follows the Ambegaokar–Baratoff (AB) relation. The QFoundry model extends it with a fitted resistance offset $R^\ast$ and a fitted prefactor $A$ (expressed through $k_{\Delta,\text{cryo}}$). Separately, a fit-free empirical figure of merit, $k_\Delta$, reports how close each junction comes to the ideal $I_c R$ product.
 
 For reference, the ideal AB relation is
 
@@ -64,8 +64,9 @@ $$
 The QFoundry model parametrizes the measured room-temperature junction resistance $R_N$ as follows:
 
 - $R^\ast = \rho^\ast / A_{JJ} + R_0^\ast$ is the fabrication resistance correction, accounting for leakage currents that do not contribute to the superconducting critical current ($A_{JJ}$ is the junction area).
-- $\Delta(T)$ is the superconducting gap at temperature $T$, and $\Delta_{\text{eff}}$ the effective gap fitted to the measured devices.
-- $k_\Delta = \dfrac{2 e_0 \, I_c (R_N + R^\ast)}{\pi \Delta_{\text{eff}}}$ is the ratio between the measured $I_c (R_N+R^\ast)$ product and the ideal zero-temperature AB value ($k_\Delta = 1$ recovers the ideal AB relation).
+- $\Delta(T)$ is the superconducting gap at temperature $T$, and $\Delta_{\text{eff}}$ the effective gap (taken as $180\,\mu eV$).
+- $k_\Delta$ is the **empirical** ratio between the measured $I_c R_N$ product and the ideal AB value (defined [below](#empirical-k_delta-and-the-i_c-r-product)). It is computed per qubit from measured quantities and physical constants only, with no fitted parameters. $k_\Delta = 1$ is the ideal AB upper bound.
+- $k_{\Delta,\text{cryo}}$ is the population-level prefactor of the fitted model, related to the empirical $k_\Delta$ through $R^\ast$ (see below).
 - $E_C = \dfrac{e_0^2}{2\left(C_\Sigma + C_J\right)}$ is the charging energy, where $C_\Sigma$ is the shunt capacitance and $C_J = \gamma \cdot A_{JJ}$ is the junction capacitance. $\gamma$ is the capacitance per unit area of the junction (ideally $\gamma = \varepsilon_0\varepsilon_{r,ox}/d$, with $d$ the oxide thickness and $\varepsilon_{r,ox}$ the relative permittivity of the oxide).
 
 #### Transmons
@@ -79,21 +80,47 @@ with
 
 $$
 \begin{cases}
-A(T) = k_\Delta \cdot \dfrac{\Delta(T)}{e_0^2} \tanh\left(\dfrac{\Delta(T)}{2 k_B T}\right) \\[10pt]
-k_\Delta = \dfrac{2 e_0 \, I_c (R_N + R^\ast)}{\pi \Delta_{\text{eff}}}
+A(T) = k_{\Delta,\text{cryo}} \cdot \dfrac{\Delta(T)}{e_0^2} \tanh\left(\dfrac{\Delta(T)}{2 k_B T}\right) \\[10pt]
+k_{\Delta,\text{cryo}} = \dfrac{A\, e_0^2}{\Delta_{\text{eff}}}
 \end{cases}
 $$
 
-##### $I_c R$ product
-Inverting the definition of $k_\Delta$ gives the critical current–resistance product, which is the figure usually reported for a junction:
+Here $E_C$ is expressed in frequency units, so $f_{01}$ is obtained directly in Hz (the Planck constant is absorbed in $A(T)$). $R_N$ is the measured room-temperature junction resistance, $R^\ast$ is the fitted correction, and $\Delta(T)$ follows the BCS temperature dependence with $T_c$ from the [process parameters](#process-parameters) table. $A$ and $R^\ast$ are fitted jointly against measured qubit frequencies with $E_C$ fixed to the design value; refit them when the process changes.
+
+##### Empirical $k_\Delta$ and the $I_c R$ product
+To compare against Ambegaokar–Baratoff theory without relying on any fitted parameter ($R^\ast$ or $A$), $k_\Delta$ is defined for each individual qubit from direct measurements:
 
 $$
-I_c \left(R_N + R^\ast\right) = k_\Delta \cdot \frac{\pi \Delta_{\text{eff}}}{2 e_0}
+k_\Delta \equiv \frac{I_c R_N}{\left(I_c R\right)_{\text{ideal}}} = \frac{2 e_0\, I_c R_N}{\pi \Delta_{\text{eff}}}, \qquad \left(I_c R\right)_{\text{ideal}} = \frac{\pi \Delta_{\text{eff}}}{2 e_0} \approx 282.74\,\mu V \;\; (\Delta_{\text{eff}} = 180\,\mu eV)
 $$
 
-With $\Delta_{\text{eff}}$ in joules and $e_0$ in coulombs, the result is in volts. The ideal AB value ($k_\Delta = 1$) with $\Delta_{sc} = 2.78\times10^{-23}\,J$ from the [process parameters](#process-parameters) is $\pi\Delta_{sc}/2e_0 \approx 273\,\mu V$, so a fitted $k_\Delta$ scales this directly: e.g. $k_\Delta = 0.8$ corresponds to $I_c R \approx 218\,\mu V$. Conversely, a measured $I_c R$ gives $k_\Delta = 2 e_0\, I_c R / (\pi \Delta_{\text{eff}})$. The critical current of a given junction follows from $I_c = I_c R / (R_N + R^\ast)$.
+where:
 
-Here $E_C$ is expressed in frequency units, so $f_{01}$ is obtained directly in Hz (the Planck constant is absorbed in $A(T)$). $R_N$ is the measured junction resistance, $R^\ast$ is the fitted correction from the [process parameters](#process-parameters) table, and $\Delta(T)$ follows the BCS temperature dependence with $T_c$ from the same table. $k_\Delta$ and $R^\ast$ are fitted jointly against measured qubit frequencies; refit them when the process changes.
+1. $E_J$ is extracted from spectroscopy, $E_J = \dfrac{h\,\left(f_{01} + E_C/h\right)^2}{8\, E_C/h}$, with the design $E_C/h$ (e.g. $230\,MHz$).
+2. $I_c = \dfrac{2 e_0 E_J}{\hbar} = \dfrac{4\pi e_0 E_J}{h}$.
+3. $R_N$ is measured directly at room temperature.
+
+The reported figure of merit is then $I_c R_N = k_\Delta \cdot \pi\Delta_{\text{eff}}/2e_0$, and a measured $I_c R_N$ gives $k_\Delta$ by the relation above. Because it uses no fit parameters, it evaluates every qubit directly against physical constants and the theoretical upper bound.
+
+**Relation to the fitted model.** For the fit $f_{01}(R_N) = \sqrt{A E_C/(R_N + R^\ast)} - E_C$, the empirical $k_\Delta$ follows from the fitted prefactor as
+
+$$
+k_\Delta(R_N) = k_{\Delta,\text{cryo}} \cdot \frac{R_N}{R_N + R^\ast}, \qquad k_{\Delta,\text{cryo}} = \frac{A e_0^2}{\Delta_{\text{eff}}}
+$$
+
+$k_{\Delta,\text{cryo}}$ is the intrinsic efficiency ratio at base temperature (the $\tanh$ factor is $\approx 1$), and $R_N/(R_N+R^\ast)$ accounts for the change of junction resistance between room temperature and base temperature ($R^\ast < 0$).
+
+**Example (QPU187/QPU189 dataset, 16 qubits, $E_C/h = 230\,MHz$ fixed).** The fit gives $R^2 = 0.9727$, $A = 7.663\times10^5\,GHz\cdot\Omega$ and $R^\ast = -1.725\,k\Omega$, i.e. $R_{cryo}/R_N \approx 86\%$ (a $\sim 14\%$ drop on cooling from 300 K to 15 mK), and $k_{\Delta,\text{cryo}} = 68.21\%$. For a $12\,k\Omega$ junction, $k_\Delta \approx 68.21\% \times 12.0/10.275 \approx 79.7\%$.
+
+Directly extracted values:
+
+Device | $R_N$ range | Average $I_c R_N$ | Average $k_\Delta$
+--- | --- | --- | ---
+QPU187 | 10.6 – 14.3 $k\Omega$ | 219.45 $\mu V$ | 77.61 %
+QPU189 | 6.4 – 8.4 $k\Omega$ | 260.91 $\mu V$ | 92.28 %
+All 16 qubits | | 240.18 $\mu V$ | 84.95 %
+
+The fitted-model prediction for a $12\,k\Omega$ junction (79.7%) agrees with the individually measured QPU187 values (about 78–80%).
 
 To use the model for design:
 
