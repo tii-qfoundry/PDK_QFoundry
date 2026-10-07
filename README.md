@@ -2,7 +2,7 @@
 
 TII QFoundry standard PDK for superconducting qubit fabrication. The KLayout PDK layout tools are built on top of the KQCircuits circuit package, providing a comprehensive design environment for quantum device development.
 
-**Latest Version**: v2.0 | **Technology Node**: QFoundry Process v1.2 | **KQCircuits Compatibility**: v4.7+
+**Latest Version**: v2.1 | **Technology Node**: QFoundry Process v1.2 | **KQCircuits Compatibility**: v4.7+
 
 ## Quick Start
 
@@ -64,7 +64,7 @@ $$
 The QFoundry model parametrizes the measured room-temperature junction resistance $R_N$ as follows:
 
 - $R^\ast = \rho^\ast / A_{JJ} + R_0^\ast$ is the fabrication resistance correction, accounting for leakage currents that do not contribute to the superconducting critical current ($A_{JJ}$ is the junction area).
-- $\Delta(T)$ is the superconducting gap at temperature $T$, and $\Delta_{\text{eff}}$ the effective gap (taken as $180\,\mu eV$).
+- $\Delta(T)$ is the superconducting gap at temperature $T$, and $\Delta_{\text{eff}}$ the effective gap (taken as $180 \mu eV$).
 - $k_\Delta$ is the **empirical** ratio between the measured $I_c R_N$ product and the ideal AB value (defined [below](#empirical-k_delta-and-the-i_c-r-product)). It is computed per qubit from measured quantities and physical constants only, with no fitted parameters. $k_\Delta = 1$ is the ideal AB upper bound.
 - $k_{\Delta,\text{cryo}}$ is the population-level prefactor of the fitted model, related to the empirical $k_\Delta$ through $R^\ast$ (see below).
 - $E_C = \dfrac{e_0^2}{2\left(C_\Sigma + C_J\right)}$ is the charging energy, where $C_\Sigma$ is the shunt capacitance and $C_J = \gamma \cdot A_{JJ}$ is the junction capacitance. $\gamma$ is the capacitance per unit area of the junction (ideally $\gamma = \varepsilon_0\varepsilon_{r,ox}/d$, with $d$ the oxide thickness and $\varepsilon_{r,ox}$ the relative permittivity of the oxide).
@@ -73,30 +73,30 @@ The QFoundry model parametrizes the measured room-temperature junction resistanc
 Combining the AB relation with the transmon approximation $E_{01} \approx \sqrt{8 E_J E_C} - E_C$, the qubit frequency as a function of the room-temperature junction resistance and the operating temperature is
 
 $$
-f_{01}(R_N, T) = \sqrt{\frac{A(T)\, E_C}{R_N + R^\ast}} - E_C
+f_{01}(R_N, T) = \sqrt{\frac{A(T)\cdot E_C}{R_N + R^\ast}} - E_C
 $$
 
 with
 
 $$
 \begin{cases}
-A(T) = k_{\Delta,\text{cryo}} \cdot \dfrac{\Delta(T)}{e_0^2} \tanh\left(\dfrac{\Delta(T)}{2 k_B T}\right) \\[10pt]
-k_{\Delta,\text{cryo}} = \dfrac{A\, e_0^2}{\Delta_{\text{eff}}}
+A(T) = k_{\Delta,\text{cryo}} \cdot \dfrac{\Delta(T)}{e_0^2} \tanh\left(\dfrac{\Delta(T)}{2 k_B T}\right) \\
+k_{\Delta,\text{cryo}} = \dfrac{A\cdot e_0^2}{\Delta_{\text{eff}}}
 \end{cases}
 $$
 
-Here $E_C$ is expressed in frequency units, so $f_{01}$ is obtained directly in Hz (the Planck constant is absorbed in $A(T)$). $R_N$ is the measured room-temperature junction resistance, $R^\ast$ is the fitted correction, and $\Delta(T)$ follows the BCS temperature dependence with $T_c$ from the [process parameters](#process-parameters) table. $A$ and $R^\ast$ are fitted jointly against measured qubit frequencies with $E_C$ fixed to the design value; refit them when the process changes.
+Here $E_C$ is expressed in frequency units, so $f_{01}$ is obtained directly in Hz (the Planck constant is absorbed in $A(T)$ ). $R_N$ is the measured room-temperature junction resistance, $R^\ast$ is the fitted correction, and $\Delta(T)$ follows the BCS temperature dependence with $T_c$ from the [process parameters](#process-parameters) table. $A$ and $R^\ast$ are fitted jointly against measured qubit frequencies with $E_C$ fixed to the design value; refit them when the process changes.
 
 ##### Empirical $k_\Delta$ and the $I_c R$ product
 To compare against Ambegaokar–Baratoff theory without relying on any fitted parameter ($R^\ast$ or $A$), $k_\Delta$ is defined for each individual qubit from direct measurements:
 
 $$
-k_\Delta \equiv \frac{I_c R_N}{\left(I_c R\right)_{\text{ideal}}} = \frac{2 e_0\, I_c R_N}{\pi \Delta_{\text{eff}}}, \qquad \left(I_c R\right)_{\text{ideal}} = \frac{\pi \Delta_{\text{eff}}}{2 e_0} \approx 282.74\,\mu V \;\; (\Delta_{\text{eff}} = 180\,\mu eV)
+k_\Delta \equiv \frac{I_c R_N}{\left(I_c R\right)_{\text{ideal}}} = \frac{2 e_0 I_c R_N}{\pi \Delta_{\text{eff}}}, \qquad \left(I_c R\right)_{\text{ideal}} = \frac{\pi \Delta_{\text{eff}}}{2 e_0} \approx 282.74\mu V \\ (\Delta_{\text{eff}} = 180\mu eV)
 $$
 
 where:
 
-1. $E_J$ is extracted from spectroscopy, $E_J = \dfrac{h\,\left(f_{01} + E_C/h\right)^2}{8\, E_C/h}$, with the design $E_C/h$ (e.g. $230\,MHz$).
+1. $E_J$ is extracted from spectroscopy, $E_J = \dfrac{h\left(f_{01} + E_C/h\right)^2}{8 E_C/h}$, with the design $E_C/h$ (e.g. $230MHz$).
 2. $I_c = \dfrac{2 e_0 E_J}{\hbar} = \dfrac{4\pi e_0 E_J}{h}$.
 3. $R_N$ is measured directly at room temperature.
 
@@ -110,7 +110,7 @@ $$
 
 $k_{\Delta,\text{cryo}}$ is the intrinsic efficiency ratio at base temperature (the $\tanh$ factor is $\approx 1$), and $R_N/(R_N+R^\ast)$ accounts for the change of junction resistance between room temperature and base temperature ($R^\ast < 0$).
 
-**Example (QPU187/QPU189 dataset, 16 qubits, $E_C/h = 230\,MHz$ fixed).** The fit gives $R^2 = 0.9727$, $A = 7.663\times10^5\,GHz\cdot\Omega$ and $R^\ast = -1.725\,k\Omega$, i.e. $R_{cryo}/R_N \approx 86\%$ (a $\sim 14\%$ drop on cooling from 300 K to 15 mK), and $k_{\Delta,\text{cryo}} = 68.21\%$. For a $12\,k\Omega$ junction, $k_\Delta \approx 68.21\% \times 12.0/10.275 \approx 79.7\%$.
+**Example (QPU187/QPU189 dataset, 16 qubits, $E_C/h = 230 MHz$ fixed).** The fit gives $R^2 = 0.9727$, $A = 7.663\times10^5 GHz\cdot\Omega$ and $R^\ast = -1.725 k\Omega$, i.e. $R_{cryo}/R_N \approx 86\%$ (a $\sim 14\%$ drop on cooling from 300 K to 15 mK), and $k_{\Delta,\text{cryo}} = 68.21\%$. For a $12 k\Omega$ junction, $k_\Delta \approx 68.21\% \times 12.0/10.275 \approx 79.7\%$.
 
 Directly extracted values:
 
@@ -120,7 +120,7 @@ QPU187 | 10.6 – 14.3 $k\Omega$ | 219.45 $\mu V$ | 77.61 %
 QPU189 | 6.4 – 8.4 $k\Omega$ | 260.91 $\mu V$ | 92.28 %
 All 16 qubits | | 240.18 $\mu V$ | 84.95 %
 
-The fitted-model prediction for a $12\,k\Omega$ junction (79.7%) agrees with the individually measured QPU187 values (about 78–80%).
+The fitted-model prediction for a $12 k\Omega$ junction (79.7%) agrees with the individually measured QPU187 values (about 78–80%).
 
 To use the model for design:
 
@@ -129,7 +129,7 @@ To use the model for design:
 3. Convert the required $R_N$ into a junction area with the [Junction Resistance](#junction-resistance) models, using the patched or full-EBL parameters as appropriate.
 
 > ``📝``
-> The earlier linear approximation $\omega_{01}/2\pi = 7.2012 - 0.1473\, R_n$ [GHz] ($R_n$ in $k\Omega$, $C_\Sigma = 74\,fF$) is **superseded** by the model above. It is only valid close to that specific shunt capacitance and resistance range, and should not be used for new designs.
+> The earlier linear approximation $\omega_{01}/2\pi = 7.2012 - 0.1473 R_n$ [GHz] ($R_n$ in $k\Omega$, $C_\Sigma = 74 fF$) is **superseded** by the model above. It is only valid close to that specific shunt capacitance and resistance range, and should not be used for new designs.
 
 #### Junction Resistance
 We can estimate the resulting jucntion resistance from a known tunneling conductance of the oxide layer, here used as a room temperature resisitivity in $\Omega \times cm^2$. It has been observed that said resistivity changes when patches are added to connect the junction metallization layer (L2/0) and the transmons capacitors (L1/0). Said change does not arise from contact resistance in the path but possibly from trapped ions in the oxide layer or oxide relaxation introduced during post-processing. As such it is necessary to use two different models of room temperature junction resistance estimation. Both following the form:
